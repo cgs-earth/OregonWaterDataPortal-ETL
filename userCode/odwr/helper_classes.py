@@ -4,11 +4,12 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 from typing import Literal, Tuple
-
+import requests
 import httpx
 from .lib import assert_valid_date
-from .types import FrostBatchRequest, Observation
+from .types import START_OF_DATA, FrostBatchRequest, Observation
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +44,9 @@ class CrawlResultTracker:
         # check if metadata.json exists if not create it
         try:
             if not metadata_file_path.exists():
-                save_metadata(UpdateMetadata("", "", [], []))
+                # If the user didn't have a metadata file, create one and make it point back to the 
+                # beginning of the API's data
+                save_metadata(UpdateMetadata(START_OF_DATA, START_OF_DATA, [], []))
             else: # if it exists, make sure the successes and failures are not left over from the previous crawl
                 metadata = load_metadata()
                 metadata.successes, metadata.failures = [], []
@@ -98,26 +101,28 @@ class BatchObservation:
 class BatchHelper():
     """Helper for more easily constructing batched requests to the FROST API"""
 
-    session: httpx.AsyncClient
-    request: dict[Literal["requests"], list[BatchObservation]]
+    API_BACKEND_URL = "http://localhost:8000"
 
-    def __init__(self, session: httpx.AsyncClient, observation_dataset: list[Observation]):
-        self.session = session
+    frost_http_body: dict[Literal["requests"], list[BatchObservation]]
+
+    def __init__(self, observation_dataset: list[Observation]):
         serialized_observations = []
         for observation in observation_dataset:
             request_encoded: FrostBatchRequest = {
-                "id": f"{observation['Datastream']['@iot.id']}{id}",
+                "id": f"{observation.Datastream}{id}",
                 "method": "post",
                 "url": "Observations",
-                "body": observation,
+                "body": observation.model_dump(),
             }
             serialized_observations.append(request_encoded)
-        self.request = {"requests": serialized_observations}
+        self.frost_http_body = {"requests": serialized_observations}
 
-    async def send(self):
+    def send(self):
         """Send batch data to the FROST API"""
-        return await self.session.post(
-            f"{API_BACKEND_URL}/$batch",
-            json=self.request,
+        resp = requests.post(
+            f"{self.API_BACKEND_URL}/$batch",
+            json=self.frost_http_body,
             headers={"Content-Type": "application/json"},
         )
+        if not resp.ok:
+            raise RuntimeError(resp.content)

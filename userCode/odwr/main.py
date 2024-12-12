@@ -49,13 +49,6 @@ class OregonStaRequestBuilder:
     data_start: str
     data_end: str
 
-    def __init__(
-        self, relevant_stations: list[int], data_start: str, data_end: str
-    ) -> None:
-        self.relevant_stations = relevant_stations
-        self.data_start = data_start
-        self.data_end = data_end
-
 
     async def _get_observations(self, station: StationData, session: httpx.AsyncClient):
         assert isinstance(station, dict)

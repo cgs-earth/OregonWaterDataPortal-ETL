@@ -1,5 +1,5 @@
 from token import OP
-from typing import Literal, Optional
+from typing import Literal, Optional, TypedDict
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
 
@@ -286,6 +286,7 @@ class Datastream(BaseModel):
         Sensor: dict
 
 class Observation(BaseModel):
+    """sta observation"""
     resultTime: str 
     phenomenonTime: str
     Datastream: dict 
@@ -331,8 +332,8 @@ class ParsedTSVData():
 
 START_OF_DATA = "9/25/1850 12:00:00 AM" # random very old date. Need a very old value to get the start of the API;
 
-class FrostBatchRequest(BaseModel):
+class FrostBatchRequest(TypedDict):
     id: str
     method: Literal["post"]
     url: Literal["Observations"]
-    body: Observation 
+    body: dict 

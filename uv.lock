@@ -600,6 +600,7 @@ dependencies = [
     { name = "dagster" },
     { name = "dagster-webserver" },
     { name = "httpx" },
+    { name = "requests" },
 ]
 
 [package.metadata]
@@ -607,6 +608,7 @@ requires-dist = [
     { name = "dagster", specifier = ">=1.9.4" },
     { name = "dagster-webserver", specifier = ">=1.9.4" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "requests", specifier = ">=2.32.3" },
 ]
 
 [[package]]
