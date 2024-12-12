@@ -9,6 +9,12 @@
                 "dev",
             ],
             "subProcess": true
-        }
+        },    {
+      "name": "Pytest One File",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-svvvv", "${file}"]
+    },
     ]
 }

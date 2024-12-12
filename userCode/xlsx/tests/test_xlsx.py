@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import pytest
-from wis2box.oregon.xlsx.lib import parse_xlsx
+from ..lib import parse_xlsx
 import frost_sta_client as fsc
 from frost_sta_client.model.ext import data_array_value
 

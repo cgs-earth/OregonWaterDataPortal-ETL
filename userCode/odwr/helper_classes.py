@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Literal, Tuple
 import requests
 from .lib import assert_valid_date
-from .types import START_OF_DATA, FrostBatchRequest, Observation
+from .types import API_BACKEND_URL, START_OF_DATA, FrostBatchRequest, Observation
 
 LOGGER = logging.getLogger(__name__)
 
@@ -107,8 +107,6 @@ class BatchObservation:
 class BatchHelper:
     """Helper for more easily constructing batched requests to the FROST API"""
 
-    API_BACKEND_URL = "http://localhost:8000"
-
     frost_http_body: dict[Literal["requests"], list[BatchObservation]]
 
     def __init__(self, observation_dataset: list[Observation]):
@@ -126,7 +124,7 @@ class BatchHelper:
     def send(self):
         """Send batch data to the FROST API"""
         resp = requests.post(
-            f"{self.API_BACKEND_URL}/$batch",
+            f"{API_BACKEND_URL}/$batch",
             json=self.frost_http_body,
             headers={"Content-Type": "application/json"},
         )

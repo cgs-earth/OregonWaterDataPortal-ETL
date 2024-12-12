@@ -1,9 +1,43 @@
-from ..main import OregonStaRequestBuilder
-from ..types import ALL_RELEVANT_STATIONS, THINGS_COLLECTION
+import requests
+from ..types import API_BACKEND_URL
+
+
+def test_duplicate():
+    resp = requests.get(f"{API_BACKEND_URL}")
+    assert resp.ok
+    payload = {
+        "name": "Kitchen",
+        "@iot.id": 1,
+        "description": "The Kitchen in my house",
+        "properties": {"oven": True, "heatingPlates": 4},
+    }
+    resp = requests.post(f"{API_BACKEND_URL}/v1.1/Things", json=payload)
+    assert resp.ok
+    resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
+    assert resp.ok
+    json = resp.json()["value"]
+    assert len(json) == 1
+    resp = requests.post(f"{API_BACKEND_URL}/v1.1/Things", json=payload)
+    assert resp.ok
+    resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
+    assert resp.ok
+    json = resp.json()["value"]
+    assert len(json) == 1
+    newpayload = {
+        "name": "Kitchen",
+        "@iot.id": 2,
+        "description": "The Kitchen in my house",
+        "properties": {"oven": True, "heatingPlates": 4},
+    }
+    resp = requests.post(f"{API_BACKEND_URL}/v1.1/Things", json=newpayload)
+    assert resp.ok
+    resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
+    assert resp.ok
+    json = resp.json()["value"]
+    assert len(json) == 2
 
 
 def test_upsert():
-    remove_collection(THINGS_COLLECTION)
     data = {
         "name": "HONEY CR NR PLUSH, OR",
         "@iot.id": 10378500,
@@ -110,4 +144,3 @@ def test_upsert():
             "precipitation_available": 0,
         },
     }
-    upsert_collection_item(THINGS_COLLECTION, data)

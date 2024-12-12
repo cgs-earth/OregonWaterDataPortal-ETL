@@ -1,17 +1,16 @@
-from token import OP
 from typing import Literal, Optional, TypedDict
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
 
 THINGS_COLLECTION = "Things"
 
-POTENTIAL_DATASTREAMS: dict[str,str] = {
+API_BACKEND_URL = "http://localhost:8080/FROST-Server"
+
+POTENTIAL_DATASTREAMS: dict[str, str] = {
     "mean_daily_flow_available": "MDF",
     "water_temp_mean_available": "WTEMP_MEAN",
-
     ### Datastreams we can extract but we are choosing not to at the moment
     ### due to the time it takes to extract them
-
     # "stage_instantaneous_available" : "Instantaneous_Stage",
     # "flow_instantaneous_available" : "Instantaneous_Flow",
     # "water_temp_measurement_avail": "WTEMP_MEASURE",
@@ -19,10 +18,8 @@ POTENTIAL_DATASTREAMS: dict[str,str] = {
     # "water_temp_max_available": "WTEMP_MAX",
     # "water_temp_min_available": "WTEMP_MIN",
     # "measured_flow_available": "Measurements",
-
     # This has the available suffix but is not a datastream
     # "rating_curve_available": "N/A",
-
     # These are potential datastreams in the ESRI API response
     # However, they are never used in the stations we use; it is unclear their parameter name
     "volume_midnight_available": "UNKNOWN",
@@ -167,8 +164,6 @@ ALL_RELEVANT_STATIONS = [
 ]
 
 
-
-
 class Attributes(BaseModel):
     OBJECTID: int
     lkp_gaging_station_id: int
@@ -207,10 +202,10 @@ class Attributes(BaseModel):
     source_type_name: str
     station_status_name: str
     current_operation_mode_name: Optional[str]
-    
+
     # period of record is as a unix time delta and thus is a int
     period_of_record_start_date: Optional[int]
-    period_of_record_end_date: Optional[int] 
+    period_of_record_end_date: Optional[int]
 
     nbr_of_complete_water_years: int
     nbr_of_peak_flow_values: int
@@ -274,24 +269,27 @@ class Properties(BaseModel):
 
 
 class Datastream(BaseModel):
-        # "@iot.selfLink": str,
-        iotid: int = Field(alias="@iot.id")
-        name: str
-        description: str
-        observationType: str
-        unitOfMeasurement: UnitOfMeasurement
-        ObservedProperty: dict[str, str]
-        # phenomenonTime: str,
-        # resultTime: NotRequired[str],  # not present in python 3.9
-        Sensor: dict
+    # "@iot.selfLink": str,
+    iotid: int = Field(alias="@iot.id")
+    name: str
+    description: str
+    observationType: str
+    unitOfMeasurement: UnitOfMeasurement
+    ObservedProperty: dict[str, str]
+    # phenomenonTime: str,
+    # resultTime: NotRequired[str],  # not present in python 3.9
+    Sensor: dict
+
 
 class Observation(BaseModel):
     """sta observation"""
-    resultTime: str 
+
+    resultTime: str
     phenomenonTime: str
-    Datastream: dict 
-    result: Optional[float] 
+    Datastream: dict
+    result: Optional[float]
     FeatureOfInterest: dict
+
 
 class OregonHttpResponse(BaseModel):
     geometryType: str
@@ -300,40 +298,43 @@ class OregonHttpResponse(BaseModel):
 
 
 OBSERVATION_COLLECTION_METADATA = {
-        "id": "Observations",
-        "title": "Observations",
-        "description": "SensorThings API Observations",
-        "keywords": ["observation", "dam"],
-        "links": ["https://gis.wrd.state.or.us/server/rest/services"],
-        "bbox": [-180, -90, 180, 90],
-        "time_field": "resultTime",
-        "id_field": "@iot.id",
-    }
+    "id": "Observations",
+    "title": "Observations",
+    "description": "SensorThings API Observations",
+    "keywords": ["observation", "dam"],
+    "links": ["https://gis.wrd.state.or.us/server/rest/services"],
+    "bbox": [-180, -90, 180, 90],
+    "time_field": "resultTime",
+    "id_field": "@iot.id",
+}
 
 DATASTREAM_COLLECTION_METADATA = {
-        "id": "Datastreams",
-        "title": "Datastreams",
-        "description": "SensorThings API Datastreams",
-        "keywords": ["datastream", "dam"],
-        "links": [
-            "https://gis.wrd.state.or.us/server/rest/services",
-            "https://gis.wrd.state.or.us/server/sdk/rest/index.html#/02ss00000029000000",
-        ],
-        "bbox": [-180, -90, 180, 90],
-        "id_field": "@iot.id",
-        "title_field": "name",
-    }
+    "id": "Datastreams",
+    "title": "Datastreams",
+    "description": "SensorThings API Datastreams",
+    "keywords": ["datastream", "dam"],
+    "links": [
+        "https://gis.wrd.state.or.us/server/rest/services",
+        "https://gis.wrd.state.or.us/server/sdk/rest/index.html#/02ss00000029000000",
+    ],
+    "bbox": [-180, -90, 180, 90],
+    "id_field": "@iot.id",
+    "title_field": "name",
+}
+
 
 @dataclass
-class ParsedTSVData():
+class ParsedTSVData:
     data: list[Optional[float]]
     units: str
     dates: list[str]
 
-START_OF_DATA = "9/25/1850 12:00:00 AM" # random very old date. Need a very old value to get the start of the API;
+
+START_OF_DATA = "9/25/1850 12:00:00 AM"  # random very old date. Need a very old value to get the start of the API;
+
 
 class FrostBatchRequest(TypedDict):
     id: str
     method: Literal["post"]
     url: Literal["Observations"]
-    body: dict 
+    body: dict
