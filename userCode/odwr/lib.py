@@ -2,21 +2,21 @@ import csv
 import datetime
 import io
 import logging
-from requests import Session
 from urllib.parse import urlencode
-from typing import List, Optional 
+from typing import Optional
 
 from ..common.cache import ShelveCache
 from .types import (
     POTENTIAL_DATASTREAMS,
-    OregonHttpResponse,
     ParsedTSVData,
 )
 
 LOGGER = logging.getLogger(__name__)
 
 
-def parse_oregon_tsv(response: bytes, drop_rows_with_null_data: bool = True) -> ParsedTSVData:
+def parse_oregon_tsv(
+    response: bytes, drop_rows_with_null_data: bool = True
+) -> ParsedTSVData:
     """Return the data column and the date column for a given tsv response"""
     # we just use the third column since the name of the dataset in the
     # url does not match the name in the result column. However,
@@ -38,7 +38,9 @@ def parse_oregon_tsv(response: bytes, drop_rows_with_null_data: bool = True) -> 
         for row in reader:
             if len(row) < 3:
                 continue
-            STATION_NUMBER_COLUMN = row[0] # here just for documentation purposes  # noqa: F841
+            _STATION_NUMBER_COLUMN = row[
+                0
+            ]  # here just for documentation purposes  # noqa: F841
             DATE_COLUMN = row[1]
             RESULT_COLUMN = row[2]
             if not RESULT_COLUMN:
@@ -84,6 +86,7 @@ def parse_date(date_str: str) -> str:
             continue
     raise ValueError(f"Date {date_str} does not match any known formats")
 
+
 def generate_oregon_tsv_url(
     dataset: str, station_nbr: int, start_date: str, end_date: str
 ) -> str:
@@ -122,7 +125,6 @@ def download_oregon_tsv(
     return response
 
 
-
 def format_where_param(station_numbers: list[int]) -> str:
     wrapped_with_quotes = [f"'{station}'" for station in station_numbers]
     formatted_stations = " , ".join(wrapped_with_quotes)
@@ -148,4 +150,3 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
 def from_oregon_datetime(date_str: str) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
     return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p")
-

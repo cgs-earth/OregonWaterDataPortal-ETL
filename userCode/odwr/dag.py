@@ -1,26 +1,18 @@
 import asyncio
 from datetime import datetime
-from optparse import Option
 from typing import Optional
 from urllib.parse import urlencode
 from dagster import (
     AssetSelection,
-    AssetsDefinition,
     DefaultScheduleStatus,
     Definitions,
     RunRequest,
-    SensorEvaluationContext,
     StaticPartitionsDefinition,
     asset,
-    dynamic_partitioned_config,
-    job,
     load_asset_checks_from_current_module,
     load_assets_from_current_module,
     AssetExecutionContext,
-    MultiPartitionsDefinition,
     schedule,
-    sensor,
-    DynamicPartitionsDefinition,
 )
 import httpx
 
@@ -32,7 +24,11 @@ from userCode.odwr.lib import (
     parse_oregon_tsv,
     to_oregon_datetime,
 )
-from userCode.odwr.sta_generation import to_sensorthings_datastream, to_sensorthings_observation, to_sensorthings_station
+from userCode.odwr.sta_generation import (
+    to_sensorthings_datastream,
+    to_sensorthings_observation,
+    to_sensorthings_station,
+)
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -112,6 +108,7 @@ def station_metadata(
 
     return relevant_metadata
 
+
 @asset(partitions_def=station_partition)
 def datastreams(
     context: AssetExecutionContext, station_metadata: StationData
@@ -124,7 +121,7 @@ def datastreams(
         if no_stream_available:
             continue
         dummy_start = to_oregon_datetime(datetime.now())
-        dummy_end = dummy_start # We get no data to just fetch the metadata about the datastream itself
+        dummy_end = dummy_start  # We get no data to just fetch the metadata about the datastream itself
         tsv_url = generate_oregon_tsv_url(
             stream, int(attr.station_nbr), dummy_start, dummy_end
         )
@@ -137,8 +134,13 @@ def datastreams(
 
     return datastreams
 
+
 @asset(partitions_def=station_partition)
-def sta_station(context: AssetExecutionContext, datastreams: list[Datastream], station_metadata: StationData):
+def sta_station(
+    context: AssetExecutionContext,
+    datastreams: list[Datastream],
+    station_metadata: StationData,
+):
     return to_sensorthings_station(station_metadata, datastreams)
 
 
@@ -148,7 +150,12 @@ def crawl_tracker(context: AssetExecutionContext) -> CrawlResultTracker:
 
 
 @asset(partitions_def=station_partition)
-def sta_all_observations(context: AssetExecutionContext, station_metadata: StationData, datastreams: list[Datastream], crawl_tracker: CrawlResultTracker):
+def sta_all_observations(
+    context: AssetExecutionContext,
+    station_metadata: StationData,
+    datastreams: list[Datastream],
+    crawl_tracker: CrawlResultTracker,
+):
     session = httpx.AsyncClient()
     start, end = crawl_tracker.get_range()
     observations: list[Observation] = []
@@ -159,7 +166,10 @@ def sta_all_observations(context: AssetExecutionContext, station_metadata: Stati
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
             # if a datastream is available is to check the propery X_available == "1"
-            datastream.description + "_available", int(attr.station_nbr), start, end
+            datastream.description + "_available",
+            int(attr.station_nbr),
+            start,
+            end,
         )
 
         response = await session.get(tsv_url)
@@ -168,12 +178,11 @@ def sta_all_observations(context: AssetExecutionContext, station_metadata: Stati
                 f"Request to {tsv_url} failed with status {response.status_code} with response '{response.content.decode()}"
             )
 
-
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
-        for (obs, date) in zip(tsvParse.data, tsvParse.dates):
+        for obs, date in zip(tsvParse.data, tsvParse.dates):
             sta_representation = to_sensorthings_observation(attr, obs, date, date, id)
             observations.append(sta_representation)
-    
+
     async def main():
         tasks = [fetch_obs(datastream, id) for id, datastream in enumerate(datastreams)]
         return await asyncio.gather(*tasks)
@@ -181,18 +190,37 @@ def sta_all_observations(context: AssetExecutionContext, station_metadata: Stati
     asyncio.run(main())
     return observations
 
+
 @asset(partitions_def=station_partition)
-def batch_post_observations(context: AssetExecutionContext, sta_all_observations: list[Observation]):
+def batch_post_observations(
+    context: AssetExecutionContext, sta_all_observations: list[Observation]
+):
     builder = BatchHelper(sta_all_observations)
     builder.send()
 
+
 @asset(partitions_def=station_partition)
-def batch_post_datastreams(context: AssetExecutionContext, datastreams: list[Datastream]):
+def batch_post_datastreams(
+    context: AssetExecutionContext, datastreams: list[Datastream]
+):
     return
+
 
 @asset(partitions_def=station_partition)
 def batch_post_stations(context: AssetExecutionContext, sta_station: dict):
     return
+
+
+@asset()
+def updated_crawl_tracker(
+    context: AssetExecutionContext,
+    batch_post_observations: None,
+    batch_post_stations: None,
+    batch_post_datastreams: None,
+):
+    start, _ = CrawlResultTracker().get_range()
+    today = to_oregon_datetime(datetime.now())
+    CrawlResultTracker().update_range(start, today)
 
 @schedule(
     cron_schedule="@daily",
@@ -202,6 +230,7 @@ def batch_post_stations(context: AssetExecutionContext, sta_station: dict):
 def crawl_entire_graph_schedule():
     for partition_key in station_partition.get_partition_keys():
         yield RunRequest(partition_key=partition_key)
+
 
 definitions = Definitions(
     assets=load_assets_from_current_module(),

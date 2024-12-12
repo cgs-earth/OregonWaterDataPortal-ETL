@@ -1,13 +1,10 @@
-
 from dataclasses import asdict, dataclass
 import json
 import logging
 import os
 from pathlib import Path
-import re
 from typing import Literal, Tuple
 import requests
-import httpx
 from .lib import assert_valid_date
 from .types import START_OF_DATA, FrostBatchRequest, Observation
 
@@ -15,14 +12,17 @@ LOGGER = logging.getLogger(__name__)
 
 metadata_file_path = Path.home() / "oregon_load_metadata.json"
 
+
 @dataclass
-class UpdateMetadata():
+class UpdateMetadata:
     """Contains the metadata about a specific crawl and how much should be downloaded
     in future updates"""
+
     data_start: str
     data_end: str
     failures: list[dict[int, str]]
     successes: list[dict[int, str]]
+
 
 def load_metadata() -> UpdateMetadata:
     # save to the home directory for easier observability
@@ -30,29 +30,32 @@ def load_metadata() -> UpdateMetadata:
         metadata = json.load(f)
     return UpdateMetadata(**metadata)
 
+
 def save_metadata(metadata: UpdateMetadata):
     # save to the home directory for easier observability
     with open(metadata_file_path, "w") as f:
         json.dump(asdict(metadata), f)
     os.chmod(metadata_file_path, 0o644)  # Read/write for owner, read-only for others
 
+
 class CrawlResultTracker:
     """Helper class to determine what to download based on a local metadata file"""
-
 
     def __init__(self):
         # check if metadata.json exists if not create it
         try:
             if not metadata_file_path.exists():
-                # If the user didn't have a metadata file, create one and make it point back to the 
+                # If the user didn't have a metadata file, create one and make it point back to the
                 # beginning of the API's data
                 save_metadata(UpdateMetadata(START_OF_DATA, START_OF_DATA, [], []))
-            else: # if it exists, make sure the successes and failures are not left over from the previous crawl
+            else:  # if it exists, make sure the successes and failures are not left over from the previous crawl
                 metadata = load_metadata()
                 metadata.successes, metadata.failures = [], []
                 save_metadata(metadata)
         except PermissionError as p:
-            raise PermissionError(f"Unable to access {metadata_file_path.absolute()}: {p}")
+            raise PermissionError(
+                f"Unable to access {metadata_file_path.absolute()}: {p}"
+            )
 
     def reset(self):
         save_metadata(UpdateMetadata("", "", [], []))
@@ -90,15 +93,18 @@ class CrawlResultTracker:
         if with_log:
             LOGGER.error(message)
 
+
 @dataclass
 class BatchObservation:
     """The body format for a FROST batch POST request"""
-    id: str 
+
+    id: str
     method: Literal["post"]
     url: Literal["Observations"]
     body: Observation
 
-class BatchHelper():
+
+class BatchHelper:
     """Helper for more easily constructing batched requests to the FROST API"""
 
     API_BACKEND_URL = "http://localhost:8000"
