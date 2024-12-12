@@ -5,8 +5,11 @@ import logging
 from urllib.parse import urlencode
 from typing import Optional
 
+import requests
+
 from ..common.cache import ShelveCache
 from .types import (
+    API_BACKEND_URL,
     POTENTIAL_DATASTREAMS,
     ParsedTSVData,
 )
@@ -150,3 +153,4 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
 def from_oregon_datetime(date_str: str) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
     return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p")
+

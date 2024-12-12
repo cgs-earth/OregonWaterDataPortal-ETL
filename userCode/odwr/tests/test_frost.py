@@ -1,8 +1,12 @@
 import requests
+
+from userCode.odwr.tests.lib import wipe_frost_db
 from ..types import API_BACKEND_URL
 
 
 def test_duplicate():
+    """Make sure that duplicate things are not allowed"""
+    wipe_frost_db()
     resp = requests.get(f"{API_BACKEND_URL}")
     assert resp.ok
     payload = {
@@ -15,26 +19,36 @@ def test_duplicate():
     assert resp.ok
     resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
     assert resp.ok
-    json = resp.json()["value"]
-    assert len(json) == 1
+    items = resp.json()["value"]
+    assert len(items) == 1
     resp = requests.post(f"{API_BACKEND_URL}/v1.1/Things", json=payload)
-    assert resp.ok
+    assert resp.status_code == 500
+    wipe_frost_db()
+
+
+def test_wipe():
+    """Make sure that after wiping the database, there are no things"""
+    wipe_frost_db()
+    for i in range(1, 10):
+        resp = requests.post(
+            f"{API_BACKEND_URL}/v1.1/Things",
+            json={
+                "name": "Kitchen",
+                "@iot.id": i,
+                "description": "The Kitchen in my house",
+                "properties": {"oven": True, "heatingPlates": 4},
+            },
+        )
+        assert resp.ok, resp.text
     resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
     assert resp.ok
     json = resp.json()["value"]
-    assert len(json) == 1
-    newpayload = {
-        "name": "Kitchen",
-        "@iot.id": 2,
-        "description": "The Kitchen in my house",
-        "properties": {"oven": True, "heatingPlates": 4},
-    }
-    resp = requests.post(f"{API_BACKEND_URL}/v1.1/Things", json=newpayload)
-    assert resp.ok
+    assert len(json) == 9
+    wipe_frost_db()
     resp = requests.get(f"{API_BACKEND_URL}/v1.1/Things")
     assert resp.ok
-    json = resp.json()["value"]
-    assert len(json) == 2
+    items = resp.json()["value"]
+    assert len(items) == 0
 
 
 def test_upsert():
