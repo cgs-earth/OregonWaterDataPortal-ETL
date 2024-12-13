@@ -11,3 +11,6 @@ wis2box:
 	
 wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
+
+test:
+	pytest -vvx

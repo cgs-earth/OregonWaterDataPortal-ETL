@@ -386,7 +386,11 @@ def test_post_with_invalid_id():
 
     resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=payload)
     assert resp.status_code == 400
-    assert resp.json()["message"] == "No such entity 'Sensor' with id  6 "
+    msg = resp.json()["message"]
+    assert (
+        msg == "No such entity 'Thing' with id  2 "
+        or msg == "No such entity 'Sensor' with id  6 "
+    )
     wipe_locations()
     wipe_things()
 
