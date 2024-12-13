@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 THINGS_COLLECTION = "Things"
 
-API_BACKEND_URL = "http://localhost:8080/FROST-Server"
+API_BACKEND_URL = "http://localhost:8080/FROST-Server/v1.1"
 
 POTENTIAL_DATASTREAMS: dict[str, str] = {
     "mean_daily_flow_available": "MDF",

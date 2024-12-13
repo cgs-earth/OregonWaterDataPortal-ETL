@@ -4,6 +4,7 @@ import logging
 import os
 from pathlib import Path
 from typing import Literal, Tuple
+from dagster import get_dagster_logger
 import requests
 from .lib import assert_valid_date
 from .types import API_BACKEND_URL, START_OF_DATA, FrostBatchRequest, Observation
@@ -121,7 +122,7 @@ class BatchHelper:
             serialized_observations.append(request_encoded)
         self.frost_http_body = {"requests": serialized_observations}
 
-    def send(self):
+    def send_observations(self):
         """Send batch data to the FROST API"""
         resp = requests.post(
             f"{API_BACKEND_URL}/$batch",
@@ -130,3 +131,8 @@ class BatchHelper:
         )
         if not resp.ok:
             raise RuntimeError(resp.content)
+
+        response_messages = resp.json()["responses"]
+        if len(response_messages) != 0:
+            for msg in response_messages:
+                get_dagster_logger().error(msg)

@@ -4,12 +4,8 @@ import io
 import logging
 from urllib.parse import urlencode
 from typing import Optional
-
-import requests
-
 from ..common.cache import ShelveCache
 from .types import (
-    API_BACKEND_URL,
     POTENTIAL_DATASTREAMS,
     ParsedTSVData,
 )
@@ -17,9 +13,7 @@ from .types import (
 LOGGER = logging.getLogger(__name__)
 
 
-def parse_oregon_tsv(
-    response: bytes, drop_rows_with_null_data: bool = True
-) -> ParsedTSVData:
+def parse_oregon_tsv(response: bytes) -> ParsedTSVData:
     """Return the data column and the date column for a given tsv response"""
     # we just use the third column since the name of the dataset in the
     # url does not match the name in the result column. However,
@@ -31,6 +25,9 @@ def parse_oregon_tsv(
     reader = csv.reader(tsv_data, delimiter="\t")
     # Skip the header row if it exists
     header = next(reader, None)
+
+    # drop rows with null data so we dont have lots of None values in the UI
+    drop_rows_with_null_data: bool = True
 
     if header is not None:
         if "Invalid data type to download" in header:
@@ -153,4 +150,3 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
 def from_oregon_datetime(date_str: str) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
     return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p")
-

@@ -9,3 +9,5 @@ start:
 wis2box:
 	git clone https://github.com/cgs-earth/wis2box/
 	
+wipedb:
+	docker volume rm oregonwaterdataportal-etl_postgis_volume

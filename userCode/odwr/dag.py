@@ -6,9 +6,11 @@ from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
     Definitions,
+    MaterializeResult,
     RunRequest,
     StaticPartitionsDefinition,
     asset,
+    get_dagster_logger,
     load_asset_checks_from_current_module,
     load_assets_from_current_module,
     AssetExecutionContext,
@@ -110,9 +112,7 @@ def station_metadata(
 
 
 @asset(partitions_def=station_partition)
-def datastreams(
-    context: AssetExecutionContext, station_metadata: StationData
-) -> list[Datastream]:
+def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     attr = station_metadata.attributes
 
     datastreams: list[Datastream] = []
@@ -137,30 +137,31 @@ def datastreams(
 
 @asset(partitions_def=station_partition)
 def sta_station(
-    context: AssetExecutionContext,
-    datastreams: list[Datastream],
+    sta_datastreams: list[Datastream],
     station_metadata: StationData,
 ):
-    return to_sensorthings_station(station_metadata, datastreams)
+    return to_sensorthings_station(station_metadata, sta_datastreams)
 
 
 @asset()
-def crawl_tracker(context: AssetExecutionContext) -> CrawlResultTracker:
-    return CrawlResultTracker()
+def crawl_tracker() -> CrawlResultTracker:
+    tracker = CrawlResultTracker()
+    start, end = tracker.get_range()
+    get_dagster_logger().info(f"Data before new load spans from {start} to {end}")
+    return tracker
 
 
 @asset(partitions_def=station_partition)
 def sta_all_observations(
-    context: AssetExecutionContext,
     station_metadata: StationData,
-    datastreams: list[Datastream],
+    sta_datastreams: list[Datastream],
     crawl_tracker: CrawlResultTracker,
 ):
     session = httpx.AsyncClient()
     start, end = crawl_tracker.get_range()
     observations: list[Observation] = []
 
-    async def fetch_obs(datastream: Datastream, id: int):
+    async def fetch_obs(datastream: Datastream):
         attr: Attributes = station_metadata.attributes
 
         tsv_url = generate_oregon_tsv_url(
@@ -180,11 +181,13 @@ def sta_all_observations(
 
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
         for obs, date in zip(tsvParse.data, tsvParse.dates):
-            sta_representation = to_sensorthings_observation(attr, obs, date, date, id)
+            sta_representation = to_sensorthings_observation(
+                datastream, obs, date, date
+            )
             observations.append(sta_representation)
 
     async def main():
-        tasks = [fetch_obs(datastream, id) for id, datastream in enumerate(datastreams)]
+        tasks = [fetch_obs(datastream) for datastream in sta_datastreams]
         return await asyncio.gather(*tasks)
 
     asyncio.run(main())
@@ -192,35 +195,34 @@ def sta_all_observations(
 
 
 @asset(partitions_def=station_partition)
-def batch_post_observations(
-    context: AssetExecutionContext, sta_all_observations: list[Observation]
-):
+def batch_post_observations(sta_all_observations: list[Observation]):
     builder = BatchHelper(sta_all_observations)
-    builder.send()
+    builder.send_observations()
 
 
 @asset(partitions_def=station_partition)
-def batch_post_datastreams(
-    context: AssetExecutionContext, datastreams: list[Datastream]
-):
+def batch_post_datastreams(sta_datastreams: list[Datastream]):
     return
 
 
 @asset(partitions_def=station_partition)
-def batch_post_stations(context: AssetExecutionContext, sta_station: dict):
+def batch_post_stations(sta_station: dict):
     return
 
 
 @asset()
 def updated_crawl_tracker(
-    context: AssetExecutionContext,
     batch_post_observations: None,
     batch_post_stations: None,
     batch_post_datastreams: None,
-):
+) -> MaterializeResult:
     start, _ = CrawlResultTracker().get_range()
     today = to_oregon_datetime(datetime.now())
     CrawlResultTracker().update_range(start, today)
+    return MaterializeResult(
+        metadata={"start of data": start, "new end of data": today}
+    )
+
 
 @schedule(
     cron_schedule="@daily",

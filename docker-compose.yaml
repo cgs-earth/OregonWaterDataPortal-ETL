@@ -12,6 +12,7 @@ services:
       - persistence_db_username=sensorthings
       - persistence_db_password=ChangeMe
       - persistence_autoUpdateDatabase=true
+      - persistence_idGenerationMode=ServerAndClientGenerated
     ports:
       - 8080:8080
       - 1883:1883

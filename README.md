@@ -1,0 +1,1 @@
+Integration for ingesting data from Oregon APIs and exposing it as sensorthings data
