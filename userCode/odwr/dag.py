@@ -70,6 +70,12 @@ def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
 
 
 @asset
+def preflight_checks():
+    sta_ping = requests.get(f"{API_BACKEND_URL}")
+    assert sta_ping.ok, "FROST server is not running"
+
+
+@asset(deps=[preflight_checks])
 def all_metadata() -> list[StationData]:
     """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
 
@@ -116,6 +122,7 @@ def station_metadata(
 @asset(partitions_def=station_partition)
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     attr = station_metadata.attributes
+    associatedThingId = int(attr.station_nbr)
 
     datastreams: list[Datastream] = []
     for id, stream in enumerate(POTENTIAL_DATASTREAMS):
@@ -131,8 +138,12 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
         phenom_time = generate_phenomenon_time(tsvParse.dates)
         datastreams.append(
-            to_sensorthings_datastream(attr, tsvParse.units, phenom_time, stream, id)
+            to_sensorthings_datastream(
+                attr, tsvParse.units, phenom_time, stream, id, associatedThingId
+            )
         )
+
+    assert len(datastreams) > 0, f"No datastreams found for {attr.station_nbr}"
 
     return datastreams
 
@@ -194,27 +205,74 @@ def sta_all_observations(
         return await asyncio.gather(*tasks)
 
     asyncio.run(main())
+
+    assert (
+        len(observations) > 0
+    ), f"No observations found in range {start=} to {end=} for station {station_metadata.attributes.station_nbr}"
+
     return observations
 
 
 @asset(partitions_def=station_partition)
-def batch_post_observations(sta_all_observations: list[Observation]):
-    BatchHelper().send(sta_all_observations)
-
-
-@asset(partitions_def=station_partition)
-def post_datastreams(sta_datastreams: list[Datastream]):
-    BatchHelper().send(sta_datastreams)
-
-
-@asset(partitions_def=station_partition)
 def post_station(sta_station: dict):
+    # get the station with the station number
+    resp = requests.get(f"{API_BACKEND_URL}/Things({sta_station['@iot.id']})")
+    if resp.status_code == 404:
+        get_dagster_logger().info(
+            f"Station {sta_station['@iot.id']} not found. Posting..."
+        )
+    elif not resp.ok:
+        get_dagster_logger().error(f"Failed checking if station '{sta_station}' exists")
+        raise RuntimeError(resp.text)
+    else:
+        id = resp.json()["@iot.id"]
+        if id == int(sta_station["@iot.id"]):
+            get_dagster_logger().warning(
+                f"Station {sta_station['@iot.id']} already exists so skipping adding it"
+            )
+            return
+
     resp = requests.post(f"{API_BACKEND_URL}/Things", json=sta_station)
     if not resp.ok:
-        get_dagster_logger().error(sta_station)
+        get_dagster_logger().error(f"Failed posting thing: {sta_station}")
         raise RuntimeError(resp.text)
 
     return
+
+
+@asset(partitions_def=station_partition, deps=[post_station])
+def post_datastreams(sta_datastreams: list[Datastream]):
+    # check if the datastreams exist
+    for datastream in sta_datastreams:
+        resp = requests.get(f"{API_BACKEND_URL}/Datastreams({datastream.iotid})")
+        if resp.status_code == 404:
+            get_dagster_logger().info(
+                f"Datastream {datastream.iotid} not found. Posting..."
+            )
+        elif not resp.ok:
+            get_dagster_logger().error(
+                f"Failed checking if datastream '{datastream}' exists"
+            )
+            raise RuntimeError(resp.text)
+        else:
+            id = resp.json()["@iot.id"]
+            if id == int(datastream.iotid):
+                get_dagster_logger().warning(
+                    f"Datastream {datastream.iotid} already exists so skipping adding it"
+                )
+                continue
+
+        resp = requests.post(
+            f"{API_BACKEND_URL}/Datastreams", json=datastream.model_dump(by_alias=True)
+        )
+        if not resp.ok:
+            get_dagster_logger().error(f"Failed posting datastream: {datastream}")
+            raise RuntimeError(resp.text)
+
+
+@asset(partitions_def=station_partition, deps=[post_datastreams])
+def batch_post_observations(sta_all_observations: list[Observation]):
+    BatchHelper().send_observations(sta_all_observations)
 
 
 harvest_job = define_asset_job(

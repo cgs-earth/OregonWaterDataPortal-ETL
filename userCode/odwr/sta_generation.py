@@ -14,9 +14,12 @@ def to_sensorthings_observation(
     if datapoint is None:
         raise RuntimeError("Missing datapoint")
 
+    # generate a unique int by hashing the datastream name with the phenomenon time and result time
+    id = hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")
     return Observation(
         **{
             "phenomenonTime": phenom_time,
+            "@iot.id": id,
             "resultTime": resultTime,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,
@@ -25,7 +28,6 @@ def to_sensorthings_observation(
                 "name": associatedDatastream.name,
                 "description": associatedDatastream.description,
                 "encodingType": "application/vnd.geo+json",
-                # TODO fill this in
                 "feature": associatedGeometry,
             },
         }
@@ -65,7 +67,12 @@ def to_sensorthings_station(
 
 
 def to_sensorthings_datastream(
-    attr: Attributes, units: str, phenom_time: Optional[str], stream_name: str, id: int
+    attr: Attributes,
+    units: str,
+    phenom_time: Optional[str],
+    stream_name: str,
+    id: int,
+    associatedThingId: int,
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     property = stream_name.removesuffix("_available").removesuffix("_avail")
@@ -94,6 +101,7 @@ def to_sensorthings_datastream(
                 "encodingType": "Unknown",
                 "metadata": "Unknown",
             },
+            "Thing": {"@iot.id": associatedThingId},
         }
     )
     # These are the same since we assume the sensor reports at the same time it is measured

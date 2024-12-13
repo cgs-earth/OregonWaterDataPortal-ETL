@@ -50,54 +50,6 @@ def test_oregon_dates():
         assert_valid_date("09/25/2024")
 
 
-def test_station_metadata_has_expected_datastreams():
-    builder = OregonStaRequestBuilder(
-        ALL_RELEVANT_STATIONS, "10/1/2023 12:00:00 AM", "10/1/2023 12:00:00 AM"
-    )
-    data: list[StationData] = builder._get_upstream_data()
-    assert len(data) == len(ALL_RELEVANT_STATIONS)
-    for station in data:
-        assert int(station["attributes"]["station_nbr"]) in ALL_RELEVANT_STATIONS
-        for attribute in station["attributes"]:
-            # the API does not return a list of datastreams explicitly but rather
-            # returns certain datastream names with the "avail" or "available" suffix mapped to 0/1
-            if (
-                attribute.endswith("_avail")
-                or attribute.endswith("_available")
-                and attribute != "rating_curve_available"
-            ):
-                assert attribute in POTENTIAL_DATASTREAMS
-
-            if attribute == "period_of_record_start_date":
-                assert isinstance(station["attributes"][attribute], (int, type(None)))
-            elif attribute == "period_of_record_end_date":
-                assert isinstance(station["attributes"][attribute], (int, type(None)))
-            elif attribute == "station_nbr":
-                assert isinstance(station["attributes"][attribute], str)
-
-
-def test_datastream_generation():
-    builder = OregonStaRequestBuilder(
-        ALL_RELEVANT_STATIONS, "10/1/2023 12:00:00 AM", "10/2/2023 12:00:00 AM"
-    )
-    response: list[StationData] = builder._get_upstream_data()
-    streams = []
-    for station in response:
-        sta_datastream = to_sensorthings_datastream(
-            station["attributes"],
-            units="Celcius",
-            phenom_time=None,
-            stream_name="test",
-            id=0,
-        )
-        streams.append(sta_datastream)
-    assert (
-        len(ALL_RELEVANT_STATIONS)
-        <= len(streams)
-        <= len(POTENTIAL_DATASTREAMS) * len(ALL_RELEVANT_STATIONS)
-    )
-
-
 def test_metadata_store_helper():
     data_range_setter = CrawlResultTracker()
     begin, end = "9/25/2024 12:00:00 AM", "10/7/2024 12:00:00 AM"

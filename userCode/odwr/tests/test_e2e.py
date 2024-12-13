@@ -1,8 +1,10 @@
 import pytest
+import requests
 
-from userCode.odwr.types import StationData
-from ..dag import all_metadata
-from dagster import AssetKey, AssetSelection, materialize
+from userCode.odwr.tests.lib import wipe_locations, wipe_things
+from userCode.odwr.types import API_BACKEND_URL, StationData
+from ..dag import all_metadata, definitions, post_station, sta_datastreams, sta_station
+from dagster import DagsterInstance
 
 
 @pytest.fixture(scope="module")
@@ -16,14 +18,40 @@ def test_metadata(metadata):
     assert len(metadata) > 0
 
 
+def test_post_station(metadata: list[StationData]):
+    wipe_things()
+    wipe_locations()
+    first_item = metadata[0]
+    assert first_item.attributes.station_nbr
+
+    datastreams = sta_datastreams(station_metadata=first_item)
+    station = sta_station(sta_datastreams=datastreams, station_metadata=first_item)
+    post_station(station)
+    wipe_locations()
+    wipe_things()
+
+
 def test_full_pipeline(metadata: list[StationData]):
     """Check to make sure that the full pipeline works."""
-    # Use `metadata` for pipeline checks
-    result = materialize(
-        assets=[batch_post_observations],
-        partition_key=metadata[0].attributes.station_nbr,
-        run_config={
-            #### Way to specify something here?
-        }
+    # Clear the locations and things before running.
+    wipe_locations()
+    wipe_things()
+
+    resolved_job = definitions.get_job_def("harvest_station")
+
+    instance = DagsterInstance.ephemeral()
+
+    first_item = metadata[0]
+    result = resolved_job.execute_in_process(
+        instance=instance, partition_key=first_item.attributes.station_nbr
     )
-    assert result.success 
+
+    assert result.success
+
+    endpoints = ["Locations", "Datastreams", "Observations"]
+    for endpoint in endpoints:
+        response = requests.get(f"{API_BACKEND_URL}/{endpoint}?$count=true")
+        assert response.ok
+        assert (
+            response.json()["@iot.count"] > 0
+        ), f"No {endpoint} items found in FROST after harvesting"

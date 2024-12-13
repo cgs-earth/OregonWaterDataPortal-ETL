@@ -1,3 +1,4 @@
+from csv import DictReader
 from typing import Literal, Optional, TypedDict
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
@@ -279,6 +280,7 @@ class Datastream(BaseModel):
     # phenomenonTime: str,
     # resultTime: NotRequired[str],  # not present in python 3.9
     Sensor: dict
+    Thing: dict
 
 
 class Observation(BaseModel):

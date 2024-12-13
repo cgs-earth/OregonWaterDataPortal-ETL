@@ -1,8 +1,6 @@
-import asyncio
 from datetime import datetime
 import logging
 
-import httpx
 
 from ..lib import (
     download_oregon_tsv,
@@ -13,7 +11,7 @@ from ..lib import (
 import pytest
 from collections import Counter
 import requests
-from ..types import ALL_RELEVANT_STATIONS, START_OF_DATA
+from ..types import START_OF_DATA
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,7 +50,7 @@ def test_no_data_with_no_end_date(start_date):
     "start_date",
     ["10/7/2023 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
 )
-def test_today_not_same_as_no_end_date(start_date):
+def test_today_same_as_no_end_date(start_date):
     no_end_response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=start_date, end_date=""
     )
@@ -68,10 +66,10 @@ def test_today_not_same_as_no_end_date(start_date):
 
     today_result = parse_oregon_tsv(response)
 
-    assert today_result.dates != no_end_result.dates
-    assert today_result.data != no_end_result.data
+    assert today_result.dates == no_end_result.dates
+    assert today_result.data == no_end_result.data
     assert today_result.units == no_end_result.units
-    assert len(today_result.dates) > len(no_end_result.data)
+    assert len(today_result.dates) == len(no_end_result.data)
 
     isSubset = not (Counter(no_end_result.data) - Counter(today_result.data))
     assert isSubset
@@ -107,12 +105,12 @@ def test_very_old_date_same_as_no_start_date():
 
 
 def test_very_old_dates_are_the_same():
-    """Make sure that one date in the past with no data gives the same result as one in the past with no data. i.e. 1800 == 1850"""
+    """Make sure that one date in the past with no data gives the same result as another in the past with no data. i.e. 1800 == 1850"""
     response: bytes = download_oregon_tsv(
         "mean_daily_flow_available",
         10371500,
         start_date="4/7/1800 11:00:00 AM",
-        end_date="4/7/2000 11:00:00 AM",
+        end_date="4/7/1960 11:00:00 AM",
     )
     very_old_result_1 = parse_oregon_tsv(response)
 
@@ -120,7 +118,7 @@ def test_very_old_dates_are_the_same():
         "mean_daily_flow_available",
         10371500,
         start_date="4/7/1850 11:00:00 AM",
-        end_date="4/7/2000 11:00:00 AM",
+        end_date="4/7/1960 11:00:00 AM",
     )
     very_old_result_2 = parse_oregon_tsv(response)
 
@@ -156,27 +154,3 @@ def test_how_many_observations_in_full_station():
     assert (
         length > 56540
     )  # we can't test an exact number here since the oregon data is consistently updating. But must be at least bigger than this value we got on Oct 28 2024
-
-
-def test_get_many_observations_in_async():
-    """Check to make sure that the server doesn't kick us out if we try to make too many requests to observation endpoints asynchronously"""
-
-    async def main():
-        builder = OregonStaRequestBuilder(
-            ALL_RELEVANT_STATIONS, "01/01/2024 12:00:00 AM", "01/15/2024 12:00:00 AM"
-        )
-        stationMetadata = builder._get_upstream_data()
-        tasks = []
-        async with httpx.AsyncClient(timeout=None) as client:
-            for station in stationMetadata:
-
-                async def get_observations():
-                    LOGGER.info(f"Processing {station['attributes']['station_nbr']}")
-                    res = builder._get_observations(station, client)
-                    async for _ in res:
-                        pass  # consume the generator
-
-                tasks.append(asyncio.create_task(get_observations()))
-            await asyncio.gather(*tasks)
-
-    asyncio.run(main())

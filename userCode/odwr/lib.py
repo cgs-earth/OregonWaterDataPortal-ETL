@@ -13,7 +13,9 @@ from .types import (
 LOGGER = logging.getLogger(__name__)
 
 
-def parse_oregon_tsv(response: bytes) -> ParsedTSVData:
+def parse_oregon_tsv(
+    response: bytes, drop_rows_with_null_data: bool = True
+) -> ParsedTSVData:
     """Return the data column and the date column for a given tsv response"""
     # we just use the third column since the name of the dataset in the
     # url does not match the name in the result column. However,
@@ -25,9 +27,6 @@ def parse_oregon_tsv(response: bytes) -> ParsedTSVData:
     reader = csv.reader(tsv_data, delimiter="\t")
     # Skip the header row if it exists
     header = next(reader, None)
-
-    # drop rows with null data so we dont have lots of None values in the UI
-    drop_rows_with_null_data: bool = True
 
     if header is not None:
         if "Invalid data type to download" in header:
