@@ -1,12 +1,10 @@
-from dataclasses import asdict, dataclass
-import json
+from dataclasses import dataclass
+import datetime
 import logging
-import os
-from pathlib import Path
-from typing import Literal, Tuple
+from typing import Literal, NamedTuple
 from dagster import get_dagster_logger
 import requests
-from .lib import assert_valid_date
+from .lib import from_oregon_datetime
 from .types import (
     START_OF_DATA,
     Datastream,
@@ -17,89 +15,6 @@ from .types import (
 from userCode import API_BACKEND_URL
 
 LOGGER = logging.getLogger(__name__)
-
-metadata_file_path = Path("oregon_load_metadata.json")
-
-
-@dataclass
-class UpdateMetadata:
-    """Contains the metadata about a specific crawl and how much should be downloaded
-    in future updates"""
-
-    data_start: str
-    data_end: str
-    failures: list[dict[int, str]]
-    successes: list[dict[int, str]]
-
-
-def load_metadata() -> UpdateMetadata:
-    # save to the home directory for easier observability
-    with open(metadata_file_path, "r") as f:
-        metadata = json.load(f)
-    return UpdateMetadata(**metadata)
-
-
-def save_metadata(metadata: UpdateMetadata):
-    # save to the home directory for easier observability
-    with open(metadata_file_path, "w") as f:
-        json.dump(asdict(metadata), f)
-    os.chmod(metadata_file_path, 0o644)  # Read/write for owner, read-only for others
-
-
-class CrawlResultTracker:
-    """Helper class to determine what to download based on a local metadata file"""
-
-    def __init__(self):
-        # check if metadata.json exists if not create it
-        try:
-            if not metadata_file_path.exists():
-                # If the user didn't have a metadata file, create one and make it point back to the
-                # beginning of the API's data
-                save_metadata(UpdateMetadata(START_OF_DATA, START_OF_DATA, [], []))
-            else:  # if it exists, make sure the successes and failures are not left over from the previous crawl
-                metadata = load_metadata()
-                metadata.successes, metadata.failures = [], []
-                save_metadata(metadata)
-        except PermissionError as p:
-            raise PermissionError(
-                f"Unable to access {metadata_file_path.absolute()}: {p}"
-            )
-
-    def reset(self):
-        save_metadata(UpdateMetadata("", "", [], []))
-
-    def get_range(self) -> Tuple[str, str]:
-        """Get the range of data that has been downloaded"""
-        metadata = load_metadata()
-        assert_valid_date(metadata.data_start)
-        assert_valid_date(metadata.data_end)
-        return (metadata.data_start, metadata.data_end)
-
-    def update_range(self, start: str, end: str):
-        """Update the range of dates of data that has been downloaded"""
-        # make sure that start and end are valid dates
-        assert_valid_date(start)
-        assert_valid_date(end)
-        metadata = load_metadata()
-        metadata.data_start = start
-        metadata.data_end = end
-        save_metadata(metadata)
-
-    def set_success(self, station: int, message: str, with_log: bool):
-        """Store the success message for a station and optionally log it"""
-        metadata = load_metadata()
-        metadata.successes.append({station: message})
-        save_metadata(metadata)
-        if with_log:
-            LOGGER.info(message)
-
-    def set_failure(self, station: int, message: str, with_log: bool):
-        """Store the failure message for a station and optionally log it"""
-        metadata = load_metadata()
-        metadata.failures.append({station: message})
-        save_metadata(metadata)
-        if with_log:
-            LOGGER.error(message)
 
 
 @dataclass
@@ -176,3 +91,28 @@ class BatchHelper:
             serialized_observations.append(request_encoded)
 
         self._send_payload(serialized_observations)
+
+
+class DatastreamTimeRange(NamedTuple):
+    start: datetime.datetime
+    end: datetime.datetime
+
+
+def get_datastream_time_range(iotid: int) -> DatastreamTimeRange:
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams({iotid})")
+    # 404 represents that there is no datastream and thus the timerange is null
+    # we represent null by setting both the start and end to the beginning of all
+    # possible data
+    if resp.status_code == 404:
+        start_dummy = from_oregon_datetime(START_OF_DATA)
+        return DatastreamTimeRange(start_dummy, start_dummy)
+    if not resp.ok:
+        raise RuntimeError(resp.text)
+    json = resp.json()
+    range = json["phenomenonTime"].split("/")
+    start = datetime.datetime.fromisoformat(range[0])
+    end = datetime.datetime.fromisoformat(range[1])
+
+    assert len(range) == 2
+
+    return DatastreamTimeRange(start, end)

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 
 from ..lib import (
     download_oregon_tsv,
+    from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
     to_oregon_datetime,
@@ -11,6 +12,7 @@ from ..lib import (
 import pytest
 from collections import Counter
 import requests
+from datetime import timezone
 from ..types import START_OF_DATA
 
 LOGGER = logging.getLogger(__name__)
@@ -154,3 +156,29 @@ def test_how_many_observations_in_full_station():
     assert (
         length > 56540
     )  # we can't test an exact number here since the oregon data is consistently updating. But must be at least bigger than this value we got on Oct 28 2024
+
+
+def test_timezone_behavior():
+    end = to_oregon_datetime(datetime.now())
+    begin = to_oregon_datetime(datetime.now() - timedelta(days=100))
+
+    response: bytes = download_oregon_tsv(
+        "mean_daily_flow_available", 10371500, start_date=begin, end_date=end
+    )
+
+    # You must drop rows with null data
+    # The oregon api says an observation is "missing" for the next day which
+    # will mess up the data and appear to be from the future. drop null drops these
+    result = parse_oregon_tsv(response, drop_rows_with_null_data=True)
+
+    for date in result.dates:
+        # Even though oregon requires requests in a specific format,
+        # it returns the data in an ISO format that is different from the request
+        with pytest.raises(ValueError):
+            from_oregon_datetime(date)
+
+        isoDate = datetime.fromisoformat(date)
+
+        assert isoDate.tzinfo == timezone.utc
+
+        assert isoDate <= datetime.now(tz=timezone.utc)

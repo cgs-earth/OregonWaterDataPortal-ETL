@@ -1,14 +1,11 @@
-from ..helper_classes import CrawlResultTracker
 from ..lib import (
     assert_valid_date,
     download_oregon_tsv,
     parse_oregon_tsv,
     from_oregon_datetime,
 )
-from ..sta_generation import to_sensorthings_datastream
 import datetime
 import pytest
-from ..types import ALL_RELEVANT_STATIONS, POTENTIAL_DATASTREAMS, StationData
 
 
 def test_download():
@@ -50,14 +47,5 @@ def test_oregon_dates():
         assert_valid_date("09/25/2024")
 
 
-def test_metadata_store_helper():
-    data_range_setter = CrawlResultTracker()
-    begin, end = "9/25/2024 12:00:00 AM", "10/7/2024 12:00:00 AM"
-    data_range_setter.update_range(begin, end)
-    retrieved_begin, retrieved_end = data_range_setter.get_range()
-    assert begin == retrieved_begin
-    assert end == retrieved_end
-    new_beginning, new_end = end, "10/8/2024 12:00:00 AM"
-    data_range_setter.update_range(new_beginning, new_end)
-    assert new_beginning != retrieved_begin
-    assert new_end != retrieved_end
+def test_get_datastream_time_range():
+    pass

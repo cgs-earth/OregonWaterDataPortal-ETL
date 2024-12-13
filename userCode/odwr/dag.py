@@ -18,7 +18,10 @@ from dagster import (
 )
 import httpx
 
-from userCode.odwr.helper_classes import BatchHelper, CrawlResultTracker
+from userCode.odwr.helper_classes import (
+    BatchHelper,
+    get_datastream_time_range,
+)
 from userCode.odwr.lib import (
     format_where_param,
     generate_oregon_tsv_url,
@@ -31,7 +34,6 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.tests.lib import get_datastream_time_range
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -156,19 +158,10 @@ def sta_station(
     return to_sensorthings_station(station_metadata, sta_datastreams)
 
 
-@asset()
-def crawl_tracker() -> CrawlResultTracker:
-    tracker = CrawlResultTracker()
-    start, end = tracker.get_range()
-    get_dagster_logger().info(f"Data before new load spans from {start} to {end}")
-    return tracker
-
-
 @asset(partitions_def=station_partition)
 def sta_all_observations(
     station_metadata: StationData,
     sta_datastreams: list[Datastream],
-    crawl_tracker: CrawlResultTracker,
 ):
     session = httpx.AsyncClient()
     observations: list[Observation] = []
@@ -185,7 +178,7 @@ def sta_all_observations(
             # if a datastream is available is to check the propery X_available == "1"
             datastream.description + "_available",
             int(attr.station_nbr),
-            start,
+            to_oregon_datetime(start),
             new_end,
         )
 
