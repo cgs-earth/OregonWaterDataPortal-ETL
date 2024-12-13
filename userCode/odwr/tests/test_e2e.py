@@ -2,7 +2,8 @@ import pytest
 import requests
 
 from userCode.odwr.tests.lib import wipe_locations, wipe_things
-from userCode.odwr.types import API_BACKEND_URL, StationData
+from userCode.odwr.types import StationData
+from userCode import API_BACKEND_URL
 from ..dag import all_metadata, definitions, post_station, sta_datastreams, sta_station
 from dagster import DagsterInstance
 

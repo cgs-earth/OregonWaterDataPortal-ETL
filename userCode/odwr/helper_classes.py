@@ -8,12 +8,13 @@ from dagster import get_dagster_logger
 import requests
 from .lib import assert_valid_date
 from .types import (
-    API_BACKEND_URL,
     START_OF_DATA,
     Datastream,
     FrostBatchRequest,
     Observation,
 )
+
+from userCode import API_BACKEND_URL
 
 LOGGER = logging.getLogger(__name__)
 

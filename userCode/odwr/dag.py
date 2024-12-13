@@ -34,7 +34,6 @@ from userCode.odwr.sta_generation import (
 )
 from .types import (
     ALL_RELEVANT_STATIONS,
-    API_BACKEND_URL,
     POTENTIAL_DATASTREAMS,
     Attributes,
     Datastream,
@@ -43,6 +42,7 @@ from .types import (
     ParsedTSVData,
     StationData,
 )
+from userCode import API_BACKEND_URL
 import requests
 
 BASE_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"

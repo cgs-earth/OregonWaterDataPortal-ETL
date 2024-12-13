@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from .types import OregonXLSX, Metadata, SiteData, Data
+from .helpers import OregonXLSX, Metadata, SiteData, Data
 
 
 # Reads a workbook sheet and returns a list of dictionaries

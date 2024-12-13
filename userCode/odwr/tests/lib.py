@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 import requests
-from ..types import API_BACKEND_URL
+from userCode import API_BACKEND_URL
 
 
 @contextmanager
@@ -35,6 +35,20 @@ def wipe_locations():
         for location in locations:
             resp = requests.delete(
                 f"{API_BACKEND_URL}/Locations({location['@iot.id']})"
+            )
+            assert resp.ok
+    else:
+        raise RuntimeError(response.text)
+
+
+def wipe_datastreams():
+    """Wipe just the Datastreams"""
+    response = requests.get(f"{API_BACKEND_URL}/Datastreams")
+    if response.ok:
+        datastreams = response.json()["value"]
+        for datastream in datastreams:
+            resp = requests.delete(
+                f"{API_BACKEND_URL}/Datastreams({datastream['@iot.id']})"
             )
             assert resp.ok
     else:

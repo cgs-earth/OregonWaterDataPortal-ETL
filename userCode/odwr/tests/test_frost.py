@@ -1,11 +1,12 @@
 import requests
 
 from userCode.odwr.tests.lib import (
+    wipe_datastreams,
     wipe_locations,
     wipe_things,
     wipe_things_before_and_after,
 )
-from ..types import API_BACKEND_URL
+from userCode import API_BACKEND_URL
 
 
 def test_duplicate():
@@ -388,3 +389,110 @@ def test_post_with_invalid_id():
     assert resp.json()["message"] == "No such entity 'Sensor' with id  6 "
     wipe_locations()
     wipe_things()
+
+
+def test_adding_linked_obs_changes_datastream_time():
+    """If we add observations, it should change the phenomenon time of the datastream it is linked with"""
+    wipe_things()
+    wipe_datastreams()
+
+    datastream = {
+        "name": "test",
+        "@iot.id": 1,
+        "description": "test",
+        "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+        "unitOfMeasurement": {
+            "name": "Degree Celsius",
+            "symbol": "degC",
+            "definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#DegreeCelsius",
+        },
+        "ObservedProperty": {
+            "@iot.id": 1,
+            "name": "test",
+            "description": "test",
+            "definition": "Unknown",
+        },
+        "Thing": {
+            "@iot.id": 1,
+            "name": "test",
+            "description": "test",
+        },
+        "Sensor": {
+            "@iot.id": 0,
+            "name": "Unknown",
+            "description": "Unknown",
+            "encodingType": "Unknown",
+            "metadata": "Unknown",
+        },
+    }
+
+    firstTime = "2022-01-01T00:00:00Z"
+    associated_obs = {
+        "phenomenonTime": firstTime,
+        "@iot.id": 999,
+        "resultTime": firstTime,
+        "Datastream": {"@iot.id": 1},
+        "result": 1234,
+        "FeatureOfInterest": {
+            "@iot.id": 999,
+            "name": "test",
+            "description": "test",
+            "encodingType": "application/vnd.geo+json",
+            "feature": {"type": "Point", "coordinates": [0, 0]},
+        },
+    }
+
+    resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=datastream)
+    assert resp.ok, resp.text
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams(1)")
+    assert resp.ok, resp.text
+    originalDatastream = resp.json()
+
+    resp = requests.post(f"{API_BACKEND_URL}/Observations", json=associated_obs)
+    assert resp.ok, resp.text
+    resp = requests.get(f"{API_BACKEND_URL}/Observations(999)")
+    assert resp.ok, resp.text
+
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams(1)")
+    assert resp.ok, resp.text
+    newDatastream = resp.json()
+    assert originalDatastream != newDatastream
+
+    assert "phenomenonTime" in newDatastream
+    assert "phenomenonTime" not in originalDatastream
+    assert firstTime in newDatastream["phenomenonTime"]
+
+    newTime = "2024-01-01T00:00:00Z"
+    obsWithUpdatedTime = {
+        "phenomenonTime": newTime,
+        "@iot.id": 1000,
+        "resultTime": newTime,
+        "Datastream": {"@iot.id": 1},
+        "result": 1234,
+        "FeatureOfInterest": {
+            "@iot.id": 999,
+            "name": "test",
+            "description": "test",
+            "encodingType": "application/vnd.geo+json",
+            "feature": {"type": "Point", "coordinates": [0, 0]},
+        },
+    }
+
+    resp = requests.post(f"{API_BACKEND_URL}/Observations", json=obsWithUpdatedTime)
+    assert resp.ok, resp.text
+
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams(1)")
+    assert resp.ok, resp.text
+    updatedDatastream = resp.json()
+
+    # We made the resulttime and the phenom time the same so they should both track to the
+    # linked observations and their time values
+    assert (
+        f"{firstTime}/{newTime}"
+        == updatedDatastream["phenomenonTime"]
+        == updatedDatastream["resultTime"]
+    )
+
+    wipe_locations()
+    wipe_things()
+    wipe_datastreams()
