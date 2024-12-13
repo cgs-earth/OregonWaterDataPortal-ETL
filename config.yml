@@ -2,7 +2,7 @@ server:
   bind:
     host: "0.0.0.0"
     port: 80
-  url: "http://localhost:80"
+  url: ${WIS2BOX_API_URL}
   cors: true
   mimetype: "application/json; charset=UTF-8"
   encoding: "utf-8"
