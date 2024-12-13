@@ -3,7 +3,7 @@ services:
     image: fraunhoferiosb/frost-server:latest
     environment:
       # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
-      - serviceRootUrl=http://localhost:8080/FROST-Server
+      - serviceRootUrl=http://frost-http:8080/FROST-Server
       - plugins_multiDatastream.enable=false
       - http_cors_enable=true
       - http_cors_allowed_origins=*
@@ -36,29 +36,33 @@ services:
       timeout: 5s
       retries: 5
 
-  pygeoapi:
+  wis2box-api:
     image: geopython/pygeoapi:latest
     volumes:
       - ./config.yml:/pygeoapi/local.config.yml
     depends_on:
       - frost-http
-    ports:
-      - 5000:80
+    environment:
+      - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
 
-  ui:
+  wis2box-ui:
     image: internetofwater/hub2box-ui:iow
     depends_on:
-      - pygeoapi
-    ports:
-      - 5001:80
+      - wis2box-api
     environment:
-      - WIS2BOX_API_BACKEND_URL=http://localhost:5000/
-      - WIS2BOX_URL=http://localhost:5001
-      - serviceRootUrl=http://localhost:8080/FROST-Server
-      - WIS2BOX_API_TYPE=pygeoapi
-      - WIS2BOX_API_BACKEND_TYPE=SensorThings
-      - WIS2BOX_API_BACKEND_URL=http://localhost:8080/FROST-Server/v1.1
+      - WIS2BOX_URL=http://localhost:8999
+      - WIS2BOX_API_URL=http://localhost:8999/api
+      - serviceRootUrl=http://frost-http:8080/FROST-Server
+      - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
+
+  web-proxy:
+    container_name: web-proxy
+    image: nginx:alpine
+    restart: always
+    depends_on:
+      - wis2box-ui
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
     postgis_volume:
-

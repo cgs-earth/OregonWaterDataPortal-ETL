@@ -2,7 +2,8 @@ server:
   bind:
     host: "0.0.0.0"
     port: 80
-  url: "https://owdp-pilot.internetofwater.app/oapi"
+  url: "http://localhost:80"
+  cors: true
   mimetype: "application/json; charset=UTF-8"
   encoding: "utf-8"
   languages:
