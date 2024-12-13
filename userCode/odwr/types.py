@@ -336,5 +336,5 @@ START_OF_DATA = "9/25/1850 12:00:00 AM"  # random very old date. Need a very old
 class FrostBatchRequest(TypedDict):
     id: str
     method: Literal["post"]
-    url: Literal["Observations"]
+    url: Literal["Observations", "Datastreams"]
     body: dict

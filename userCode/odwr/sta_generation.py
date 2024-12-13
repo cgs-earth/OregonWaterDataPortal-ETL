@@ -8,6 +8,7 @@ def to_sensorthings_observation(
     datapoint: Optional[float],
     resultTime: str,
     phenom_time: str,
+    associatedGeometry: dict,
 ) -> Observation:
     """Return the json body for a sensorthings observation insert to FROST"""
     if datapoint is None:
@@ -25,7 +26,7 @@ def to_sensorthings_observation(
                 "description": associatedDatastream.description,
                 "encodingType": "application/vnd.geo+json",
                 # TODO fill this in
-                "feature": {"type": "Point", "coordinates": [0, 0, 0]},
+                "feature": associatedGeometry,
             },
         }
     )
@@ -36,7 +37,7 @@ def to_sensorthings_station(
 ) -> dict:
     """Generate data for the body of a POST request for Locations/ in FROST"""
     attr = station.attributes
-    return {
+    representation = {
         "name": attr.station_name,
         "@iot.id": int(attr.station_nbr),
         "description": attr.station_name,
@@ -48,11 +49,7 @@ def to_sensorthings_station(
                 "encodingType": "application/vnd.geo+json",
                 "location": {
                     "type": "Point",
-                    "coordinates": [
-                        attr.longitude_dec,
-                        attr.latitude_dec,
-                        attr.elevation,
-                    ],
+                    "coordinates": [attr.longitude_dec, attr.latitude_dec],
                 },
             }
         ],
@@ -61,6 +58,10 @@ def to_sensorthings_station(
         ],
         "properties": attr.model_dump(by_alias=True),
     }
+    if attr.elevation is not None:
+        representation["Locations"][0]["location"]["coordinates"].append(attr.elevation)
+
+    return representation
 
 
 def to_sensorthings_datastream(

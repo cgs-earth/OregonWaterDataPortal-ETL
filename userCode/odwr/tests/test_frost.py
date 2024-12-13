@@ -182,6 +182,7 @@ def test_insert_large_payload():
 
 def test_insert_same_id_different_obj():
     with wipe_things_before_and_after():
+        wipe_locations()
         payload = {
             "@iot.id": 888,
             "name": "test",

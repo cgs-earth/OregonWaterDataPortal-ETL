@@ -7,7 +7,13 @@ from typing import Literal, Tuple
 from dagster import get_dagster_logger
 import requests
 from .lib import assert_valid_date
-from .types import API_BACKEND_URL, START_OF_DATA, FrostBatchRequest, Observation
+from .types import (
+    API_BACKEND_URL,
+    START_OF_DATA,
+    Datastream,
+    FrostBatchRequest,
+    Observation,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -108,25 +114,34 @@ class BatchObservation:
 class BatchHelper:
     """Helper for more easily constructing batched requests to the FROST API"""
 
-    frost_http_body: dict[Literal["requests"], list[BatchObservation]]
-
-    def __init__(self, observation_dataset: list[Observation]):
-        serialized_observations = []
-        for observation in observation_dataset:
-            request_encoded: FrostBatchRequest = {
-                "id": f"{observation.Datastream}{id}",
-                "method": "post",
-                "url": "Observations",
-                "body": observation.model_dump(by_alias=True),
-            }
-            serialized_observations.append(request_encoded)
-        self.frost_http_body = {"requests": serialized_observations}
-
-    def send_observations(self):
+    def send(self, dataset: list[Datastream] | list[Observation]):  # noqa: F821
         """Send batch data to the FROST API"""
+        serialized_observations = []
+
+        for id, data in enumerate(dataset):
+            if isinstance(data, Observation):
+                request_encoded: FrostBatchRequest = {
+                    "id": str(id),
+                    "method": "post",
+                    "url": "Observations",
+                    "body": data.model_dump(by_alias=True),
+                }
+            else:
+                request_encoded = {
+                    "id": str(id),
+                    "method": "post",
+                    "url": "Datastreams",
+                    "body": data.model_dump(by_alias=True),
+                }
+
+            serialized_observations.append(request_encoded)
+        frost_http_body: dict[Literal["requests"], list[BatchObservation]] = {
+            "requests": serialized_observations
+        }
+
         resp = requests.post(
             f"{API_BACKEND_URL}/$batch",
-            json=self.frost_http_body,
+            json=frost_http_body,
             headers={"Content-Type": "application/json"},
         )
         if not resp.ok:
@@ -135,4 +150,9 @@ class BatchHelper:
         response_messages = resp.json()["responses"]
         if len(response_messages) != 0:
             for msg in response_messages:
-                get_dagster_logger().error(msg)
+                if msg["status"] == 201:
+                    get_dagster_logger().info(
+                        f"Created observations successfully for {msg["id"]}"
+                    )
+                else:
+                    get_dagster_logger().error(msg)

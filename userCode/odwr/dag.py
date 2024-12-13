@@ -162,6 +162,7 @@ def sta_all_observations(
     session = httpx.AsyncClient()
     start, end = crawl_tracker.get_range()
     observations: list[Observation] = []
+    associatedGeometry = station_metadata.geometry
 
     async def fetch_obs(datastream: Datastream):
         attr: Attributes = station_metadata.attributes
@@ -184,7 +185,7 @@ def sta_all_observations(
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
         for obs, date in zip(tsvParse.data, tsvParse.dates):
             sta_representation = to_sensorthings_observation(
-                datastream, obs, date, date
+                datastream, obs, date, date, associatedGeometry
             )
             observations.append(sta_representation)
 
@@ -198,13 +199,12 @@ def sta_all_observations(
 
 @asset(partitions_def=station_partition)
 def batch_post_observations(sta_all_observations: list[Observation]):
-    builder = BatchHelper(sta_all_observations)
-    builder.send_observations()
+    BatchHelper().send(sta_all_observations)
 
 
 @asset(partitions_def=station_partition)
 def post_datastreams(sta_datastreams: list[Datastream]):
-    return
+    BatchHelper().send(sta_datastreams)
 
 
 @asset(partitions_def=station_partition)
@@ -224,12 +224,8 @@ harvest_job = define_asset_job(
 )
 
 
-@asset()
-def updated_crawl_tracker(
-    batch_post_observations: None,
-    batch_post_stations: None,
-    batch_post_datastreams: None,
-) -> MaterializeResult:
+@asset(deps=[batch_post_observations, post_station, post_datastreams])
+def updated_crawl_tracker() -> MaterializeResult:
     start, _ = CrawlResultTracker().get_range()
     today = to_oregon_datetime(datetime.now())
     CrawlResultTracker().update_range(start, today)
