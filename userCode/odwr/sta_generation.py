@@ -56,10 +56,10 @@ def to_sensorthings_station(
                 },
             }
         ],
-        "Datastreams": datastreams,
-        "properties": {
-            attr.model_dump_json(),
-        },
+        "Datastreams": [
+            datastream.model_dump(by_alias=True) for datastream in datastreams
+        ],
+        "properties": attr.model_dump(by_alias=True),
     }
 
 
@@ -81,7 +81,7 @@ def to_sensorthings_datastream(
                 "definition": units,
             },
             "ObservedProperty": {
-                "@iot.id": property,
+                "@iot.id": int(f"{attr.station_nbr}{id}"),
                 "name": property,
                 "description": property,
                 "definition": "Unknown",

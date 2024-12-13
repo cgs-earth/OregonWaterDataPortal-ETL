@@ -275,7 +275,7 @@ class Datastream(BaseModel):
     description: str
     observationType: str
     unitOfMeasurement: UnitOfMeasurement
-    ObservedProperty: dict[str, str]
+    ObservedProperty: dict[str, str | int]
     # phenomenonTime: str,
     # resultTime: NotRequired[str],  # not present in python 3.9
     Sensor: dict

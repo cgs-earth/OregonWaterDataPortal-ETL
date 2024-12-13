@@ -1,6 +1,7 @@
 import requests
 
 from userCode.odwr.tests.lib import (
+    wipe_locations,
     wipe_things,
     wipe_things_before_and_after,
 )
@@ -212,3 +213,5 @@ def test_insert_same_id_different_obj():
         items = resp.json()["value"]
         assert len(items) == 1
         assert items[0]["@iot.id"] == 888
+        # things dont wipe locations when deleted
+        wipe_locations()

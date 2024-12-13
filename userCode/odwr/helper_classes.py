@@ -117,7 +117,7 @@ class BatchHelper:
                 "id": f"{observation.Datastream}{id}",
                 "method": "post",
                 "url": "Observations",
-                "body": observation.model_dump(),
+                "body": observation.model_dump(by_alias=True),
             }
             serialized_observations.append(request_encoded)
         self.frost_http_body = {"requests": serialized_observations}

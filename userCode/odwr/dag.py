@@ -10,6 +10,7 @@ from dagster import (
     RunRequest,
     StaticPartitionsDefinition,
     asset,
+    define_asset_job,
     get_dagster_logger,
     load_asset_checks_from_current_module,
     load_assets_from_current_module,
@@ -33,6 +34,7 @@ from userCode.odwr.sta_generation import (
 )
 from .types import (
     ALL_RELEVANT_STATIONS,
+    API_BACKEND_URL,
     POTENTIAL_DATASTREAMS,
     Attributes,
     Datastream,
@@ -201,13 +203,25 @@ def batch_post_observations(sta_all_observations: list[Observation]):
 
 
 @asset(partitions_def=station_partition)
-def batch_post_datastreams(sta_datastreams: list[Datastream]):
+def post_datastreams(sta_datastreams: list[Datastream]):
     return
 
 
 @asset(partitions_def=station_partition)
-def batch_post_stations(sta_station: dict):
+def post_station(sta_station: dict):
+    resp = requests.post(f"{API_BACKEND_URL}/Things", json=sta_station)
+    if not resp.ok:
+        get_dagster_logger().error(sta_station)
+        raise RuntimeError(resp.text)
+
     return
+
+
+harvest_job = define_asset_job(
+    "harvest_station",
+    description="harvest a station",
+    selection=AssetSelection.all(),
+)
 
 
 @asset()
@@ -238,4 +252,5 @@ definitions = Definitions(
     assets=load_assets_from_current_module(),
     asset_checks=load_asset_checks_from_current_module(),
     schedules=[crawl_entire_graph_schedule],
+    jobs=[harvest_job],
 )
