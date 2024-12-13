@@ -1,6 +1,9 @@
 from contextlib import contextmanager
 import requests
 from userCode import API_BACKEND_URL
+from typing import NamedTuple
+
+from userCode.odwr.types import START_OF_DATA
 
 
 @contextmanager
@@ -53,3 +56,25 @@ def wipe_datastreams():
             assert resp.ok
     else:
         raise RuntimeError(response.text)
+
+
+class DatastreamTimeRange(NamedTuple):
+    start: str
+    end: str
+
+
+def get_datastream_time_range(iotid: int) -> DatastreamTimeRange:
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams({iotid})")
+    # 404 represents that there is no datastream and thus the timerange is null
+    # we represent null by setting both the start and end to the beginning of all
+    # possible data
+    if resp.status_code == 404:
+        return DatastreamTimeRange(START_OF_DATA, START_OF_DATA)
+    if not resp.ok:
+        raise RuntimeError(resp.text)
+    json = resp.json()
+    range = json["phenomenonTime"].split("/")
+    start = range[0]
+    end = range[1]
+
+    return DatastreamTimeRange(start, end)

@@ -6,7 +6,6 @@ from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
     Definitions,
-    MaterializeResult,
     RunRequest,
     StaticPartitionsDefinition,
     asset,
@@ -32,6 +31,7 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
+from userCode.odwr.tests.lib import get_datastream_time_range
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -171,12 +171,14 @@ def sta_all_observations(
     crawl_tracker: CrawlResultTracker,
 ):
     session = httpx.AsyncClient()
-    start, end = crawl_tracker.get_range()
     observations: list[Observation] = []
     associatedGeometry = station_metadata.geometry
 
     async def fetch_obs(datastream: Datastream):
         attr: Attributes = station_metadata.attributes
+
+        start, _ = get_datastream_time_range(int(attr.station_nbr))
+        new_end = to_oregon_datetime(datetime.today())
 
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
@@ -184,7 +186,7 @@ def sta_all_observations(
             datastream.description + "_available",
             int(attr.station_nbr),
             start,
-            end,
+            new_end,
         )
 
         response = await session.get(tsv_url)
@@ -200,15 +202,15 @@ def sta_all_observations(
             )
             observations.append(sta_representation)
 
+        assert (
+            len(observations) > 0
+        ), f"No observations found in range {start=} to {new_end=} for station {station_metadata.attributes.station_nbr}"
+
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]
         return await asyncio.gather(*tasks)
 
     asyncio.run(main())
-
-    assert (
-        len(observations) > 0
-    ), f"No observations found in range {start=} to {end=} for station {station_metadata.attributes.station_nbr}"
 
     return observations
 
@@ -280,16 +282,6 @@ harvest_job = define_asset_job(
     description="harvest a station",
     selection=AssetSelection.all(),
 )
-
-
-@asset(deps=[batch_post_observations, post_station, post_datastreams])
-def updated_crawl_tracker() -> MaterializeResult:
-    start, _ = CrawlResultTracker().get_range()
-    today = to_oregon_datetime(datetime.now())
-    CrawlResultTracker().update_range(start, today)
-    return MaterializeResult(
-        metadata={"start of data": start, "new end of data": today}
-    )
 
 
 @schedule(

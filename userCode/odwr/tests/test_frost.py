@@ -1,6 +1,8 @@
 import requests
 
 from userCode.odwr.tests.lib import (
+    DatastreamTimeRange,
+    get_datastream_time_range,
     wipe_datastreams,
     wipe_locations,
     wipe_things,
@@ -496,6 +498,10 @@ def test_adding_linked_obs_changes_datastream_time():
         == updatedDatastream["phenomenonTime"]
         == updatedDatastream["resultTime"]
     )
+
+    assert (
+        get_datastream_time_range(1) == DatastreamTimeRange(firstTime, newTime)
+    ), "The second check of the datastream timerange failed. This may be a sign that the time_range helper fn is wrong"
 
     wipe_locations()
     wipe_things()
