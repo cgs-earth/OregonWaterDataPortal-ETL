@@ -1,5 +1,5 @@
 services:
-  web:
+  frost-http:
     image: fraunhoferiosb/frost-server:latest
     environment:
       # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
@@ -35,6 +35,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  pygeoapi:
+    image: geopython/pygeoapi:latest
+    volumes:
+      - ./config.yml:/pygeoapi/local.config.yml
+    depends_on:
+      - frost-http
+    ports:
+      - 5000:80
+
+  ui:
+    image: internetofwater/hub2box-ui:iow
+    depends_on:
+      - pygeoapi
+    ports:
+      - 5001:80
+    environment:
+      - WIS2BOX_API_BACKEND_URL=http://localhost:5000/
+      - WIS2BOX_URL=http://localhost:5001
+      - serviceRootUrl=http://localhost:8080/FROST-Server
+      - WIS2BOX_API_TYPE=pygeoapi
+      - WIS2BOX_API_BACKEND_TYPE=SensorThings
+      - WIS2BOX_API_BACKEND_URL=http://localhost:8080/FROST-Server/v1.1
 
 volumes:
     postgis_volume:
