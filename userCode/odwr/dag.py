@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 from typing import Optional
 from urllib.parse import urlencode
 from dagster import (
@@ -20,10 +19,12 @@ import httpx
 
 from userCode.odwr.helper_classes import (
     BatchHelper,
+    TimeRange,
     get_datastream_time_range,
 )
 from userCode.odwr.lib import (
     format_where_param,
+    from_oregon_datetime,
     generate_oregon_tsv_url,
     generate_phenomenon_time,
     parse_oregon_tsv,
@@ -34,6 +35,7 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
+from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -131,7 +133,7 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
         no_stream_available = str(getattr(attr, stream)) != "1"
         if no_stream_available:
             continue
-        dummy_start = to_oregon_datetime(datetime.now())
+        dummy_start = now_as_oregon_datetime()
         dummy_end = dummy_start  # We get no data to just fetch the metadata about the datastream itself
         tsv_url = generate_oregon_tsv_url(
             stream, int(attr.station_nbr), dummy_start, dummy_end
@@ -170,15 +172,15 @@ def sta_all_observations(
     async def fetch_obs(datastream: Datastream):
         attr: Attributes = station_metadata.attributes
 
-        start, _ = get_datastream_time_range(int(attr.station_nbr))
-        new_end = to_oregon_datetime(datetime.today())
+        range = get_datastream_time_range(int(attr.station_nbr))
+        new_end = now_as_oregon_datetime()
 
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
             # if a datastream is available is to check the propery X_available == "1"
             datastream.description + "_available",
             int(attr.station_nbr),
-            to_oregon_datetime(start),
+            to_oregon_datetime(range.start),
             new_end,
         )
 
@@ -190,9 +192,14 @@ def sta_all_observations(
 
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
         for obs, date in zip(tsvParse.data, tsvParse.dates):
+            assert_date_in_range(
+                date, TimeRange(range.start, from_oregon_datetime(new_end))
+            )
+
             sta_representation = to_sensorthings_observation(
                 datastream, obs, date, date, associatedGeometry
             )
+
             observations.append(sta_representation)
 
         assert (

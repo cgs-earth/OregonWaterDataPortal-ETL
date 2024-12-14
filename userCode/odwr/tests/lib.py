@@ -1,6 +1,9 @@
 from contextlib import contextmanager
+import datetime
 import requests
 from userCode import API_BACKEND_URL
+from userCode.odwr.lib import to_oregon_datetime
+from datetime import datetime, timezone
 
 
 @contextmanager
@@ -109,3 +112,15 @@ def add_mock_data_to_limit_time_range(datastreamId: int):
     assert resp.ok, resp.text
     resp = requests.post(f"{API_BACKEND_URL}/Observations", json=associated_obs)
     assert resp.ok, resp.text
+
+
+def assert_date_in_range(date: str, start: datetime, end: datetime):
+    isoDate = datetime.fromisoformat(date)
+    assert isoDate.tzinfo == timezone.utc
+    assert isoDate >= start
+    assert isoDate <= end
+
+
+def now_as_oregon_datetime():
+    now = datetime.now(tz=timezone.utc)
+    return to_oregon_datetime(now)

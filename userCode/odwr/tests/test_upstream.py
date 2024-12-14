@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
+
+from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
 
 
 from ..lib import (
@@ -12,7 +14,6 @@ from ..lib import (
 import pytest
 from collections import Counter
 import requests
-from datetime import timezone
 from ..types import START_OF_DATA
 
 LOGGER = logging.getLogger(__name__)
@@ -62,7 +63,7 @@ def test_today_same_as_no_end_date(start_date):
         "mean_daily_flow_available",
         10371500,
         start_date=start_date,
-        end_date=to_oregon_datetime(datetime.now()),
+        end_date=now_as_oregon_datetime(),
     )
     assert len(response.decode("utf-8")) > 0
 
@@ -145,7 +146,7 @@ def test_old_data_has_many_null_values():
 
 def test_how_many_observations_in_full_station():
     begin = START_OF_DATA
-    end = to_oregon_datetime(datetime.now())
+    end = now_as_oregon_datetime()
 
     response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=begin, end_date=end
@@ -159,8 +160,8 @@ def test_how_many_observations_in_full_station():
 
 
 def test_timezone_behavior():
-    end = to_oregon_datetime(datetime.now())
-    begin = to_oregon_datetime(datetime.now() - timedelta(days=100))
+    end = now_as_oregon_datetime()
+    begin = to_oregon_datetime(datetime.now(tz=timezone.utc) - timedelta(days=100))
 
     response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=begin, end_date=end
@@ -177,8 +178,7 @@ def test_timezone_behavior():
         with pytest.raises(ValueError):
             from_oregon_datetime(date)
 
-        isoDate = datetime.fromisoformat(date)
-
-        assert isoDate.tzinfo == timezone.utc
-
-        assert isoDate <= datetime.now(tz=timezone.utc)
+        print(from_oregon_datetime(begin))
+        assert_date_in_range(
+            date, from_oregon_datetime(begin), from_oregon_datetime(end)
+        )

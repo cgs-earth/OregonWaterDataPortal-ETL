@@ -1,5 +1,5 @@
 from ..lib import (
-    assert_valid_date,
+    assert_valid_oregon_date,
     download_oregon_tsv,
     parse_oregon_tsv,
     from_oregon_datetime,
@@ -42,10 +42,7 @@ def test_parse_tsv():
 
 
 def test_oregon_dates():
-    assert_valid_date("09/25/2024 12:00:00 AM")
+    assert_valid_oregon_date("09/25/2024 12:00:00 AM")
     with pytest.raises(ValueError):
-        assert_valid_date("09/25/2024")
+        assert_valid_oregon_date("09/25/2024")
 
-
-def test_get_datastream_time_range():
-    pass

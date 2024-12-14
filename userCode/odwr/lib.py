@@ -131,7 +131,7 @@ def format_where_param(station_numbers: list[int]) -> str:
     return query
 
 
-def assert_valid_date(date_str: str) -> None:
+def assert_valid_oregon_date(date_str: str) -> None:
     """defensively assert that a date string is in the proper format for the Oregon API"""
     try:
         datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p")
@@ -148,4 +148,6 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
 
 def from_oregon_datetime(date_str: str) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p")
+    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
+        tzinfo=datetime.timezone.utc
+    )

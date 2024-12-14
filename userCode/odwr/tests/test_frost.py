@@ -1,6 +1,6 @@
 import requests
 
-from userCode.odwr.helper_classes import DatastreamTimeRange, get_datastream_time_range
+from userCode.odwr.helper_classes import TimeRange, get_datastream_time_range
 from userCode.odwr.lib import from_oregon_datetime
 from userCode.odwr.tests.lib import (
     wipe_datastreams,
@@ -501,9 +501,7 @@ def test_adding_linked_obs_changes_datastream_time():
 
     assert (
         get_datastream_time_range(1)
-        == DatastreamTimeRange(
-            from_oregon_datetime(firstTime), from_oregon_datetime(newTime)
-        )
+        == TimeRange(from_oregon_datetime(firstTime), from_oregon_datetime(newTime))
     ), "The second check of the datastream timerange failed. This may be a sign that the time_range helper fn is wrong"
 
     wipe_locations()

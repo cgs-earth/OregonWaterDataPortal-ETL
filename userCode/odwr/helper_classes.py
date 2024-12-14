@@ -93,19 +93,19 @@ class BatchHelper:
         self._send_payload(serialized_observations)
 
 
-class DatastreamTimeRange(NamedTuple):
+class TimeRange(NamedTuple):
     start: datetime.datetime
     end: datetime.datetime
 
 
-def get_datastream_time_range(iotid: int) -> DatastreamTimeRange:
+def get_datastream_time_range(iotid: int) -> TimeRange:
     resp = requests.get(f"{API_BACKEND_URL}/Datastreams({iotid})")
     # 404 represents that there is no datastream and thus the timerange is null
     # we represent null by setting both the start and end to the beginning of all
     # possible data
     if resp.status_code == 404:
         start_dummy = from_oregon_datetime(START_OF_DATA)
-        return DatastreamTimeRange(start_dummy, start_dummy)
+        return TimeRange(start_dummy, start_dummy)
     if not resp.ok:
         raise RuntimeError(resp.text)
     json = resp.json()
@@ -115,4 +115,4 @@ def get_datastream_time_range(iotid: int) -> DatastreamTimeRange:
 
     assert len(range) == 2
 
-    return DatastreamTimeRange(start, end)
+    return TimeRange(start, end)
