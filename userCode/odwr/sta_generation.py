@@ -16,11 +16,11 @@ def to_sensorthings_observation(
 
     # generate a unique int by hashing the datastream name with the phenomenon time and result time
     # we use mod with the max size in order to always get a positive int result
-    id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")) % 10000000
+    # id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")) % 10000000
     return Observation(
         **{
             "phenomenonTime": phenom_time,
-            "@iot.id": int(id),
+            # "@iot.id": int(id),
             "resultTime": resultTime,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,

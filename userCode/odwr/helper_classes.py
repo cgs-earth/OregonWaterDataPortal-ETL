@@ -50,7 +50,9 @@ class BatchHelper:
         if len(response_messages) != 0:
             for i, msg in enumerate(response_messages):
                 if msg["status"] == 201:
-                    get_dagster_logger().info(f"Batch post {i}/{len(response_messages)} successful")
+                    get_dagster_logger().info(
+                        f"Batch post {i}/{len(response_messages)} successful"
+                    )
                     continue  # Ignore successful responses
                 else:
                     get_dagster_logger().error(
@@ -92,7 +94,6 @@ class BatchHelper:
         for batch in batched(dataset, NUM_ITEMS_IN_BATCH):
             for id, data in enumerate(batch):
                 serialized = data.model_dump(by_alias=True)
-                assert type(serialized["@iot.id"]) is int
                 request_encoded: FrostBatchRequest = {
                     "id": str(id),
                     "method": "post",
