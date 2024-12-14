@@ -1,4 +1,4 @@
-name: Tests
+name: Pyright
 
 on:
   push:
@@ -22,11 +22,15 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
-      - name: Run docker-compose
-        uses: hoverkraft-tech/compose-action@v2.0.1
+      - uses: jakebailey/pyright-action@v2
         with:
-          compose-file: "./docker-compose.yaml"
+          pylance-version: latest-release
 
-      - name: Run tests
-        # For example, using `pytest`
-        run: uv run pytest
+      # - name: Run docker-compose
+      #   uses: hoverkraft-tech/compose-action@v2.0.1
+      #   with:
+      #     compose-file: "./docker-compose.yaml"
+
+      # - name: Run tests
+      #   # For example, using `pytest`
+      #   run: uv run pytest
