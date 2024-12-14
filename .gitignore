@@ -4,3 +4,4 @@ __pycache__/
 tmp*/
 oregondb*
 oregon_load_metadata.json
+.env
