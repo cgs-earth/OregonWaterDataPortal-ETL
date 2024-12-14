@@ -35,14 +35,13 @@ def test_parse_tsv():
     # make sure the dates are in the specified range; we need to remove the timezone information from the dates to compare
     assert from_oregon_datetime(start) <= datetime.datetime.fromisoformat(
         dates[0]
-    ).replace(tzinfo=None)
+    ).replace(tzinfo=datetime.timezone.utc)
     assert from_oregon_datetime(end) >= datetime.datetime.fromisoformat(
         dates[-1]
-    ).replace(tzinfo=None)
+    ).replace(tzinfo=datetime.timezone.utc)
 
 
 def test_oregon_dates():
     assert_valid_oregon_date("09/25/2024 12:00:00 AM")
     with pytest.raises(ValueError):
         assert_valid_oregon_date("09/25/2024")
-

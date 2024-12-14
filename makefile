@@ -13,4 +13,7 @@ wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
 test:
-	pytest -vvx
+	pytest -vv -x
+
+gh:
+	gh act

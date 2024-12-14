@@ -1,7 +1,7 @@
+import datetime
 import requests
 
 from userCode.odwr.helper_classes import TimeRange, get_datastream_time_range
-from userCode.odwr.lib import from_oregon_datetime
 from userCode.odwr.tests.lib import (
     wipe_datastreams,
     wipe_locations,
@@ -432,7 +432,7 @@ def test_adding_linked_obs_changes_datastream_time():
         },
     }
 
-    firstTime = "2022-01-01T00:00:00Z"
+    firstTime = "2022-01-01T00:00:00Z"  # this is an iso date in UTC since the Oregon tsv API returns UTC
     associated_obs = {
         "phenomenonTime": firstTime,
         "@iot.id": 999,
@@ -501,7 +501,10 @@ def test_adding_linked_obs_changes_datastream_time():
 
     assert (
         get_datastream_time_range(1)
-        == TimeRange(from_oregon_datetime(firstTime), from_oregon_datetime(newTime))
+        == TimeRange(
+            datetime.datetime.fromisoformat(firstTime),
+            datetime.datetime.fromisoformat(newTime),
+        )
     ), "The second check of the datastream timerange failed. This may be a sign that the time_range helper fn is wrong"
 
     wipe_locations()

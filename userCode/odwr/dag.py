@@ -19,7 +19,6 @@ import httpx
 
 from userCode.odwr.helper_classes import (
     BatchHelper,
-    TimeRange,
     get_datastream_time_range,
 )
 from userCode.odwr.lib import (
@@ -192,9 +191,7 @@ def sta_all_observations(
 
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
         for obs, date in zip(tsvParse.data, tsvParse.dates):
-            assert_date_in_range(
-                date, TimeRange(range.start, from_oregon_datetime(new_end))
-            )
+            assert_date_in_range(date, range.start, from_oregon_datetime(new_end))
 
             sta_representation = to_sensorthings_observation(
                 datastream, obs, date, date, associatedGeometry
@@ -204,7 +201,7 @@ def sta_all_observations(
 
         assert (
             len(observations) > 0
-        ), f"No observations found in range {start=} to {new_end=} for station {station_metadata.attributes.station_nbr}"
+        ), f"No observations found in range {range.start=} to {new_end=} for station {station_metadata.attributes.station_nbr}"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]
