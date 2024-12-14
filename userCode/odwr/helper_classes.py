@@ -50,6 +50,7 @@ class BatchHelper:
         if len(response_messages) != 0:
             for i, msg in enumerate(response_messages):
                 if msg["status"] == 201:
+                    get_dagster_logger().info(f"Batch post {i}/{len(response_messages)} successful")
                     continue  # Ignore successful responses
                 else:
                     get_dagster_logger().error(

@@ -9,7 +9,7 @@ from userCode.odwr.tests.lib import (
 )
 from userCode.odwr.types import StationData
 from userCode import API_BACKEND_URL
-from ..dag import all_metadata, definitions, post_station, sta_datastreams, sta_station
+from ..dag import all_metadata, definitions, post_station, sta_station
 from dagster import DagsterInstance
 
 
@@ -44,6 +44,9 @@ def test_full_pipeline(metadata: list[StationData]):
     datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
     assert datastreams.ok, "Failed to get datastreams"
     assert datastreams.json() == {"value": []}
+    obs = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert obs.ok, "Failed to get observations"
+    assert obs.json() == {"value": []}
 
     resolved_job = definitions.get_job_def("harvest_station")
 
