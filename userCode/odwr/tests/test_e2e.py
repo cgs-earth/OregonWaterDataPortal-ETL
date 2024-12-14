@@ -3,7 +3,7 @@ import requests
 
 from userCode.odwr.helper_classes import get_datastream_time_range
 from userCode.odwr.tests.lib import (
-    add_mock_data_to_limit_time_range,
+    wipe_datastreams,
     wipe_locations,
     wipe_things,
 )
@@ -30,8 +30,7 @@ def test_post_station(metadata: list[StationData]):
     first_item = metadata[0]
     assert first_item.attributes.station_nbr
 
-    datastreams = sta_datastreams(station_metadata=first_item)
-    station = sta_station(sta_datastreams=datastreams, station_metadata=first_item)
+    station = sta_station(station_metadata=first_item)
     post_station(station)
     wipe_locations()
     wipe_things()
@@ -42,13 +41,18 @@ def test_full_pipeline(metadata: list[StationData]):
     # Clear the locations and things before running.
     wipe_locations()
     wipe_things()
+    datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
+    assert datastreams.ok, "Failed to get datastreams"
+    assert datastreams.json() == {"value": []}
 
     resolved_job = definitions.get_job_def("harvest_station")
 
     instance = DagsterInstance.ephemeral()
 
     first_item = metadata[0].attributes.station_nbr
-    add_mock_data_to_limit_time_range(int(first_item))
+    # add_mock_data_to_change_start_time_for_datastream(
+    #     int(first_item), int(first_item) * 10
+    # )
 
     result = resolved_job.execute_in_process(
         instance=instance, partition_key=first_item
@@ -65,3 +69,5 @@ def test_full_pipeline(metadata: list[StationData]):
         ), f"No {endpoint} items found in FROST after harvesting"
 
     get_datastream_time_range(int(first_item))
+    wipe_things()
+    wipe_datastreams()  # wipe the datastreams that aren't associated with a thing

@@ -15,11 +15,12 @@ def to_sensorthings_observation(
         raise RuntimeError("Missing datapoint")
 
     # generate a unique int by hashing the datastream name with the phenomenon time and result time
-    id = hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")
+    # we use mod with the max size in order to always get a positive int result
+    id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")) % 10000000
     return Observation(
         **{
             "phenomenonTime": phenom_time,
-            "@iot.id": id,
+            "@iot.id": int(id),
             "resultTime": resultTime,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,
@@ -28,15 +29,16 @@ def to_sensorthings_observation(
                 "name": associatedDatastream.name,
                 "description": associatedDatastream.description,
                 "encodingType": "application/vnd.geo+json",
-                "feature": associatedGeometry,
+                "feature": {
+                    "type": "Point",
+                    "coordinates": list(associatedGeometry.values()),
+                },
             },
         }
     )
 
 
-def to_sensorthings_station(
-    station: StationData, datastreams: list[Datastream]
-) -> dict:
+def to_sensorthings_station(station: StationData) -> dict:
     """Generate data for the body of a POST request for Locations/ in FROST"""
     attr = station.attributes
     representation = {
@@ -55,9 +57,6 @@ def to_sensorthings_station(
                 },
             }
         ],
-        "Datastreams": [
-            datastream.model_dump(by_alias=True) for datastream in datastreams
-        ],
         "properties": attr.model_dump(by_alias=True),
     }
     if attr.elevation is not None:
@@ -69,7 +68,6 @@ def to_sensorthings_station(
 def to_sensorthings_datastream(
     attr: Attributes,
     units: str,
-    phenom_time: Optional[str],
     stream_name: str,
     id: int,
     associatedThingId: int,
@@ -104,9 +102,4 @@ def to_sensorthings_datastream(
             "Thing": {"@iot.id": associatedThingId},
         }
     )
-    # These are the same since we assume the sensor reports at the same time it is measured
-    # Even though those are the same value, FROST appears to round resultTime to the nearest hour but not phenomenonTime
-    if phenom_time:
-        datastream["resultTime"] = phenom_time  # type: ignore
-        datastream["phenomenonTime"] = phenom_time  # type: ignore
     return datastream

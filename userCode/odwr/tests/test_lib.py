@@ -1,3 +1,4 @@
+from userCode.odwr.tests.lib import wipe_datastreams, wipe_locations, wipe_things
 from ..lib import (
     assert_valid_oregon_date,
     download_oregon_tsv,
@@ -45,3 +46,9 @@ def test_oregon_dates():
     assert_valid_oregon_date("09/25/2024 12:00:00 AM")
     with pytest.raises(ValueError):
         assert_valid_oregon_date("09/25/2024")
+
+
+def test_fully_wipe_db():
+    wipe_datastreams()
+    wipe_locations()
+    wipe_things()

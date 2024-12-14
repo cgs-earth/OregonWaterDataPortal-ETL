@@ -178,7 +178,6 @@ def test_timezone_behavior():
         with pytest.raises(ValueError):
             from_oregon_datetime(date)
 
-        print(from_oregon_datetime(begin))
         assert_date_in_range(
             date, from_oregon_datetime(begin), from_oregon_datetime(end)
         )

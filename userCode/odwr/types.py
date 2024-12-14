@@ -267,7 +267,6 @@ class Properties(BaseModel):
 
 
 class Datastream(BaseModel):
-    # "@iot.selfLink": str,
     iotid: int = Field(alias="@iot.id")
     name: str
     description: str
@@ -283,6 +282,7 @@ class Datastream(BaseModel):
 class Observation(BaseModel):
     """sta observation"""
 
+    iotid: int = Field(alias="@iot.id")
     resultTime: str
     phenomenonTime: str
     Datastream: dict

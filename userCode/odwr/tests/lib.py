@@ -58,14 +58,16 @@ def wipe_datastreams():
         raise RuntimeError(response.text)
 
 
-def add_mock_data_to_limit_time_range(datastreamId: int):
+def add_mock_data_to_change_start_time_for_datastream(
+    associatedThingId: int, datastreamId: int
+):
     """By adding a datastream with a recent observation, the e2e pipeline will only fetch
     after it, thus reducing the time it takes to run the pipeline in CI
     """
     datastream = {
-        "name": "test",
+        "name": "mock_test_datastream",
         "@iot.id": datastreamId,
-        "description": "test",
+        "description": "mock_test_description",
         "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
         "unitOfMeasurement": {
             "name": "Degree Celsius",
@@ -79,8 +81,8 @@ def add_mock_data_to_limit_time_range(datastreamId: int):
             "definition": "Unknown",
         },
         "Thing": {
-            "@iot.id": 1,
-            "name": "test",
+            "@iot.id": associatedThingId,
+            "name": "test_thing",
             "description": "test",
         },
         "Sensor": {

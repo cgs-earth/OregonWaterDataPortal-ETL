@@ -25,7 +25,6 @@ from userCode.odwr.lib import (
     format_where_param,
     from_oregon_datetime,
     generate_oregon_tsv_url,
-    generate_phenomenon_time,
     parse_oregon_tsv,
     to_oregon_datetime,
 )
@@ -139,10 +138,9 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
         )
         response = requests.get(tsv_url)
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
-        phenom_time = generate_phenomenon_time(tsvParse.dates)
         datastreams.append(
             to_sensorthings_datastream(
-                attr, tsvParse.units, phenom_time, stream, id, associatedThingId
+                attr, tsvParse.units, stream, id, associatedThingId
             )
         )
 
@@ -153,10 +151,9 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
 
 @asset(partitions_def=station_partition)
 def sta_station(
-    sta_datastreams: list[Datastream],
     station_metadata: StationData,
 ):
-    return to_sensorthings_station(station_metadata, sta_datastreams)
+    return to_sensorthings_station(station_metadata)
 
 
 @asset(partitions_def=station_partition)
@@ -165,13 +162,15 @@ def sta_all_observations(
     sta_datastreams: list[Datastream],
 ):
     session = httpx.AsyncClient()
-    observations: list[Observation] = []
+    observations: list[Observation] = []  # all attributes in both datastreams
     associatedGeometry = station_metadata.geometry
+    attr: Attributes = station_metadata.attributes
+    range = get_datastream_time_range(int(attr.station_nbr))
+    get_dagster_logger().info(
+        f"Found existing observations in range {range.start} to {range.end}"
+    )
 
     async def fetch_obs(datastream: Datastream):
-        attr: Attributes = station_metadata.attributes
-
-        range = get_datastream_time_range(int(attr.station_nbr))
         new_end = now_as_oregon_datetime()
 
         tsv_url = generate_oregon_tsv_url(
@@ -250,7 +249,7 @@ def post_datastreams(sta_datastreams: list[Datastream]):
             )
         elif not resp.ok:
             get_dagster_logger().error(
-                f"Failed checking if datastream '{datastream}' exists"
+                f"Failed checking if datastream '{datastream.iotid}' exists"
             )
             raise RuntimeError(resp.text)
         else:

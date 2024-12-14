@@ -1,7 +1,10 @@
 import datetime
 import requests
 
-from userCode.odwr.helper_classes import TimeRange, get_datastream_time_range
+from userCode.odwr.helper_classes import (
+    TimeRange,
+    get_datastream_time_range,
+)
 from userCode.odwr.tests.lib import (
     wipe_datastreams,
     wipe_locations,
@@ -37,6 +40,7 @@ def test_duplicate():
 
 def test_wipe():
     """Make sure that after wiping the database, there are no things"""
+    wipe_things()
     for i in range(1, 10):
         resp = requests.post(
             f"{API_BACKEND_URL}/Things",
@@ -509,4 +513,164 @@ def test_adding_linked_obs_changes_datastream_time():
 
     wipe_locations()
     wipe_things()
+    wipe_datastreams()
+
+
+def test_batch():
+    wipe_datastreams()
+    # put in the datastream first before the associated observations
+    datastream = {
+        "name": "testBatch",
+        "@iot.id": 103785001,
+        "description": "test",
+        "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+        "unitOfMeasurement": {
+            "name": "Degree Celsius",
+            "symbol": "degC",
+            "definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#DegreeCelsius",
+        },
+        "ObservedProperty": {
+            "@iot.id": 1,
+            "name": "test",
+            "description": "test",
+            "definition": "Unknown",
+        },
+        "Thing": {
+            "@iot.id": 1,
+            "name": "test",
+            "description": "test",
+        },
+        "Sensor": {
+            "@iot.id": 0,
+            "name": "Unknown",
+            "description": "Unknown",
+            "encodingType": "Unknown",
+            "metadata": "Unknown",
+        },
+    }
+    resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=datastream)
+    assert resp.ok, resp.text
+
+    batch = {
+        "requests": [
+            {
+                "id": "0",
+                "method": "post",
+                "url": "Observations",
+                "body": {
+                    "@iot.id": 3028655,
+                    "resultTime": "2022-01-01T00:00:00Z",
+                    "phenomenonTime": "2022-01-01T00:00:00Z",
+                    "Datastream": {"@iot.id": 103785001},
+                    "result": 0.9,
+                    "FeatureOfInterest": {
+                        "@iot.id": 103785001,
+                        "name": "HONEY CR NR PLUSH, OR water_temp_mean",
+                        "description": "water_temp_mean",
+                        "encodingType": "application/vnd.geo+json",
+                        "feature": {
+                            "type": "Point",
+                            "coordinates": [-13349691.87182539, 5224841.217882111],
+                        },
+                    },
+                },
+            },
+            {
+                "id": "1",
+                "method": "post",
+                "url": "Observations",
+                "body": {
+                    "@iot.id": 9709526,
+                    "resultTime": "2022-01-02T00:00:00Z",
+                    "phenomenonTime": "2022-01-02T00:00:00Z",
+                    "Datastream": {"@iot.id": 103785001},
+                    "result": 1.2,
+                    "FeatureOfInterest": {
+                        "@iot.id": 103785001,
+                        "name": "HONEY CR NR PLUSH, OR water_temp_mean",
+                        "description": "water_temp_mean",
+                        "encodingType": "application/vnd.geo+json",
+                        "feature": {
+                            "type": "Point",
+                            "coordinates": [-13349691.87182539, 5224841.217882111],
+                        },
+                    },
+                },
+            },
+            {
+                "id": "2",
+                "method": "post",
+                "url": "Observations",
+                "body": {
+                    "@iot.id": 2399042,
+                    "resultTime": "2022-01-03T00:00:00Z",
+                    "phenomenonTime": "2022-01-03T00:00:00Z",
+                    "Datastream": {"@iot.id": 103785001},
+                    "result": 1.2,
+                    "FeatureOfInterest": {
+                        "@iot.id": 103785001,
+                        "name": "HONEY CR NR PLUSH, OR water_temp_mean",
+                        "description": "water_temp_mean",
+                        "encodingType": "application/vnd.geo+json",
+                        "feature": {
+                            "type": "Point",
+                            "coordinates": [-13349691.87182539, 5224841.217882111],
+                        },
+                    },
+                },
+            },
+            {
+                "id": "3",
+                "method": "post",
+                "url": "Observations",
+                "body": {
+                    "@iot.id": 9620043,
+                    "resultTime": "2022-01-04T00:00:00Z",
+                    "phenomenonTime": "2022-01-04T00:00:00Z",
+                    "Datastream": {"@iot.id": 103785001},
+                    "result": 0.2,
+                    "FeatureOfInterest": {
+                        "@iot.id": 103785001,
+                        "name": "HONEY CR NR PLUSH, OR water_temp_mean",
+                        "description": "water_temp_mean",
+                        "encodingType": "application/vnd.geo+json",
+                        "feature": {
+                            "type": "Point",
+                            "coordinates": [-13349691.87182539, 5224841.217882111],
+                        },
+                    },
+                },
+            },
+            {
+                "id": "4",
+                "method": "post",
+                "url": "Observations",
+                "body": {
+                    "@iot.id": 6986075,
+                    "resultTime": "2022-01-05T00:00:00Z",
+                    "phenomenonTime": "2022-01-05T00:00:00Z",
+                    "Datastream": {"@iot.id": 103785001},
+                    "result": 0.1,
+                    "FeatureOfInterest": {
+                        "@iot.id": 103785001,
+                        "name": "HONEY CR NR PLUSH, OR water_temp_mean",
+                        "description": "water_temp_mean",
+                        "encodingType": "application/vnd.geo+json",
+                        "feature": {
+                            "type": "Point",
+                            "coordinates": [-13349691.87182539, 5224841.217882111],
+                        },
+                    },
+                },
+            },
+        ]
+    }
+
+    resp = requests.post(f"{API_BACKEND_URL}/$batch", json=batch)
+    assert resp.ok, resp.text
+
+    json = resp.json()
+    for i, msg in enumerate(json["responses"]):
+        assert msg["status"] == 201, msg
+
     wipe_datastreams()
