@@ -166,13 +166,13 @@ def sta_all_observations(
     associatedGeometry = station_metadata.geometry
     attr: Attributes = station_metadata.attributes
     range = get_datastream_time_range(int(attr.station_nbr))
+    new_end = now_as_oregon_datetime()
+
     get_dagster_logger().info(
-        f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {now_as_oregon_datetime()}"
+        f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {new_end}"
     )
 
     async def fetch_obs(datastream: Datastream):
-        new_end = now_as_oregon_datetime()
-
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
             # if a datastream is available is to check the propery X_available == "1"
