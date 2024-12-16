@@ -68,4 +68,4 @@ services:
       - 8999:80
 
 volumes:
-    postgis_volume:
+  postgis_volume:

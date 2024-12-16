@@ -12,7 +12,7 @@ server:
   limit: 500
   map:
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    attribution: "<a href=\"https://osm.org/copyright\">OpenStreetMap</a> contributors"
+    attribution: '<a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
   templates:
     path: "/pygeoapi/pygeoapi/templates"
 logging:
