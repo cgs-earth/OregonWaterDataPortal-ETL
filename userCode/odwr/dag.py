@@ -295,4 +295,13 @@ definitions = Definitions(
     asset_checks=load_asset_checks_from_current_module(),
     schedules=[crawl_entire_graph_schedule],
     jobs=[harvest_job],
+    # sensors=[
+    #     dagster_slack.make_slack_on_run_failure_sensor(
+    #         channel="#cgs-iow-bots",
+    #         slack_token=strict_env("DAGSTER_SLACK_TOKEN"),
+    #         text_fn=slack_error_fn,
+    #         default_status=DefaultSensorStatus.RUNNING,
+    #         monitor_all_code_locations=True,
+    #     )
+    # ],
 )

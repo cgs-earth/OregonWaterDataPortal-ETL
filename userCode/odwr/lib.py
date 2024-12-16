@@ -2,8 +2,11 @@ import csv
 import datetime
 import io
 import logging
+import os
 from urllib.parse import urlencode
 from typing import Optional
+
+from dagster import RunFailureSensorContext, get_dagster_logger
 from ..common.cache import ShelveCache
 from .types import (
     POTENTIAL_DATASTREAMS,
@@ -151,3 +154,22 @@ def from_oregon_datetime(date_str: str) -> datetime.datetime:
     return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
         tzinfo=datetime.timezone.utc
     )
+
+
+def strict_env(key: str):
+    val = os.environ.get(key)
+    if val is None:
+        raise Exception(f"Missing ENV var: {key}")
+
+    return val
+
+
+def slack_error_fn(context: RunFailureSensorContext) -> str:
+    get_dagster_logger().info("Sending notification to Slack")
+    # The make_slack_on_run_failure_sensor automatically sends the job
+    # id and name so you can just send the error. We don't need other data in the string
+    source_being_crawled = context.partition_key
+    if source_being_crawled:
+        return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
+    else:
+        return f"Error: {context.failure_event.message}"
