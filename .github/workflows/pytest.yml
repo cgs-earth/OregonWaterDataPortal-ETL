@@ -34,7 +34,7 @@ jobs:
         if: failure() # Only runs if the workflow fails
         run: |
           echo "Logging container output for debugging..."
-          docker compose logs db # Replace 'db' with your database service name
+          docker compose logs database # Replace 'db' with your database service name
           docker compose ps
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
