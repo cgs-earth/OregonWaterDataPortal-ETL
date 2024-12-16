@@ -50,9 +50,6 @@ class BatchHelper:
         if len(response_messages) != 0:
             for i, msg in enumerate(response_messages):
                 if msg["status"] == 201:
-                    get_dagster_logger().info(
-                        f"Batch post {i}/{len(response_messages)} successful"
-                    )
                     continue  # Ignore successful responses
                 else:
                     get_dagster_logger().error(
@@ -61,6 +58,9 @@ class BatchHelper:
                     raise RuntimeError(
                         f"Batch post {i}/{len(response_messages)} failed due with response from FROST: {msg}"
                     )
+            get_dagster_logger().info(
+                f"{len(response_messages)} Batch posts completed successfully"
+            )
         else:
             get_dagster_logger().warning(
                 "No responses from FROST API after batching. This suggests a potential issue with your batch request"
