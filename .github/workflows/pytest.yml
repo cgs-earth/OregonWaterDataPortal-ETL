@@ -1,4 +1,4 @@
-name: Pyright
+name: Pytest
 
 on:
   push:

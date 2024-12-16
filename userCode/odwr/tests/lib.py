@@ -3,7 +3,7 @@ import datetime
 import requests
 from userCode import API_BACKEND_URL
 from userCode.odwr.lib import to_oregon_datetime
-from datetime import datetime, timezone
+from datetime import timezone
 
 
 @contextmanager
