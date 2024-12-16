@@ -36,7 +36,8 @@ jobs:
       - name: Compare requirements.txt
         run: |
           if ! diff -q new_requirements.txt requirements.txt; then
-            echo "requirements.txt is out of sync with the project configuration."
+            echo "requirements.txt is out of sync with the project configuration:"
+            diff -u requirements.txt new_requirements.txt
             exit 1
           fi
         shell: bash
