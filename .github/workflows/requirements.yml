@@ -1,6 +1,7 @@
 name: Validate Requirements
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - "pyproject.toml"  # Trigger on changes to pyproject.toml
