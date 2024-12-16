@@ -1,4 +1,4 @@
-name: Pyright
+name: Pytest
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
           docker inspect $(docker ps -aq) || true
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run pytest -x
 
       - name: Stop Docker Compose services
         if: always()
