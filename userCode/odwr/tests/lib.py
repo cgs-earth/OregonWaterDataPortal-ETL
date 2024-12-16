@@ -116,13 +116,13 @@ def add_mock_data_to_change_start_time_for_datastream(
     assert resp.ok, resp.text
 
 
-def assert_date_in_range(date: str, start: datetime, end: datetime):
-    isoDate = datetime.fromisoformat(date)
+def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
+    isoDate = datetime.datetime.fromisoformat(date)
     assert isoDate.tzinfo == timezone.utc
     assert isoDate >= start
     assert isoDate <= end
 
 
 def now_as_oregon_datetime():
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.datetime.now(tz=timezone.utc)
     return to_oregon_datetime(now)
