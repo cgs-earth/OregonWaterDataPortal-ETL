@@ -5,9 +5,11 @@ on:
   push:
     paths:
       - "pyproject.toml"  # Trigger on changes to pyproject.toml
+      - "requirements.txt"
   pull_request:
     paths:
       - "pyproject.toml"  # Trigger on changes to pyproject.toml
+      - "requirements.txt"
 
 jobs:
   validate-requirements:

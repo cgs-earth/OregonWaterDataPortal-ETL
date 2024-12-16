@@ -167,7 +167,7 @@ def sta_all_observations(
     attr: Attributes = station_metadata.attributes
     range = get_datastream_time_range(int(attr.station_nbr))
     get_dagster_logger().info(
-        f"Found existing observations in range {range.start} to {range.end}"
+        f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {now_as_oregon_datetime()}"
     )
 
     async def fetch_obs(datastream: Datastream):
