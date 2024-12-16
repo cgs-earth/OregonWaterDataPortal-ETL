@@ -393,9 +393,12 @@ def test_post_with_invalid_id():
     resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=payload)
     assert resp.status_code == 400
     msg = resp.json()["message"]
+    # Nondeterministic which of these gets triggered, but one always does
+    # since you are referring to a iot.id that doesnt exist and isnt defined inline in the JSON
     assert (
         msg == "No such entity 'Thing' with id  2 "
         or msg == "No such entity 'Sensor' with id  6 "
+        or msg == "No such entity 'ObservedProperty' with id  7 "
     )
     wipe_locations()
     wipe_things()
@@ -522,7 +525,7 @@ def test_batch():
     datastream = {
         "name": "testBatch",
         "@iot.id": 103785001,
-        "description": "test",
+        "description": "testBatchDescription",
         "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
         "unitOfMeasurement": {
             "name": "Degree Celsius",
@@ -537,8 +540,8 @@ def test_batch():
         },
         "Thing": {
             "@iot.id": 1,
-            "name": "test",
-            "description": "test",
+            "name": "testBatchThing",
+            "description": "testBatchThing",
         },
         "Sensor": {
             "@iot.id": 0,
@@ -673,4 +676,4 @@ def test_batch():
     for i, msg in enumerate(json["responses"]):
         assert msg["status"] == 201, msg
 
-    wipe_datastreams()
+    wipe_things()

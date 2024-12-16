@@ -124,7 +124,10 @@ class OregonXLSX:
                 unit_of_measurement=fsc.UnitOfMeasurement(
                     name=metadata["Units Name"], definition=metadata["Units URI"]
                 ),
-                observed_area=getObservedArea(associatedThing),
+                # Don't believe we need this here, FROST
+                # generates this dynamically it appears based on the location
+                # it is linked with
+                # observed_area=getObservedArea(associatedThing),
                 observed_property=fsc.ObservedProperty(
                     name=metadata["Observed Property Name"],
                     definition=metadata["Observed Property URI"],
