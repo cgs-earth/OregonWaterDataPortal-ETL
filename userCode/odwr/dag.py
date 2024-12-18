@@ -34,6 +34,7 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_station,
 )
 from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
+from userCode.odwr.helper_classes import MockValues
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -158,21 +159,27 @@ def sta_station(
 
 @asset(partitions_def=station_partition)
 def sta_all_observations(
-    station_metadata: StationData,
-    sta_datastreams: list[Datastream],
+    station_metadata: StationData, sta_datastreams: list[Datastream], config: MockValues
 ):
     session = httpx.AsyncClient()
     observations: list[Observation] = []  # all attributes in both datastreams
     associatedGeometry = station_metadata.geometry
     attr: Attributes = station_metadata.attributes
-    range = get_datastream_time_range(int(attr.station_nbr))
-    new_end = now_as_oregon_datetime()
-
-    get_dagster_logger().info(
-        f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {new_end}"
-    )
 
     async def fetch_obs(datastream: Datastream):
+        range = get_datastream_time_range(datastream.iotid)
+
+        # If we have a mocked date to update until, use that instead
+        # of downloading everything
+        if config and config.mocked_date_to_update_until:
+            new_end = config.mocked_date_to_update_until
+        else:
+            new_end = now_as_oregon_datetime()
+
+        get_dagster_logger().info(
+            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {new_end}"
+        )
+
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
             # if a datastream is available is to check the propery X_available == "1"
@@ -200,7 +207,7 @@ def sta_all_observations(
 
         assert (
             len(observations) > 0
-        ), f"No observations found in range {range.start=} to {new_end=} for station {station_metadata.attributes.station_nbr}"
+        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}'"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]

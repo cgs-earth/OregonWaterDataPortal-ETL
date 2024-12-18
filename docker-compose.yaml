@@ -37,7 +37,7 @@ services:
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
-    image: geopython/pygeoapi:latest
+    image: internetofwater/pygeoapi:owdp
     volumes:
       - ./config.yml:/pygeoapi/local.config.yml
     depends_on:

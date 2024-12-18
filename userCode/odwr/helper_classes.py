@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import datetime
 import logging
-from typing import Literal, NamedTuple
-from dagster import get_dagster_logger
+from typing import Literal, NamedTuple, Optional
+from dagster import Config, get_dagster_logger
 import requests
 from .lib import from_oregon_datetime
 from .types import (
@@ -107,8 +107,18 @@ class BatchHelper:
 
 
 class TimeRange(NamedTuple):
+    """Helper class for representing a time range of a STA datastream"""
+
     start: datetime.datetime
     end: datetime.datetime
+
+
+class MockValues(Config):
+    """Helper class for mocking values for testing"""
+
+    # needs to be a string because the dagster config system does not support datetime
+    # doesn't need to exist since mocking is optional and only used for testing
+    mocked_date_to_update_until: Optional[str]
 
 
 def get_datastream_time_range(iotid: int) -> TimeRange:
@@ -121,6 +131,7 @@ def get_datastream_time_range(iotid: int) -> TimeRange:
     # possible data
     if resp.status_code == 404:
         start_dummy = from_oregon_datetime(START_OF_DATA)
+        get_dagster_logger().warning(f"Did not find datastream: '{iotid}' inside FROST")
         return TimeRange(start_dummy, start_dummy)
     if not resp.ok:
         raise RuntimeError(resp.text)

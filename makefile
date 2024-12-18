@@ -21,6 +21,7 @@ gh:
 uv:
 # uv is a python version manager and venv manager that we use because of the fact that dagster is pinned to specific
 # python versions and is not trivial to manage. 
+	wget -qO- https://astral.sh/uv/install.sh | sh
 	uv python install 3.12
 	uv sync 
 	source .venv/bin/activate
