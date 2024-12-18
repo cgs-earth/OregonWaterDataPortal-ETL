@@ -85,14 +85,14 @@ class BatchHelper:
 
     def send_observations(self, dataset: list[Observation]):
         """Send batch observations to the FROST API"""
-        serialized_observations = []
 
         get_dagster_logger().info(f"Batch posting {len(dataset)} observations")
-        NUM_ITEMS_IN_BATCH = 800
+        NUM_ITEMS_IN_BATCH = 500
         get_dagster_logger().info(
             f"Batch is grouped into groups of at most {NUM_ITEMS_IN_BATCH} observations"
         )
         for batch in batched(dataset, NUM_ITEMS_IN_BATCH):
+            serialized_observations = []
             for id, data in enumerate(batch):
                 serialized = data.model_dump(by_alias=True)
                 request_encoded: FrostBatchRequest = {
