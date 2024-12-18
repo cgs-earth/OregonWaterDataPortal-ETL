@@ -1,4 +1,6 @@
 {
+  // version needs to be specified in launch.json or debugging won't work
+  "version": "0.2.0",
   "configurations": [
     {
       "name": "dagster dev",
