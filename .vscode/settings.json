@@ -7,9 +7,7 @@
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.analysis.typeCheckingMode": "standard",
-  "python.testing.pytestArgs": [
-    "userCode"
-  ],
+  "python.testing.pytestArgs": ["userCode"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true
 }
