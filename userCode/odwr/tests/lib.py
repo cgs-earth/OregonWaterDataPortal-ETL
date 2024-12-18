@@ -124,5 +124,18 @@ def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.date
 
 
 def now_as_oregon_datetime():
+    """Get the current time formatted in a way that the oregon api expects"""
     now = datetime.datetime.now(tz=timezone.utc)
     return to_oregon_datetime(now)
+
+
+def dates_are_within_X_days(
+    date1: datetime.datetime, date2: datetime.datetime, days: int
+):
+    """Check if two dates are within X days of each other
+    Used for sanity checking the api. Since the API can
+    sometimes lag behind or not update with new data,
+    we need to check that the data is within a certain
+    time frame more coarsely
+    """
+    return abs((date1 - date2).days) <= days

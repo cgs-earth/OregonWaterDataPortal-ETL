@@ -5,6 +5,7 @@ import requests
 from userCode.odwr.helper_classes import get_datastream_time_range
 from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
+    dates_are_within_X_days,
     wipe_locations,
     wipe_things,
 )
@@ -90,10 +91,10 @@ def test_full_pipeline(metadata: list[StationData]):
     first_iotid = datastreams.json()["value"][0]["@iot.id"]
     range = get_datastream_time_range(first_iotid)
 
-    assert (
-        range.start < range.end
-    ), "The start of the datastream should be before the end"
-    assert range.end.month == mocked_date.month
+    assert range.start < range.end, "The start of the datastream must be before the end"
+    assert dates_are_within_X_days(
+        range.end, mocked_date, 7
+    ), "The end of the data in the database is significantly older than the mocked date. This could be ok if the upstream is lagging behind, but is generally a sign of an error"
 
     # run again to see if the datastream is updated
     result2 = resolved_job.execute_in_process(
@@ -101,10 +102,16 @@ def test_full_pipeline(metadata: list[StationData]):
     )
     assert result2.success
     range2 = get_datastream_time_range(first_iotid)
-    assert range2.start < range2.end
-    assert range2.start == range.start
+    assert (
+        range2.start < range2.end
+    ), "The start of the datastream must be before the end"
+    assert (
+        range2.start == range.start
+    ), "The start of the datastream should not change as new data is added to the end"
     assert range2.end >= range.end
     today = datetime.datetime.now(tz=datetime.timezone.utc)
-    assert (
-        range2.end.month == today.month
-    ), "The most recent observation in a datastream should be in the current month unless there API is behind and has not updated yet"
+    assert dates_are_within_X_days(
+        range2.end, today, 3
+    ), "The most recent observation in a datastream should be in the current month unless the upstream Oregon API is behind and has not updated observations yet"
+    wipe_locations()
+    wipe_things()
