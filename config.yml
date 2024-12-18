@@ -138,7 +138,9 @@ resources:
         id_field: "@iot.id"
         title_field: "name"
         intralink: true
-        expand: Thing/Locations,Observations($select=result,phenomenonTime,@iot.id;$orderby=phenomenonTime desc;$top=1),Observations/FeatureOfInterest($select=feature)
+        expand: Thing/Locations,Observations($select=@iot.id;$orderby=phenomenonTime desc;$top=1),Observations/FeatureOfInterest($select=feature),Sensor,ObservedProperty
+        storage_crs: http://www.opengis.net/def/crs/EPSG/0/3857
+    links:
       - type: "text/html"
         rel: "canonical"
         title: "information"
@@ -169,9 +171,9 @@ resources:
         id_field: "@iot.id"
         time_field: "resultTime"
         intralink: true
+        storage_crs: http://www.opengis.net/def/crs/EPSG/0/3857
     links:
       - type: "text/html"
         rel: "canonical"
         title: "information"
-        storage_crs: http://www.opengis.net/def/crs/EPSG/0/3857
         href: "https://gis.wrd.state.or.us/server/rest/services"
