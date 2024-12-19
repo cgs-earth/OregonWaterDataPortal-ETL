@@ -3,7 +3,6 @@ from typing import Optional
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
-    DefaultSensorStatus,
     Definitions,
     RunRequest,
     StaticPartitionsDefinition,
@@ -15,7 +14,6 @@ from dagster import (
     AssetExecutionContext,
     schedule,
 )
-import dagster_slack
 import httpx
 
 from userCode.odwr.helper_classes import (
@@ -27,8 +25,6 @@ from userCode.odwr.lib import (
     from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    slack_error_fn,
-    strict_env,
     to_oregon_datetime,
 )
 from userCode.odwr.sta_generation import (

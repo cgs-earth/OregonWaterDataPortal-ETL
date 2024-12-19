@@ -62,7 +62,7 @@ def test_wipe():
     assert resp.ok
     items = resp.json()["value"]
     assert len(items) == 0
-    wipe_observed_properties() 
+    wipe_observed_properties()
     resp = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
     assert resp.ok
     items = resp.json()["value"]
