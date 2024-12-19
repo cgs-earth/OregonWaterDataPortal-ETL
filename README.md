@@ -1,4 +1,6 @@
-Integration for ingesting data from Oregon APIs and exposing it as sensorthings data
+# Oregon Water Data Portal ETL
+
+The Oregon Water Data portal crawls or ingests data from multiple different Oregon sources and exposes them via a Sensorthings and OGC API Features endpoint.
 
 # How to use
 

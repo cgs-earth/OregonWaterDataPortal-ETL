@@ -187,7 +187,7 @@ def sta_all_observations(
 
         assert (
             len(observations) > 0
-        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}'"
+        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]

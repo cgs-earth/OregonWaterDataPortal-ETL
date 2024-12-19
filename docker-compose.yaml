@@ -3,7 +3,7 @@ services:
     image: fraunhoferiosb/frost-server:latest
     environment:
       # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
-      - serviceRootUrl=http://localhost:8999/FROST-Server
+      - serviceRootUrl=${OWDP_URL}/FROST-Server
       - plugins_multiDatastream.enable=false
       - http_cors_enable=true
       - http_cors_allowed_origins=*
@@ -44,7 +44,7 @@ services:
       - frost-http
     environment:
       - WIS2BOX_API_URL=${OWDP_URL}/oapi
-      - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
+      - WIS2BOX_API_BACKEND_URL=${OWDP_URL}/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
   wis2box-ui:

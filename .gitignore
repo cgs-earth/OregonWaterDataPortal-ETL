@@ -4,4 +4,6 @@ __pycache__/
 tmp*/
 oregondb*
 oregon_load_metadata.json
-.env
+# dagster local sqlite dbs
+history/
+schedules/
