@@ -54,7 +54,7 @@ station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STA
 def preflight_checks():
     """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
-    assert sta_ping.ok, "FROST server is not running"
+    assert sta_ping.ok, f"FROST server is not running at {API_BACKEND_URL}"
 
 
 @asset(deps=[preflight_checks])
