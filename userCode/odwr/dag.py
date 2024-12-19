@@ -54,7 +54,7 @@ station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STA
 def preflight_checks():
     """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
-    assert sta_ping.ok, "FROST server is not running"
+    assert sta_ping.ok, f"FROST server is not running at {API_BACKEND_URL}"
 
 
 @asset(deps=[preflight_checks])
@@ -187,7 +187,7 @@ def sta_all_observations(
 
         assert (
             len(observations) > 0
-        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}'"
+        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]

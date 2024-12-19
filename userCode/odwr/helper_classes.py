@@ -136,6 +136,9 @@ def get_datastream_time_range(iotid: int) -> TimeRange:
     if not resp.ok:
         raise RuntimeError(resp.text)
     json = resp.json()
+    assert (
+        "phenomenonTime" in json
+    ), f"phenomenonTime was not found in the datastream. This is a sign that the datastream was created in a previous call but never populated correctly. Full json: {json}"
     range = json["phenomenonTime"].split("/")
     start = datetime.datetime.fromisoformat(range[0])
     end = datetime.datetime.fromisoformat(range[1])

@@ -28,6 +28,7 @@ def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
         "f": "json",
     }
     url = BASE_OREGON_URL + urlencode(params)
+    get_dagster_logger().info(f"Fetching {url} to get all station metadata")
     response = requests.get(url)
     if response.ok:
         json: OregonHttpResponse = OregonHttpResponse(**response.json())

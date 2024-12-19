@@ -25,7 +25,7 @@ def wipe_things():
         things = response.json()["value"]
         for thing in things:
             resp = requests.delete(f"{API_BACKEND_URL}/Things({thing['@iot.id']})")
-            assert resp.ok
+            assert resp.ok, resp.text
     else:
         raise RuntimeError(response.text)
 
