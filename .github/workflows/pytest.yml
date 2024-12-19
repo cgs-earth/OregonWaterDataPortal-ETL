@@ -27,6 +27,7 @@ jobs:
 
       - name: Start Docker Compose services
         run: |
+          cp .env.example .env
           docker compose up -d
           docker compose ps # Display the status of all containers
 
