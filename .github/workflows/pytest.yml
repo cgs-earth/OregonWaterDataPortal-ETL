@@ -27,6 +27,7 @@ jobs:
 
       - name: Start Docker Compose services
         run: |
+          OWDP_URL=localhost:8999
           docker compose up -d
           docker compose ps # Display the status of all containers
 
