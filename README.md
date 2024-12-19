@@ -5,10 +5,11 @@ Integration for ingesting data from Oregon APIs and exposing it as sensorthings 
 1. Spin up the infrastructure with docker
 
 ```sh
-docker compose up
+docker compose --env-file owdp.env up
 ```
 
-Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`
+Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`,
+or edit `owdp.env` and deploy at your own URL.
 
 2. Start Caddy with `make caddy` if you want to get https in production.
 
