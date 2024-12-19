@@ -3,7 +3,7 @@ import datetime
 import requests
 from userCode import API_BACKEND_URL
 from userCode.odwr.lib import to_oregon_datetime
-from datetime import datetime, timezone
+from datetime import timezone
 
 
 @contextmanager
@@ -38,6 +38,20 @@ def wipe_locations():
         for location in locations:
             resp = requests.delete(
                 f"{API_BACKEND_URL}/Locations({location['@iot.id']})"
+            )
+            assert resp.ok
+    else:
+        raise RuntimeError(response.text)
+
+
+def wipe_observed_properties():
+    """Wipe just the ObservedProperties"""
+    response = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    if response.ok:
+        observed_properties = response.json()["value"]
+        for observed_property in observed_properties:
+            resp = requests.delete(
+                f"{API_BACKEND_URL}/ObservedProperties({observed_property['@iot.id']})"
             )
             assert resp.ok
     else:
@@ -116,13 +130,26 @@ def add_mock_data_to_change_start_time_for_datastream(
     assert resp.ok, resp.text
 
 
-def assert_date_in_range(date: str, start: datetime, end: datetime):
-    isoDate = datetime.fromisoformat(date)
+def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
+    isoDate = datetime.datetime.fromisoformat(date)
     assert isoDate.tzinfo == timezone.utc
     assert isoDate >= start
     assert isoDate <= end
 
 
 def now_as_oregon_datetime():
-    now = datetime.now(tz=timezone.utc)
+    """Get the current time formatted in a way that the oregon api expects"""
+    now = datetime.datetime.now(tz=timezone.utc)
     return to_oregon_datetime(now)
+
+
+def dates_are_within_X_days(
+    date1: datetime.datetime, date2: datetime.datetime, days: int
+):
+    """Check if two dates are within X days of each other
+    Used for sanity checking the api. Since the API can
+    sometimes lag behind or not update with new data,
+    we need to check that the data is within a certain
+    time frame more coarsely
+    """
+    return abs((date1 - date2).days) <= days

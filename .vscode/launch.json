@@ -1,20 +1,21 @@
 {
-    "configurations": [
-        {
-            "name": "dagster dev",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "dagster",
-            "args": [
-                "dev",
-            ],
-            "subProcess": true
-        },    {
+  // version needs to be specified in launch.json or debugging won't work
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "dagster dev",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "dagster",
+      "args": ["dev"],
+      "subProcess": true
+    },
+    {
       "name": "Pytest One File",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": ["-svvvv", "${file}"]
-    },
-    ]
+    }
+  ]
 }

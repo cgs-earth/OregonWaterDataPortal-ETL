@@ -2,7 +2,7 @@ from typing import Literal, Optional, TypedDict
 from pydantic import BaseModel, Field
 from dataclasses import dataclass
 
-THINGS_COLLECTION = "Things"
+BASE_OREGON_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
 
 POTENTIAL_DATASTREAMS: dict[str, str] = {
     "mean_daily_flow_available": "MDF",
@@ -259,11 +259,11 @@ class Threshold(BaseModel):
     ReferenceCode: str
 
 
-class Properties(BaseModel):
-    Thresholds: list[Threshold]
-    ParameterCode: Optional[str]
-    StatisticCode: Optional[str]
-    # Add other optional properties here if needed
+class ObservedProperty(BaseModel):
+    name: str
+    definition: str
+    description: str
+    properties: dict
 
 
 class Datastream(BaseModel):
@@ -272,7 +272,7 @@ class Datastream(BaseModel):
     description: str
     observationType: str
     unitOfMeasurement: UnitOfMeasurement
-    ObservedProperty: dict[str, str | int]
+    ObservedProperty: ObservedProperty
     # phenomenonTime: str,
     # resultTime: NotRequired[str],  # not present in python 3.9
     Sensor: dict

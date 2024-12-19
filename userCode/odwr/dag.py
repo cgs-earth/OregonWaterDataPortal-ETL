@@ -1,6 +1,5 @@
 import asyncio
 from typing import Optional
-from urllib.parse import urlencode
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -22,7 +21,7 @@ from userCode.odwr.helper_classes import (
     get_datastream_time_range,
 )
 from userCode.odwr.lib import (
-    format_where_param,
+    fetch_station_metadata,
     from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
@@ -34,6 +33,7 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_station,
 )
 from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
+from userCode.odwr.helper_classes import MockValues
 from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
@@ -47,32 +47,12 @@ from .types import (
 from userCode import API_BACKEND_URL
 import requests
 
-BASE_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
-
-
-def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
-    """Fetches stations given a list of station numbers."""
-    params = {
-        "where": format_where_param(station_numbers),
-        "outFields": "*",
-        "f": "json",
-    }
-    url = BASE_URL + urlencode(params)
-    response = requests.get(url)
-    if response.ok:
-        json: OregonHttpResponse = OregonHttpResponse(**response.json())
-        if not json.features:
-            raise RuntimeError(
-                f"No stations found for station numbers {station_numbers}. Got {response.content.decode()}"
-            )
-        return json
-    else:
-        raise RuntimeError(response.url)
 
 
 @asset
 def preflight_checks():
+    """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, "FROST server is not running"
 
@@ -123,6 +103,7 @@ def station_metadata(
 
 @asset(partitions_def=station_partition)
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
+    """The sensorthings representation of all datastreams for a given station"""
     attr = station_metadata.attributes
     associatedThingId = int(attr.station_nbr)
 
@@ -158,20 +139,26 @@ def sta_station(
 
 @asset(partitions_def=station_partition)
 def sta_all_observations(
-    station_metadata: StationData,
-    sta_datastreams: list[Datastream],
+    station_metadata: StationData, sta_datastreams: list[Datastream], config: MockValues
 ):
     session = httpx.AsyncClient()
     observations: list[Observation] = []  # all attributes in both datastreams
     associatedGeometry = station_metadata.geometry
     attr: Attributes = station_metadata.attributes
-    range = get_datastream_time_range(int(attr.station_nbr))
-    get_dagster_logger().info(
-        f"Found existing observations in range {range.start} to {range.end}"
-    )
 
     async def fetch_obs(datastream: Datastream):
-        new_end = now_as_oregon_datetime()
+        range = get_datastream_time_range(datastream.iotid)
+
+        # If we have a mocked date to update until, use that instead
+        # of downloading everything
+        if config and config.mocked_date_to_update_until:
+            new_end = config.mocked_date_to_update_until
+        else:
+            new_end = now_as_oregon_datetime()
+
+        get_dagster_logger().info(
+            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {new_end}"
+        )
 
         tsv_url = generate_oregon_tsv_url(
             # We need to add available to the datastream name since the only way to determine
@@ -200,7 +187,7 @@ def sta_all_observations(
 
         assert (
             len(observations) > 0
-        ), f"No observations found in range {range.start=} to {new_end=} for station {station_metadata.attributes.station_nbr}"
+        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}'"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]

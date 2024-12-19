@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import datetime
 import logging
-from typing import Literal, NamedTuple
-from dagster import get_dagster_logger
+from typing import Literal, NamedTuple, Optional
+from dagster import Config, get_dagster_logger
 import requests
 from .lib import from_oregon_datetime
 from .types import (
@@ -47,12 +47,10 @@ class BatchHelper:
 
         response_messages = response["responses"]
 
+        get_dagster_logger().info(f"Sending {len(payload)} requests to FROST API")
         if len(response_messages) != 0:
             for i, msg in enumerate(response_messages):
                 if msg["status"] == 201:
-                    get_dagster_logger().info(
-                        f"Batch post {i}/{len(response_messages)} successful"
-                    )
                     continue  # Ignore successful responses
                 else:
                     get_dagster_logger().error(
@@ -61,6 +59,9 @@ class BatchHelper:
                     raise RuntimeError(
                         f"Batch post {i}/{len(response_messages)} failed due with response from FROST: {msg}"
                     )
+            get_dagster_logger().info(
+                f"{len(payload)} Batch posts completed successfully"
+            )
         else:
             get_dagster_logger().warning(
                 "No responses from FROST API after batching. This suggests a potential issue with your batch request"
@@ -84,14 +85,14 @@ class BatchHelper:
 
     def send_observations(self, dataset: list[Observation]):
         """Send batch observations to the FROST API"""
-        serialized_observations = []
 
         get_dagster_logger().info(f"Batch posting {len(dataset)} observations")
-        NUM_ITEMS_IN_BATCH = 800
+        NUM_ITEMS_IN_BATCH = 500
         get_dagster_logger().info(
             f"Batch is grouped into groups of at most {NUM_ITEMS_IN_BATCH} observations"
         )
         for batch in batched(dataset, NUM_ITEMS_IN_BATCH):
+            serialized_observations = []
             for id, data in enumerate(batch):
                 serialized = data.model_dump(by_alias=True)
                 request_encoded: FrostBatchRequest = {
@@ -106,12 +107,23 @@ class BatchHelper:
 
 
 class TimeRange(NamedTuple):
+    """Helper class for representing a time range of a STA datastream"""
+
     start: datetime.datetime
     end: datetime.datetime
 
 
+class MockValues(Config):
+    """Helper class for mocking values for testing"""
+
+    # needs to be a string because the dagster config system does not support datetime
+    # doesn't need to exist since mocking is optional and only used for testing
+    mocked_date_to_update_until: Optional[str]
+
+
 def get_datastream_time_range(iotid: int) -> TimeRange:
-    """Get the range of the observation times within a given STA datastream"""
+    """Get the range of the observation times within a given STA datastream. This can be
+    accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
     resp = requests.get(f"{API_BACKEND_URL}/Datastreams({iotid})")
     # 404 represents that there is no datastream and thus the timerange is null
@@ -119,6 +131,7 @@ def get_datastream_time_range(iotid: int) -> TimeRange:
     # possible data
     if resp.status_code == 404:
         start_dummy = from_oregon_datetime(START_OF_DATA)
+        get_dagster_logger().warning(f"Did not find datastream: '{iotid}' inside FROST")
         return TimeRange(start_dummy, start_dummy)
     if not resp.ok:
         raise RuntimeError(resp.text)

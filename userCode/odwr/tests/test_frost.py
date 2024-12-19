@@ -8,6 +8,7 @@ from userCode.odwr.helper_classes import (
 from userCode.odwr.tests.lib import (
     wipe_datastreams,
     wipe_locations,
+    wipe_observed_properties,
     wipe_things,
     wipe_things_before_and_after,
 )
@@ -58,6 +59,11 @@ def test_wipe():
     assert len(json) == 9
     wipe_things()
     resp = requests.get(f"{API_BACKEND_URL}/Things")
+    assert resp.ok
+    items = resp.json()["value"]
+    assert len(items) == 0
+    wipe_observed_properties()
+    resp = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
     assert resp.ok
     items = resp.json()["value"]
     assert len(items) == 0

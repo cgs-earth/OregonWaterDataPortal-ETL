@@ -1,0 +1,48 @@
+name: Pytest
+
+on:
+  push:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  uv-example:
+    runs-on: ubuntu-latest
+    name: python
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Setup Docker Compose
+        uses: docker/setup-buildx-action@v2
+
+      - name: Start Docker Compose services
+        run: |
+          docker compose up -d
+          docker compose ps # Display the status of all containers
+
+      - name: Log container output if database fails
+        if: failure() # Only runs if the workflow fails
+        run: |
+          echo "Logging container output for debugging..."
+          docker compose logs database # Replace 'db' with your database service name
+          docker compose ps
+          docker network inspect $(docker network ls -q) || true
+          docker inspect $(docker ps -aq) || true
+
+      - name: Run tests
+        run: uv run pytest -x
+
+      - name: Stop Docker Compose services
+        if: always()
+        run: |
+          docker compose down
