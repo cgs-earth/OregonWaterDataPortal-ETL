@@ -40,8 +40,9 @@ jobs:
           docker inspect $(docker ps -aq) || true
 
       - name: Run tests
+        run: |
         OWDP_URL=localhost:8999
-        run: uv run pytest -x
+        uv run pytest -x
 
       - name: Stop Docker Compose services
         if: always()
