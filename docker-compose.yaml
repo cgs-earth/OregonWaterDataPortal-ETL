@@ -42,9 +42,10 @@ services:
       - ./config.yml:/pygeoapi/local.config.yml
     depends_on:
       - frost-http
+    restart: always
     environment:
       - WIS2BOX_API_URL=${OWDP_URL}/oapi
-      - WIS2BOX_API_BACKEND_URL=${OWDP_URL}/FROST-Server/v1.1
+      - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
   wis2box-ui:
