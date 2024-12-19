@@ -27,7 +27,6 @@ jobs:
 
       - name: Start Docker Compose services
         run: |
-          OWDP_URL=localhost:8999
           docker compose up -d
           docker compose ps # Display the status of all containers
 
@@ -41,6 +40,7 @@ jobs:
           docker inspect $(docker ps -aq) || true
 
       - name: Run tests
+        OWDP_URL=localhost:8999
         run: uv run pytest -x
 
       - name: Stop Docker Compose services
