@@ -4,7 +4,6 @@ The Oregon Water Data portal crawls or ingests data from multiple different Oreg
 
 # How to use
 
-
 1. Copy the `.env.example` file to `.env` and change the URL to your desired domain.
 2. Spin up the infrastructure with docker
 
