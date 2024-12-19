@@ -41,8 +41,8 @@ jobs:
 
       - name: Run tests
         run: |
-        OWDP_URL=localhost:8999
-        uv run pytest -x
+          OWDP_URL=localhost:8999
+          uv run pytest -x
 
       - name: Stop Docker Compose services
         if: always()
