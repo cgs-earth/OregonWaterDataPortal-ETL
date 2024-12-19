@@ -9,7 +9,7 @@ docker compose --env-file owdp.env up
 ```
 
 Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`,
-or edit ``owdp.env`` and deploy at your own URL.
+or edit `owdp.env` and deploy at your own URL.
 
 2. Start Caddy with `make caddy` if you want to get https in production.
 
