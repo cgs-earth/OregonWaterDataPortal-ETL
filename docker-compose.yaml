@@ -43,7 +43,7 @@ services:
     depends_on:
       - frost-http
     environment:
-      - WIS2BOX_API_URL=http://localhost:8999/oapi
+      - WIS2BOX_API_URL=${OWDP_URL}/oapi
       - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
@@ -52,9 +52,9 @@ services:
     depends_on:
       - owdp-pygeoapi
     environment:
-      - WIS2BOX_URL=http://localhost:8999
-      - WIS2BOX_API_URL=http://localhost:8999/oapi
-      - serviceRootUrl=http://localhost:8999/FROST-Server
+      - WIS2BOX_URL=${OWDP_URL}
+      - WIS2BOX_API_URL=${OWDP_URL}/oapi
+      - serviceRootUrl=${OWDP_URL}/FROST-Server
 
   web-proxy:
     container_name: web-proxy
