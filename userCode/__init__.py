@@ -1,1 +1,3 @@
-API_BACKEND_URL = "http://localhost:8999/FROST-Server/v1.1"
+import os 
+
+API_BACKEND_URL = f"{os.getenv('OWDP_URL')}/FROST-Server/v1.1"
