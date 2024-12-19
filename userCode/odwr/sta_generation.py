@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .types import Attributes, Datastream, Observation, StationData
-
+from userCode.common.ontology import ONTOLOGY_MAPPING
 
 def to_sensorthings_observation(
     associatedDatastream: Datastream,
@@ -75,6 +75,10 @@ def to_sensorthings_datastream(
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     property = stream_name.removesuffix("_available").removesuffix("_avail")
 
+    ontology_mapped_property = ONTOLOGY_MAPPING.get(property) 
+    if not ontology_mapped_property:
+        raise RuntimeError(f"Datastream '{property}' not found in the ontology: '{ONTOLOGY_MAPPING}'. You need to map this term to a common vocabulary term to use it.")
+
     datastream: Datastream = Datastream(
         **{
             "@iot.id": int(f"{attr.station_nbr}{id}"),
@@ -87,10 +91,13 @@ def to_sensorthings_datastream(
                 "definition": units,
             },
             "ObservedProperty": {
-                "@iot.id": int(f"{attr.station_nbr}{id}"),
-                "name": property,
-                "description": property,
-                "definition": "Unknown",
+                "@iot.id": ontology_mapped_property.id,
+                "name": ontology_mapped_property.name,
+                "description": ontology_mapped_property.description,
+                "definition": ontology_mapped_property.definition,
+                "properties": {
+                    "uri": ontology_mapped_property.uri
+                }
             },
             "Sensor": {
                 "@iot.id": 0,

@@ -1,9 +1,9 @@
 import asyncio
 from typing import Optional
-from urllib.parse import urlencode
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
+    DefaultSensorStatus,
     Definitions,
     RunRequest,
     StaticPartitionsDefinition,
@@ -15,6 +15,7 @@ from dagster import (
     AssetExecutionContext,
     schedule,
 )
+import dagster_slack
 import httpx
 
 from userCode.odwr.helper_classes import (
@@ -22,10 +23,12 @@ from userCode.odwr.helper_classes import (
     get_datastream_time_range,
 )
 from userCode.odwr.lib import (
-    format_where_param,
+    fetch_station_metadata,
     from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
+    slack_error_fn,
+    strict_env,
     to_oregon_datetime,
 )
 from userCode.odwr.sta_generation import (
@@ -48,32 +51,12 @@ from .types import (
 from userCode import API_BACKEND_URL
 import requests
 
-BASE_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
-
-
-def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
-    """Fetches stations given a list of station numbers."""
-    params = {
-        "where": format_where_param(station_numbers),
-        "outFields": "*",
-        "f": "json",
-    }
-    url = BASE_URL + urlencode(params)
-    response = requests.get(url)
-    if response.ok:
-        json: OregonHttpResponse = OregonHttpResponse(**response.json())
-        if not json.features:
-            raise RuntimeError(
-                f"No stations found for station numbers {station_numbers}. Got {response.content.decode()}"
-            )
-        return json
-    else:
-        raise RuntimeError(response.url)
 
 
 @asset
 def preflight_checks():
+    """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, "FROST server is not running"
 
@@ -124,6 +107,7 @@ def station_metadata(
 
 @asset(partitions_def=station_partition)
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
+    """The sensorthings representation of all datastreams for a given station"""
     attr = station_metadata.attributes
     associatedThingId = int(attr.station_nbr)
 

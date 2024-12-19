@@ -7,13 +7,37 @@ from urllib.parse import urlencode
 from typing import Optional
 
 from dagster import RunFailureSensorContext, get_dagster_logger
+import requests
+
 from ..common.cache import ShelveCache
 from .types import (
+    BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
+    OregonHttpResponse,
     ParsedTSVData,
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
+    """Fetches stations given a list of station numbers."""
+    params = {
+        "where": format_where_param(station_numbers),
+        "outFields": "*",
+        "f": "json",
+    }
+    url = BASE_OREGON_URL + urlencode(params)
+    response = requests.get(url)
+    if response.ok:
+        json: OregonHttpResponse = OregonHttpResponse(**response.json())
+        if not json.features:
+            raise RuntimeError(
+                f"No stations found for station numbers {station_numbers}. Got {response.content.decode()}"
+            )
+        return json
+    else:
+        raise RuntimeError(response.url)
 
 
 def parse_oregon_tsv(

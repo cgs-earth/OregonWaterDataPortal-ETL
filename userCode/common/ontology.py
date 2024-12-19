@@ -33,7 +33,8 @@ def get_ontology(uri: str) -> Ontology:
     )
 
 
-assoc_list = (
+# Define the association between user terms
+__ontology_definition = (
     (
         ("mean_daily_flow", "mean daily flow", "mean_daily_flow_available"),
         get_ontology(f"{BASE_URL}/variablename/waterLevel"),
@@ -46,8 +47,9 @@ assoc_list = (
 
 
 def construct_ontology_mapping() -> dict[str, Ontology]:
+    """Construct a dictionary from the association list in which we defined hte ontology mapping"""
     equiv_dict = dict()
-    for keys, value in assoc_list:
+    for keys, value in __ontology_definition:
         for key in keys:
             assert (
                 key not in equiv_dict
@@ -55,3 +57,6 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
             equiv_dict[key] = value
 
     return equiv_dict
+
+
+ONTOLOGY_MAPPING = construct_ontology_mapping()

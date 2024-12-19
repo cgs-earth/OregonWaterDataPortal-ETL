@@ -2,6 +2,7 @@ import datetime
 import pytest
 import requests
 
+from userCode.common.ontology import ONTOLOGY_MAPPING
 from userCode.odwr.helper_classes import get_datastream_time_range
 from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
@@ -91,6 +92,19 @@ def test_full_pipeline(metadata: list[StationData]):
     first_iotid = datastreams.json()["value"][0]["@iot.id"]
     range = get_datastream_time_range(first_iotid)
 
+    observedPropertyResp = requests.get(
+        datastreams.json()["value"][0]["ObservedProperty@iot.navigationLink"]
+    )
+    assert observedPropertyResp.ok, observedPropertyResp.text
+
+    observedPropertyName = observedPropertyResp.json()["name"]
+
+    for ontology in ONTOLOGY_MAPPING:
+        if observedPropertyName in ONTOLOGY_MAPPING[ontology].name:
+            break
+    else:
+        assert False, f"Failed to find ontology for observed property {observedPropertyName} within {ONTOLOGY_MAPPING}"
+
     assert range.start < range.end, "The start of the datastream must be before the end"
     assert dates_are_within_X_days(
         range.end, mocked_date, 7
@@ -111,7 +125,7 @@ def test_full_pipeline(metadata: list[StationData]):
     assert range2.end >= range.end
     today = datetime.datetime.now(tz=datetime.timezone.utc)
     assert dates_are_within_X_days(
-        range2.end, today, 3
-    ), "The most recent observation in a datastream should be in the current month unless the upstream Oregon API is behind and has not updated observations yet"
+        range2.end, today, 7
+    ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
     wipe_locations()
     wipe_things()

@@ -6,6 +6,8 @@ from userCode.odwr.lib import to_oregon_datetime
 from datetime import timezone
 
 
+
+
 @contextmanager
 def wipe_things_before_and_after():
     """Helper to wipe the database before and after each test"""
@@ -43,6 +45,18 @@ def wipe_locations():
     else:
         raise RuntimeError(response.text)
 
+def wipe_observed_properties():
+    """Wipe just the ObservedProperties"""
+    response = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    if response.ok:
+        observed_properties = response.json()["value"]
+        for observed_property in observed_properties:
+            resp = requests.delete(
+                f"{API_BACKEND_URL}/ObservedProperties({observed_property['@iot.id']})"
+            )
+            assert resp.ok
+    else:
+        raise RuntimeError(response.text)
 
 def wipe_datastreams():
     """Wipe just the Datastreams"""
