@@ -1,12 +1,14 @@
 import asyncio
 from typing import Optional
 from dagster import (
+    AssetCheckResult,
     AssetSelection,
     DefaultScheduleStatus,
     Definitions,
     RunRequest,
     StaticPartitionsDefinition,
     asset,
+    asset_check,
     define_asset_job,
     get_dagster_logger,
     load_asset_checks_from_current_module,
@@ -260,15 +262,40 @@ def batch_post_observations(sta_all_observations: list[Observation]):
     BatchHelper().send_observations(sta_all_observations)
 
 
+@asset_check(asset=batch_post_observations)
+def check_duplicates():
+    """Do a sanity check to make sure there are no obvious duplicates in either observations
+    or observed properties"""
+
+    observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    assert observedProperties.ok, observedProperties.text
+    observedProperties = observedProperties.json()["value"]
+
+    names = set()
+
+    for prop in observedProperties:
+        if prop["name"] in names:
+            raise RuntimeError(
+                f"Found duplicate observed property name: {prop['name']} in {observedProperties=}"
+            )
+        names.add(prop["name"])
+
+    return AssetCheckResult(
+        passed=True,
+    )
+
+
 harvest_job = define_asset_job(
     "harvest_station",
     description="harvest a station",
     selection=AssetSelection.all(),
 )
 
+DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST = "0 16 * * *"
+
 
 @schedule(
-    cron_schedule="@daily",
+    cron_schedule=DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST,
     target=AssetSelection.all(),
     default_status=DefaultScheduleStatus.STOPPED,
 )

@@ -1,11 +1,12 @@
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
 import requests
+from .lib import deterministic_hash
 
 BASE_URL = "http://vocabulary.odm2.org/api/v1"
 
 
-class Ontology(BaseModel):
+class Ontology(BaseModel, extra="forbid"):
     # The human readable name of the vocabulary term
     name: str
     # The human readable description of the vocabulary term
@@ -15,7 +16,10 @@ class Ontology(BaseModel):
     # The url / uri that a client could go to for more information
     uri: str
     # a unique id that can be used in the sensorthings api to differentiate the term
-    id: int = Field(alias="@iot.id", default_factory=lambda json: hash(json["name"]))
+    id: int = Field(
+        alias="@iot.id",
+        default_factory=lambda input: deterministic_hash(input["uri"], 5),
+    )
 
 
 def get_ontology(uri: str) -> Ontology:

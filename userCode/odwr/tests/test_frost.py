@@ -683,3 +683,77 @@ def test_batch():
         assert msg["status"] == 201, msg
 
     wipe_things()
+
+
+def test_observed_properties():
+    """Check what happens when we add a duplicate observed property
+    This test shows that, like other endpoints, if you specify an iot.id
+    that already exists, it will be used and a new one will not be generated
+    """
+    wipe_things()
+    wipe_observed_properties()
+    resp = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    assert resp.ok, resp.text
+    items = resp.json()["value"]
+    assert len(items) == 0
+
+    thing = {
+        "@iot.id": 1111111,
+        "name": "test_thing_name",
+        "description": "test_thing_description",
+        "properties": {"uri": "example.org"},
+    }
+
+    resp = requests.post(f"{API_BACKEND_URL}/Things", json=thing)
+    assert resp.ok, resp.text
+
+    test_datastream = {
+        "@iot.id": 22222222,
+        "name": "test_datastream_name",
+        "description": "test_datastream_description",
+        "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+        "unitOfMeasurement": {
+            "name": "Unknown test unit",
+            "symbol": "Unknown",
+            "definition": "Unknown",
+        },
+        "ObservedProperty": {
+            "@iot.id": 1,
+            "name": "test_observed_property_name",
+            "description": "test_observed_property_description",
+            "definition": "test_observed_property_definition",
+            "properties": {"uri": "example.org"},
+        },
+        "Sensor": {
+            "@iot.id": 0,
+            "name": "Unknown",
+            "description": "Unknown",
+            "encodingType": "Unknown",
+            "metadata": "Unknown",
+        },
+        "Thing": {"@iot.id": 1111111},
+    }
+
+    resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=test_datastream)
+    assert resp.ok, resp.text
+
+    resp = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    assert resp.ok, resp.text
+    items = resp.json()["value"]
+    assert len(items) == 1
+    assert items[0]["@iot.id"] == 1
+
+    new_datastream_with_same_observed_property = test_datastream.copy()
+    new_datastream_with_same_observed_property["@iot.id"] = 33333333
+    resp = requests.post(
+        f"{API_BACKEND_URL}/Datastreams",
+        json=new_datastream_with_same_observed_property,
+    )
+    assert resp.ok, resp.text
+
+    resp = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    assert resp.ok, resp.text
+    items = resp.json()["value"]
+    assert len(items) == 1
+    assert items[0]["@iot.id"] == 1
+    wipe_observed_properties()

@@ -8,3 +8,4 @@ oregon_load_metadata.json
 history/
 schedules/
 .env
+.hypothesis/

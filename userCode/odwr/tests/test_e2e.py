@@ -8,6 +8,7 @@ from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
     dates_are_within_X_days,
     wipe_locations,
+    wipe_observed_properties,
     wipe_things,
 )
 from userCode.odwr.types import StationData
@@ -129,3 +130,4 @@ def test_full_pipeline(metadata: list[StationData]):
     ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
     wipe_locations()
     wipe_things()
+    wipe_observed_properties()

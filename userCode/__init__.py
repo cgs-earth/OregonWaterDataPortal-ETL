@@ -1,3 +1,3 @@
-from userCode.odwr.lib import strict_env
-
-API_BACKEND_URL = f"{strict_env('OWDP_URL')}/FROST-Server/v1.1"
+# Access FROST directly without going through nginx so we can avoid issues with
+# the reverse proxy blocking or timing out requests
+API_BACKEND_URL = "http://localhost:8080/FROST-Server/v1.1"

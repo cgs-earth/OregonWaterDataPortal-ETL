@@ -1,5 +1,7 @@
 from typing import Optional
 
+from userCode.common.lib import deterministic_hash
+
 from .types import Attributes, Datastream, Observation, StationData
 from userCode.common.ontology import ONTOLOGY_MAPPING
 
@@ -15,9 +17,11 @@ def to_sensorthings_observation(
     if datapoint is None:
         raise RuntimeError("Missing datapoint")
 
-    # generate a unique int by hashing the datastream name with the phenomenon time and result time
-    # we use mod with the max size in order to always get a positive int result
-    id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}"))
+    # generate a unique hash for the observation since we don't have any other way of
+    # uniquely identifying it from the upstream api
+    id = deterministic_hash(
+        (f"{associatedDatastream.name}{phenom_time}{resultTime}{datapoint}"), 10
+    )
     return Observation(
         **{
             "phenomenonTime": phenom_time,
