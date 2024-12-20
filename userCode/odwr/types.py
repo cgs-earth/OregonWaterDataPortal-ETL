@@ -233,18 +233,18 @@ class Attributes(BaseModel):
     precipitation_available: int
 
 
-class StationData(BaseModel):
+class StationData(BaseModel, extra="forbid"):
     attributes: Attributes
     geometry: dict[str, float]
 
 
-class UnitOfMeasurement(BaseModel):
+class UnitOfMeasurement(BaseModel, extra="forbid"):
     name: str
     symbol: str
     definition: str
 
 
-class Period(BaseModel):
+class Period(BaseModel, extra="forbid"):
     EndTime: str
     StartTime: str
     SuppressData: bool
@@ -260,13 +260,14 @@ class Threshold(BaseModel):
 
 
 class ObservedProperty(BaseModel):
+    iotid: int = Field(alias="@iot.id")
     name: str
     definition: str
     description: str
     properties: dict
 
 
-class Datastream(BaseModel):
+class Datastream(BaseModel, extra="forbid"):
     iotid: int = Field(alias="@iot.id")
     name: str
     description: str

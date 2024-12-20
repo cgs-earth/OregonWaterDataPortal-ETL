@@ -1,5 +1,7 @@
 from typing import Optional
 
+from userCode.common.lib import deterministic_hash
+
 from .types import Attributes, Datastream, Observation, StationData
 from userCode.common.ontology import ONTOLOGY_MAPPING
 
@@ -17,7 +19,9 @@ def to_sensorthings_observation(
 
     # generate a unique int by hashing the datastream name with the phenomenon time and result time
     # we use mod with the max size in order to always get a positive int result
-    id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}"))
+    id = deterministic_hash(
+        (f"{associatedDatastream.name}{phenom_time}{resultTime}"), 10
+    )
     return Observation(
         **{
             "phenomenonTime": phenom_time,
