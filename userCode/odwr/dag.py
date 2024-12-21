@@ -301,7 +301,14 @@ DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST = "0 16 * * *"
 )
 def crawl_entire_graph_schedule():
     for partition_key in station_partition.get_partition_keys():
-        yield RunRequest(partition_key=partition_key)
+        yield RunRequest(
+            partition_key=partition_key,
+            # Dagster uses run keys to distinguish between runs of the same job
+            # Every time the sensor is ran we want to recrawl so we generate a new run
+            # key each time. Caching and logic for determining what new data should be added
+            # is handled by the phenomenonTime datastream storage inside FROST
+            run_key=f"{partition_key} {now_as_oregon_datetime()}",
+        )
 
 
 definitions = Definitions(
