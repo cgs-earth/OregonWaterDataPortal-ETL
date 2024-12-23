@@ -1,9 +1,11 @@
 import asyncio
+import os
 from typing import Optional
 from dagster import (
     AssetCheckResult,
     AssetSelection,
     DefaultScheduleStatus,
+    DefaultSensorStatus,
     Definitions,
     RunRequest,
     StaticPartitionsDefinition,
@@ -16,6 +18,7 @@ from dagster import (
     AssetExecutionContext,
     schedule,
 )
+import dagster_slack
 import httpx
 
 from userCode.odwr.helper_classes import (
@@ -27,6 +30,8 @@ from userCode.odwr.lib import (
     from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
+    slack_error_fn,
+    strict_env,
     to_oregon_datetime,
 )
 from userCode.odwr.sta_generation import (
@@ -316,13 +321,17 @@ definitions = Definitions(
     asset_checks=load_asset_checks_from_current_module(),
     schedules=[crawl_entire_graph_schedule],
     jobs=[harvest_job],
-    # sensors=[
-    #     dagster_slack.make_slack_on_run_failure_sensor(
-    #         channel="#cgs-iow-bots",
-    #         slack_token=strict_env("DAGSTER_SLACK_TOKEN"),
-    #         text_fn=slack_error_fn,
-    #         default_status=DefaultSensorStatus.RUNNING,
-    #         monitor_all_code_locations=True,
-    #     )
-    # ],
+    sensors=[
+        dagster_slack.make_slack_on_run_failure_sensor(
+            channel="#cgs-iow-bots",
+            slack_token=strict_env("DAGSTER_SLACK_TOKEN"),
+            text_fn=slack_error_fn,
+            default_status=DefaultSensorStatus.RUNNING,
+            monitor_all_code_locations=True,
+        )
+    ]
+    # only register the sensor if the token is set
+    # allow the token not to be set in case we don't want the integration or we are running in CI
+    if os.environ.get("DAGSTER_SLACK_TOKEN")
+    else [],
 )
