@@ -316,8 +316,6 @@ def crawl_entire_graph_schedule():
         )
 
 
-
-
 definitions = Definitions(
     assets=load_assets_from_current_module(),
     asset_checks=load_asset_checks_from_current_module(),
@@ -332,7 +330,7 @@ definitions = Definitions(
             monitor_all_code_locations=True,
         )
     ]
-   # only register the sensor if the token is set
+    # only register the sensor if the token is set
     # allow the token not to be set in case we don't want the integration or we are running in CI
     if os.environ.get("DAGSTER_SLACK_TOKEN")
     else [],
