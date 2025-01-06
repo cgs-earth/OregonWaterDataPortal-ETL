@@ -74,7 +74,7 @@ resources:
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: "http://frost-http:8080/FROST-Server/v1.1/Things"
+        data: "http://owdp-sta:8080/FROST-Server/v1.1/Things"
         id_field: "@iot.id"
         title_field: "name"
         intralink: true
@@ -105,7 +105,7 @@ resources:
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: "http://frost-http:8080/FROST-Server/v1.1/Datastreams"
+        data: "http://owdp-sta:8080/FROST-Server/v1.1/Datastreams"
         id_field: "@iot.id"
         title_field: "name"
         intralink: true
@@ -136,7 +136,7 @@ resources:
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: "http://frost-http:8080/FROST-Server/v1.1/Observations"
+        data: "http://owdp-sta:8080/FROST-Server/v1.1/Observations"
         id_field: "@iot.id"
         time_field: "resultTime"
         intralink: true
