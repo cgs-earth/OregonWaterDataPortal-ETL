@@ -1,5 +1,5 @@
 services:
-  frost-http:
+  owdp-sta:
     image: fraunhoferiosb/frost-server:latest
     environment:
       # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
@@ -13,16 +13,14 @@ services:
       - persistence_db_password=ChangeMe
       - persistence_autoUpdateDatabase=true
       - persistence_idGenerationMode=ServerAndClientGenerated
-    ports:
-      - 1883:1883
     depends_on:
-      database:
+      owdp-database:
         condition: service_healthy
 
-  database:
-    container_name: database
+  owdp-database:
+    container_name: owdp-database
     build:
-      context: ./docker
+      context: ./docker/database
     environment:
       - POSTGRES_DB=sensorthings
       - POSTGRES_USER=sensorthings
@@ -37,18 +35,18 @@ services:
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
-    image: geopython/pygeoapi:latest
-    volumes:
-      - ./config.yml:/pygeoapi/local.config.yml
+    build:
+      context: docker/pygeoapi
     depends_on:
-      - frost-http
+      - owdp-sta
     environment:
       - WIS2BOX_API_URL=http://localhost:8999/oapi
       - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
-  wis2box-ui:
+  owdp-ui:
     image: internetofwater/hub2box-ui:iow
+    container_name: owdp-ui
     depends_on:
       - owdp-pygeoapi
     environment:
@@ -58,12 +56,11 @@ services:
 
   web-proxy:
     container_name: web-proxy
-    image: nginx:alpine
+    build:
+      context: docker/nginx
     restart: always
     depends_on:
-      - wis2box-ui
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - owdp-ui
     ports:
       - 8999:80
 

@@ -3,12 +3,10 @@ caddy:
 	sudo systemctl restart caddy
 
 start:
+	python3 -m venv ./venv
 	source ./venv/bin/activate
 	dagster dev
 
-wis2box:
-	git clone https://github.com/cgs-earth/wis2box/
-	
 wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
