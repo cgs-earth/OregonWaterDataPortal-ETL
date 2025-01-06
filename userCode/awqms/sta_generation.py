@@ -1,7 +1,35 @@
 from typing import Optional
 
 from ..common.types import Datastream, Observation
-from .types import Attributes, StationData
+from .types import StationData
+
+
+def to_sensorthings_station(station: StationData) -> dict:
+    """Generate data for the body of a POST request for Locations/ in FROST"""
+
+    representation = {
+        "name": station.MonitoringLocationName,
+        "@iot.id": station.MonitoringLocationId,
+        "description": station.MonitoringLocationName,
+        "Locations": [
+            {
+                "@iot.id": station.MonitoringLocationId,
+                "name": station.MonitoringLocationName,
+                "description": station.MonitoringLocationName,
+                "encodingType": "application/vnd.geo+json",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [
+                        station.Geometry.latitude,
+                        station.Geometry.longitude,
+                    ]
+                },
+            }
+        ],
+        "properties": station.model_dump(by_alias=True),
+    }
+
+    return representation
 
 
 def to_sensorthings_observation(
@@ -39,35 +67,8 @@ def to_sensorthings_observation(
     )
 
 
-def to_sensorthings_station(station: StationData) -> dict:
-    """Generate data for the body of a POST request for Locations/ in FROST"""
-    attr = station.attributes
-    representation = {
-        "name": attr.station_name,
-        "@iot.id": int(attr.station_nbr),
-        "description": attr.station_name,
-        "Locations": [
-            {
-                "@iot.id": int(attr.station_nbr),
-                "name": attr.station_name,
-                "description": attr.station_name,
-                "encodingType": "application/vnd.geo+json",
-                "location": {
-                    "type": "Point",
-                    "coordinates": [attr.longitude_dec, attr.latitude_dec],
-                },
-            }
-        ],
-        "properties": attr.model_dump(by_alias=True),
-    }
-    if attr.elevation is not None:
-        representation["Locations"][0]["location"]["coordinates"].append(attr.elevation)
-
-    return representation
-
-
 def to_sensorthings_datastream(
-    attr: Attributes,
+    attr: StationData,
     units: str,
     stream_name: str,
     id: int,
@@ -78,8 +79,8 @@ def to_sensorthings_datastream(
 
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": int(f"{attr.station_nbr}{id}"),
-            "name": f"{attr.station_name} {property}",
+            "@iot.id": int(f"{attr.MonitoringLocationId}{id}"),
+            "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
             "unitOfMeasurement": {
@@ -88,7 +89,7 @@ def to_sensorthings_datastream(
                 "definition": units,
             },
             "ObservedProperty": {
-                "@iot.id": int(f"{attr.station_nbr}{id}"),
+                "@iot.id": int(f"{attr.MonitoringLocationId}{id}"),
                 "name": property,
                 "description": property,
                 "definition": "Unknown",

@@ -17,7 +17,7 @@ from dagster import (
 )
 import httpx
 
-from userCode.odwr.helper_classes import (
+from userCode.common.helper_classes import (
     BatchHelper,
     get_datastream_time_range,
 )
@@ -38,12 +38,11 @@ from .types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     Attributes,
-    Datastream,
-    Observation,
     OregonHttpResponse,
     ParsedTSVData,
     StationData,
 )
+from ..common.types import Datastream, Observation
 from userCode import API_BACKEND_URL
 import requests
 
@@ -71,13 +70,13 @@ def fetch_station_metadata(station_numbers: list[int]) -> OregonHttpResponse:
         raise RuntimeError(response.url)
 
 
-@asset
+@asset(group_name="owdp")
 def preflight_checks():
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, "FROST server is not running"
 
 
-@asset(deps=[preflight_checks])
+@asset(deps=[preflight_checks], group_name="owdp")
 def all_metadata() -> list[StationData]:
     """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
 
@@ -104,7 +103,7 @@ def all_metadata() -> list[StationData]:
     return stations
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def station_metadata(
     context: AssetExecutionContext, all_metadata: list[StationData]
 ) -> StationData:
@@ -121,7 +120,7 @@ def station_metadata(
     return relevant_metadata
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     attr = station_metadata.attributes
     associatedThingId = int(attr.station_nbr)
@@ -149,14 +148,14 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     return datastreams
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_station(
     station_metadata: StationData,
 ):
     return to_sensorthings_station(station_metadata)
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_all_observations(
     station_metadata: StationData,
     sta_datastreams: list[Datastream],
@@ -211,7 +210,7 @@ def sta_all_observations(
     return observations
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def post_station(sta_station: dict):
     # get the station with the station number
     resp = requests.get(f"{API_BACKEND_URL}/Things({sta_station['@iot.id']})")
@@ -238,7 +237,7 @@ def post_station(sta_station: dict):
     return
 
 
-@asset(partitions_def=station_partition, deps=[post_station])
+@asset(partitions_def=station_partition, deps=[post_station], group_name="owdp")
 def post_datastreams(sta_datastreams: list[Datastream]):
     # check if the datastreams exist
     for datastream in sta_datastreams:
@@ -268,31 +267,22 @@ def post_datastreams(sta_datastreams: list[Datastream]):
             raise RuntimeError(resp.text)
 
 
-@asset(partitions_def=station_partition, deps=[post_datastreams])
+@asset(partitions_def=station_partition, deps=[post_datastreams], group_name="owdp")
 def batch_post_observations(sta_all_observations: list[Observation]):
     BatchHelper().send_observations(sta_all_observations)
 
 
-harvest_job = define_asset_job(
-    "harvest_station",
-    description="harvest a station",
-    selection=AssetSelection.all(),
-)
-
-
 @schedule(
     cron_schedule="@daily",
-    target=AssetSelection.all(),
+    target=AssetSelection.groups("owdp"),
     default_status=DefaultScheduleStatus.STOPPED,
 )
-def crawl_entire_graph_schedule():
+def owdr_schedule():
     for partition_key in station_partition.get_partition_keys():
         yield RunRequest(partition_key=partition_key)
 
-
-definitions = Definitions(
-    assets=load_assets_from_current_module(),
-    asset_checks=load_asset_checks_from_current_module(),
-    schedules=[crawl_entire_graph_schedule],
-    jobs=[harvest_job],
+owdr_job = define_asset_job(
+    "harvest_owdp",
+    description="harvest an owdp station",
+    selection=AssetSelection.groups("owdp"),
 )
