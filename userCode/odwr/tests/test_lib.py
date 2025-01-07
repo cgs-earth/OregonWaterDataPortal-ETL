@@ -1,5 +1,5 @@
 from userCode.odwr.tests.lib import wipe_datastreams, wipe_locations, wipe_things
-from ..lib import (
+from userCode.odwr.lib import (
     assert_valid_oregon_date,
     download_oregon_tsv,
     parse_oregon_tsv,

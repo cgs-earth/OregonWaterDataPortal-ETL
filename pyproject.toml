@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [tool.dagster]
-module_name = "userCode.odwr.dag"
+module_name = "userCode"
 code_location_name = "userCode"
 
 [tool.pytest.ini_options]
