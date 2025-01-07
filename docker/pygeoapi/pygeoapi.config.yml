@@ -2,15 +2,14 @@ server:
   bind:
     host: "0.0.0.0"
     port: 80
-  url: ${WIS2BOX_API_URL}
+  url: ${API_URL}
   cors: true
   mimetype: "application/json; charset=UTF-8"
   encoding: "utf-8"
   languages:
     - "en-US"
   pretty_print: false
-  # need to bump this up a lot since we have a lot of data
-  limit: 500000000
+  limit: 10000
   map:
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     attribution: '<a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -57,34 +56,6 @@ metadata:
     url: "https://internetofwater.org"
     role: "pointOfContact"
 resources:
-  data:
-    type: "stac-collection"
-    title:
-      en: "Data assets"
-    description:
-      en: "Data assets"
-    keywords:
-      en:
-        - "observations"
-    links:
-      - type: "text/html"
-        rel: "canonical"
-        title: "information"
-        href: "https://example.org"
-    extents:
-      spatial:
-        bbox:
-          - -180
-          - -90
-          - 180
-          - 90
-        crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
-    providers:
-      - type: "stac"
-        name: "FileSystem"
-        data: "/data/wis2box/data"
-        file_types:
-          - ".csv"
   things:
     type: "collection"
     title: "Things"
@@ -94,16 +65,13 @@ resources:
       - "oregon"
     extents:
       spatial:
-        bbox:
-          - -180
-          - -90
-          - 180
-          - 90
+        bbox: [-124.55417836738366,41.99161889477894,-116.46390970729706,46.26801803457034]
         crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: ${WIS2BOX_API_BACKEND_URL}/Things
+        data: ${API_BACKEND_URL}
+        entity: Things
         id_field: "@iot.id"
         title_field: "name"
         intralink: true
@@ -125,16 +93,13 @@ resources:
       - "dam"
     extents:
       spatial:
-        bbox:
-          - -180
-          - -90
-          - 180
-          - 90
+        bbox: [-124.55417836738366,41.99161889477894,-116.46390970729706,46.26801803457034]
         crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: ${WIS2BOX_API_BACKEND_URL}/Datastreams
+        data: ${API_BACKEND_URL}
+        entity: Datastreams
         id_field: "@iot.id"
         title_field: "name"
         intralink: true
@@ -158,16 +123,13 @@ resources:
       - "dam"
     extents:
       spatial:
-        bbox:
-          - -180
-          - -90
-          - 180
-          - 90
+        bbox: [-124.55417836738366,41.99161889477894,-116.46390970729706,46.26801803457034]
         crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
     providers:
       - type: "feature"
         name: "SensorThings"
-        data: ${WIS2BOX_API_BACKEND_URL}/Observations
+        data: ${API_BACKEND_URL}
+        entity: Observations
         id_field: "@iot.id"
         time_field: "resultTime"
         intralink: true
