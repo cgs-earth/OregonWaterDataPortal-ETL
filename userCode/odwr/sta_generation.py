@@ -1,6 +1,6 @@
 # =================================================================
 #
-# Authors: Ben Webb <bwebb@lincolninst.edu>
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
 #
 # Copyright (c) 2025 Lincoln Institute of Land Policy
 #
