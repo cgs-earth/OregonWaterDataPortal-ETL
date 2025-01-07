@@ -183,6 +183,7 @@ def dates_are_within_X_days(
     """
     return abs((date1 - date2).days) <= days
 
+
 if __name__ == "__main__":
     wipe_datastreams()
     wipe_locations()

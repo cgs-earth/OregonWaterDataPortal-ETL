@@ -28,7 +28,10 @@
 # =================================================================
 
 from userCode.common.ontology import (
-    ONTOLOGY_MAPPING, construct_ontology_mapping, get_ontology)
+    ONTOLOGY_MAPPING,
+    construct_ontology_mapping,
+    get_ontology,
+)
 
 
 def test_construct_ontology_mapping():

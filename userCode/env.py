@@ -31,4 +31,5 @@
 from userCode.util import get_env
 
 API_BACKEND_URL = get_env(
-    "API_BACKEND_URL", fallback="http://localhost:8999/FROST-Server/v1.1")
+    "API_BACKEND_URL", fallback="http://localhost:8999/FROST-Server/v1.1"
+)

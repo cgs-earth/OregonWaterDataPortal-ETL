@@ -144,13 +144,13 @@ class MockValues(Config):
     mocked_date_to_update_until: Optional[str]
 
 
-def get_datastream_time_range(iotid: str|int) -> TimeRange:
+def get_datastream_time_range(iotid: str | int) -> TimeRange:
     """Get the range of the observation times within a given STA datastream. This can be
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
     resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{iotid}')")
     get_dagster_logger().debug(resp.url)
-    
+
     # 404 represents that there is no datastream and thus the timerange is null
     # we represent null by setting both the start and end to the beginning of all
     # possible data

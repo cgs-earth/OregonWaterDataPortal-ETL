@@ -34,6 +34,7 @@ from userCode.odwr.types import Attributes, StationData
 from userCode.types import Datastream, Observation
 from userCode.util import deterministic_hash
 
+
 def to_sensorthings_observation(
     associatedDatastream: Datastream,
     datapoint: Optional[float],

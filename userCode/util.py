@@ -42,6 +42,7 @@ def get_env(key: str, fallback: Any = None) -> str:
 
     return val
 
+
 def deterministic_hash(name: str, desiredLength: int) -> int:
     """Python's built-in hash function is not deterministic, so this is a workaround"""
     data = name.encode("utf-8")
@@ -50,6 +51,7 @@ def deterministic_hash(name: str, desiredLength: int) -> int:
     trimmed_hash = hash_int % (10**desiredLength)
     # handle case where it hashes to 0
     return trimmed_hash if trimmed_hash != 0 else trimmed_hash + 1
+
 
 def slack_error_fn(context: RunFailureSensorContext) -> str:
     get_dagster_logger().info("Sending notification to Slack")

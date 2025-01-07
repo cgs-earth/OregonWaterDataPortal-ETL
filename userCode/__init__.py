@@ -54,5 +54,5 @@ definitions = Definitions(
             default_status=DefaultSensorStatus.RUNNING,
             monitor_all_code_locations=True,
         )
-    ]
+    ],
 )
