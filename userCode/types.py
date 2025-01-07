@@ -31,12 +31,14 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class UnitOfMeasurement(BaseModel):
     """SensorThings API UnitOfMeasurement"""
 
     name: str
     symbol: str
     definition: str
+
 
 class ObservedProperty(BaseModel):
     """SensorThings API ObservedProperty"""
@@ -46,6 +48,7 @@ class ObservedProperty(BaseModel):
     definition: str
     description: str
     properties: dict
+
 
 class Datastream(BaseModel):
     """SensorThings API Datastream"""
@@ -59,6 +62,7 @@ class Datastream(BaseModel):
     Sensor: dict
     Thing: dict
 
+
 class Observation(BaseModel):
     """SensorThings API Observation"""
 
@@ -67,4 +71,3 @@ class Observation(BaseModel):
     Datastream: dict
     result: Optional[float]
     FeatureOfInterest: dict
-

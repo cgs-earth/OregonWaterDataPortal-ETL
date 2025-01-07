@@ -28,7 +28,6 @@
 # =================================================================
 
 import frost_sta_client as fsc
-import logging
 from pathlib import Path
 import pytest
 
