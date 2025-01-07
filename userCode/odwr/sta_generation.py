@@ -48,7 +48,7 @@ def to_sensorthings_station(station: StationData) -> dict:
         "description": attr.station_name,
         "Locations": [
             {
-                "@iot.id": int(attr.station_nbr),
+                "@iot.id": str(attr.station_nbr),
                 "name": attr.station_name,
                 "description": attr.station_name,
                 "encodingType": "application/vnd.geo+json",
@@ -78,7 +78,7 @@ def to_sensorthings_datastream(
 
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": int(f"{attr.station_nbr}{id}"),
+            "@iot.id": f"{attr.station_nbr}{id}",
             "name": f"{attr.station_name} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",

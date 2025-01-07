@@ -213,7 +213,7 @@ def sta_all_observations(
 @asset(partitions_def=station_partition, group_name="owdp")
 def post_station(sta_station: dict):
     # get the station with the station number
-    resp = requests.get(f"{API_BACKEND_URL}/Things({sta_station['@iot.id']})")
+    resp = requests.get(f"{API_BACKEND_URL}/Things('{sta_station['@iot.id']}')")
     if resp.status_code == 404:
         get_dagster_logger().info(
             f"Station {sta_station['@iot.id']} not found. Posting..."
@@ -241,7 +241,7 @@ def post_station(sta_station: dict):
 def post_datastreams(sta_datastreams: list[Datastream]):
     # check if the datastreams exist
     for datastream in sta_datastreams:
-        resp = requests.get(f"{API_BACKEND_URL}/Datastreams({datastream.iotid})")
+        resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{datastream.iotid}')")
         if resp.status_code == 404:
             get_dagster_logger().info(
                 f"Datastream {datastream.iotid} not found. Posting..."

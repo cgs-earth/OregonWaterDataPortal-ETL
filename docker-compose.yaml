@@ -1,5 +1,6 @@
 services:
   owdp-sta:
+    container_name: owdp-sta
     image: fraunhoferiosb/frost-server:latest
     environment:
       # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
@@ -15,6 +16,7 @@ services:
       - persistence_idGenerationMode=ServerAndClientGenerated
       - plugins_coreModel_idType_thing=STRING
       - plugins_coreModel_idType_location=STRING
+      - plugins_coreModel_idType_datastream=STRING
     depends_on:
       owdp-database:
         condition: service_healthy
@@ -28,7 +30,7 @@ services:
       - POSTGRES_USER=sensorthings
       - POSTGRES_PASSWORD=ChangeMe
     volumes:
-      - postgis_volume:/var/lib/postgresql
+      - postgis_volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d sensorthings -U sensorthings "]
       interval: 10s

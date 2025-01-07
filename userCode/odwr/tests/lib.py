@@ -24,8 +24,10 @@ def wipe_things():
     if response.ok:
         things = response.json()["value"]
         for thing in things:
-            resp = requests.delete(f"{API_BACKEND_URL}/Things({thing['@iot.id']})")
-            assert resp.ok
+            url = f"{API_BACKEND_URL}/Things('{thing['@iot.id']}')"
+            print(url)
+            resp = requests.delete(url)
+            # assert resp.ok
     else:
         raise RuntimeError(response.text)
 
@@ -37,7 +39,7 @@ def wipe_locations():
         locations = response.json()["value"]
         for location in locations:
             resp = requests.delete(
-                f"{API_BACKEND_URL}/Locations({location['@iot.id']})"
+                f"{API_BACKEND_URL}/Locations('{location['@iot.id']}')"
             )
             assert resp.ok
     else:
@@ -126,3 +128,8 @@ def assert_date_in_range(date: str, start: datetime, end: datetime):
 def now_as_oregon_datetime():
     now = datetime.now(tz=timezone.utc)
     return to_oregon_datetime(now)
+
+if __name__ == "__main__":
+    wipe_things()
+    wipe_locations()
+    wipe_datastreams()

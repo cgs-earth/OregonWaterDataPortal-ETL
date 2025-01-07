@@ -1,7 +1,7 @@
 from typing import Optional
 
 from ..common.types import Datastream, Observation
-from .types import StationData
+from .types import StationData, POTENTIAL_DATASTREAMS
 
 
 def to_sensorthings_station(station: StationData) -> dict:
@@ -26,8 +26,24 @@ def to_sensorthings_station(station: StationData) -> dict:
                 },
             }
         ],
-        "properties": station.model_dump(by_alias=True),
+        "properties": {
+            "county": station.CountyName,
+            "ResultsUrl": station.ResultsUrl,
+            "ContinuousResultsUrl": station.ContinuousResultsUrl,
+            "IndexesUrl": station.IndexesUrl,
+            "MetricsUrl": station.MetricsUrl,
+            "OrganizationIdentifier": station.OrganizationIdentifier,
+            "WaterbodyName": station.WaterbodyName
+        }
     }
+    
+    if station.Huc8:
+        representation["properties"]["hu08"] = \
+            f"https://geoconnex.us/ref/hu08/{station.Huc8}"
+
+    if station.Huc12:
+        representation["properties"]["hu12"] = \
+            f"https://geoconnex.us/ref/hu12/{station.Huc12}"
 
     return representation
 
@@ -70,16 +86,16 @@ def to_sensorthings_observation(
 def to_sensorthings_datastream(
     attr: StationData,
     units: str,
-    stream_name: str,
-    id: int,
-    associatedThingId: int,
+    property: str,
+    associatedThingId: str,
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
-    property = stream_name.removesuffix("_available").removesuffix("_avail")
+    
+    id = POTENTIAL_DATASTREAMS[property]
 
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": int(f"{attr.MonitoringLocationId}{id}"),
+            "@iot.id": f"{attr.MonitoringLocationId}{id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
@@ -89,10 +105,7 @@ def to_sensorthings_datastream(
                 "definition": units,
             },
             "ObservedProperty": {
-                "@iot.id": int(f"{attr.MonitoringLocationId}{id}"),
-                "name": property,
-                "description": property,
-                "definition": "Unknown",
+                "@iot.id": id,
             },
             "Sensor": {
                 "@iot.id": 0,

@@ -7,7 +7,7 @@ class UnitOfMeasurement(BaseModel):
     definition: str
 
 class Datastream(BaseModel):
-    iotid: int = Field(alias="@iot.id")
+    iotid: str = Field(alias="@iot.id")
     name: str
     description: str
     observationType: str
