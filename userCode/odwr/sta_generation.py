@@ -1,10 +1,38 @@
+# =================================================================
+#
+# Authors: Ben Webb <bwebb@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
 from typing import Optional
 
-from userCode.common.lib import deterministic_hash
-
-from .types import Attributes, Datastream, Observation, StationData
 from userCode.common.ontology import ONTOLOGY_MAPPING
-
+from userCode.odwr.types import Attributes, StationData
+from userCode.types import Datastream, Observation
+from userCode.util import deterministic_hash
 
 def to_sensorthings_observation(
     associatedDatastream: Datastream,
@@ -48,11 +76,11 @@ def to_sensorthings_station(station: StationData) -> dict:
     attr = station.attributes
     representation = {
         "name": attr.station_name,
-        "@iot.id": int(attr.station_nbr),
+        "@iot.id": str(attr.station_nbr),
         "description": attr.station_name,
         "Locations": [
             {
-                "@iot.id": int(attr.station_nbr),
+                "@iot.id": str(attr.station_nbr),
                 "name": attr.station_name,
                 "description": attr.station_name,
                 "encodingType": "application/vnd.geo+json",
@@ -75,7 +103,7 @@ def to_sensorthings_datastream(
     units: str,
     stream_name: str,
     id: int,
-    associatedThingId: int,
+    associatedThingId: str,
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     property = stream_name.removesuffix("_available").removesuffix("_avail")
@@ -88,7 +116,7 @@ def to_sensorthings_datastream(
 
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": int(f"{attr.station_nbr}{id}"),
+            "@iot.id": str(f"{attr.station_nbr}{id}"),
             "name": f"{attr.station_name} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",

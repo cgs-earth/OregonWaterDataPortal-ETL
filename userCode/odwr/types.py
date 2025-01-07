@@ -1,5 +1,34 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
 from typing import Literal, Optional, TypedDict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from dataclasses import dataclass
 
 BASE_OREGON_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
@@ -259,68 +288,10 @@ class Threshold(BaseModel):
     ReferenceCode: str
 
 
-class ObservedProperty(BaseModel):
-    iotid: int = Field(alias="@iot.id")
-    name: str
-    definition: str
-    description: str
-    properties: dict
-
-
-class Datastream(BaseModel, extra="forbid"):
-    iotid: int = Field(alias="@iot.id")
-    name: str
-    description: str
-    observationType: str
-    unitOfMeasurement: UnitOfMeasurement
-    ObservedProperty: ObservedProperty
-    # phenomenonTime: str,
-    # resultTime: NotRequired[str],  # not present in python 3.9
-    Sensor: dict
-    Thing: dict
-
-
-class Observation(BaseModel):
-    """sta observation"""
-
-    # iotid: int = Field(alias="@iot.id")
-    resultTime: str
-    phenomenonTime: str
-    Datastream: dict
-    result: Optional[float]
-    FeatureOfInterest: dict
-
-
 class OregonHttpResponse(BaseModel):
     geometryType: str
     fields: list
     features: list[StationData]
-
-
-OBSERVATION_COLLECTION_METADATA = {
-    "id": "Observations",
-    "title": "Observations",
-    "description": "SensorThings API Observations",
-    "keywords": ["observation", "dam"],
-    "links": ["https://gis.wrd.state.or.us/server/rest/services"],
-    "bbox": [-180, -90, 180, 90],
-    "time_field": "resultTime",
-    "id_field": "@iot.id",
-}
-
-DATASTREAM_COLLECTION_METADATA = {
-    "id": "Datastreams",
-    "title": "Datastreams",
-    "description": "SensorThings API Datastreams",
-    "keywords": ["datastream", "dam"],
-    "links": [
-        "https://gis.wrd.state.or.us/server/rest/services",
-        "https://gis.wrd.state.or.us/server/sdk/rest/index.html#/02ss00000029000000",
-    ],
-    "bbox": [-180, -90, 180, 90],
-    "id_field": "@iot.id",
-    "title_field": "name",
-}
 
 
 @dataclass

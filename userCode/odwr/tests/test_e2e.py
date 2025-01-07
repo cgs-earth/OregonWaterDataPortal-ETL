@@ -1,9 +1,42 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
+from dagster import DagsterInstance, RunConfig
 import datetime
 import pytest
 import requests
 
+from userCode import definitions
 from userCode.common.ontology import ONTOLOGY_MAPPING
-from userCode.odwr.helper_classes import get_datastream_time_range
+from userCode.env import API_BACKEND_URL
+from userCode.odwr.dag import all_metadata, post_station, sta_station
+from userCode.odwr.helper_classes import get_datastream_time_range, MockValues
 from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
     dates_are_within_X_days,
@@ -12,10 +45,6 @@ from userCode.odwr.tests.lib import (
     wipe_things,
 )
 from userCode.odwr.types import StationData
-from userCode import API_BACKEND_URL
-from ..dag import all_metadata, definitions, post_station, sta_station
-from dagster import DagsterInstance, RunConfig
-from userCode.odwr.helper_classes import MockValues
 
 
 @pytest.fixture(scope="module")
@@ -53,7 +82,7 @@ def test_full_pipeline(metadata: list[StationData]):
     assert obs.ok, "Failed to get observations"
     assert obs.json() == {"value": []}
 
-    resolved_job = definitions.get_job_def("harvest_station")
+    resolved_job = definitions.get_job_def("harvest_owdp")
 
     instance = DagsterInstance.ephemeral()
 

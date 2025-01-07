@@ -1,6 +1,36 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
 import datetime
 import requests
 
+from userCode.env import API_BACKEND_URL
 from userCode.odwr.helper_classes import (
     TimeRange,
     get_datastream_time_range,
@@ -12,13 +42,12 @@ from userCode.odwr.tests.lib import (
     wipe_things,
     wipe_things_before_and_after,
 )
-from userCode import API_BACKEND_URL
 
 
 def test_duplicate():
     """Make sure that duplicate things are not allowed"""
     wipe_things()
-    resp = requests.get(f"{API_BACKEND_URL}")
+    resp = requests.get(API_BACKEND_URL)
     assert resp.ok
     unique_id = "1234"  # @iot.id does not need to be an int on clientside but it does need to be serializable as an int
     payload = {
@@ -33,7 +62,7 @@ def test_duplicate():
     assert resp.ok, resp.text
     items = resp.json()["value"]
     assert len(items) == 1
-    assert items[0]["@iot.id"] == int(unique_id)
+    assert items[0]["@iot.id"] == unique_id
     resp = requests.post(f"{API_BACKEND_URL}/Things", json=payload)
     assert resp.status_code == 500
     wipe_things()
@@ -191,7 +220,7 @@ def test_insert_large_payload():
         items = resp.json()["value"]
         assert len(items) == 1
         # NOTE: iot.id will stay a int if it was originally an int. It is not always a string
-        assert items[0]["@iot.id"] == 10378500
+        assert items[0]["@iot.id"] == "10378500"
 
 
 def test_insert_same_id_different_obj():
@@ -223,13 +252,13 @@ def test_insert_same_id_different_obj():
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == 888
+        assert items[0]["@iot.id"] == "888"
 
         resp = requests.get(f"{API_BACKEND_URL}/Locations")
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == 888
+        assert items[0]["@iot.id"] == "888"
         # things dont wipe locations when deleted
         wipe_locations()
 
@@ -240,7 +269,7 @@ def test_post_station():
     wipe_locations()
     data = {
         "name": "HONEY CR NR PLUSH, OR",
-        "@iot.id": 10378500,
+        "@iot.id": "10378500",
         "description": "HONEY CR NR PLUSH, OR",
         "Locations": [
             {
@@ -370,7 +399,7 @@ def test_post_station():
     }
     resp = requests.post(f"{API_BACKEND_URL}/Things", json=data)
     assert resp.ok
-    resp = requests.get(f"{API_BACKEND_URL}/Things({data['@iot.id']})")
+    resp = requests.get(f"{API_BACKEND_URL}/Things('{data['@iot.id']}')")
     assert resp.ok
     assert resp.json()["@iot.id"] == data["@iot.id"]
     wipe_locations()
@@ -513,7 +542,7 @@ def test_adding_linked_obs_changes_datastream_time():
     )
 
     assert (
-        get_datastream_time_range(1)
+        get_datastream_time_range('1')
         == TimeRange(
             datetime.datetime.fromisoformat(firstTime),
             datetime.datetime.fromisoformat(newTime),

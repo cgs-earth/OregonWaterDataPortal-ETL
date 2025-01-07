@@ -1,16 +1,44 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
 import csv
+from dagster import get_dagster_logger
 import datetime
 import io
 import logging
-import os
-from urllib.parse import urlencode
-from typing import Optional
-
-from dagster import RunFailureSensorContext, get_dagster_logger
 import requests
+from typing import Optional
+from urllib.parse import urlencode
 
-from ..common.cache import ShelveCache
-from .types import (
+
+from userCode.common.cache import ShelveCache
+from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
     OregonHttpResponse,
@@ -179,22 +207,3 @@ def from_oregon_datetime(date_str: str) -> datetime.datetime:
     return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
         tzinfo=datetime.timezone.utc
     )
-
-
-def strict_env(key: str):
-    val = os.environ.get(key)
-    if val is None:
-        raise Exception(f"Missing ENV var: {key}")
-
-    return val
-
-
-def slack_error_fn(context: RunFailureSensorContext) -> str:
-    get_dagster_logger().info("Sending notification to Slack")
-    # The make_slack_on_run_failure_sensor automatically sends the job
-    # id and name so you can just send the error. We don't need other data in the string
-    source_being_crawled = context.partition_key
-    if source_being_crawled:
-        return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
-    else:
-        return f"Error: {context.failure_event.message}"

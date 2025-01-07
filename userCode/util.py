@@ -1,6 +1,7 @@
 # =================================================================
 #
 # Authors: Colton Loftus <cloftus@lincolninst.edu>
+# Authors: Ben Webb <bwebb@lincolninst.edu>
 #
 # Copyright (c) 2025 Lincoln Institute of Land Policy
 #
@@ -27,21 +28,35 @@
 #
 # =================================================================
 
-from hypothesis import given, strategies as st
-
-from userCode.util import deterministic_hash
-
-
-def test_deterministic_hash():
-    assert (
-        deterministic_hash("test", 5) == 28374
-    ), "Hashes should be deterministic across runs"
+from dagster import RunFailureSensorContext, get_dagster_logger
+import hashlib
+import os
+from typing import Any
 
 
-# Property: Hash is always positive
-@given(name=st.text(), desiredLength=st.integers(min_value=1, max_value=18))
-def test_hash_is_positive_fuzz(name, desiredLength):
-    result = deterministic_hash(name, desiredLength)
-    assert result > 0, f"Hash result should always be positive, got {result}"
-    # can be less since the result may be padded at the start with 0s
-    assert len(str(result)) <= desiredLength
+def get_env(key: str, fallback: Any = None) -> str:
+    """Fetch environment variable"""
+    val = os.environ.get(key, fallback)
+    if val is None:
+        raise Exception(f"Missing ENV var: {key}")
+
+    return val
+
+def deterministic_hash(name: str, desiredLength: int) -> int:
+    """Python's built-in hash function is not deterministic, so this is a workaround"""
+    data = name.encode("utf-8")
+    hash_hex = hashlib.md5(data).hexdigest()
+    hash_int = int(hash_hex, 16)
+    trimmed_hash = hash_int % (10**desiredLength)
+    # handle case where it hashes to 0
+    return trimmed_hash if trimmed_hash != 0 else trimmed_hash + 1
+
+def slack_error_fn(context: RunFailureSensorContext) -> str:
+    get_dagster_logger().info("Sending notification to Slack")
+    # The make_slack_on_run_failure_sensor automatically sends the job
+    # id and name so you can just send the error. We don't need other data in the string
+    source_being_crawled = context.partition_key
+    if source_being_crawled:
+        return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
+    else:
+        return f"Error: {context.failure_event.message}"
