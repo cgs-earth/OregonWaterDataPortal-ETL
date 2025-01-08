@@ -17,8 +17,7 @@ services:
       - 1883:1883
       - 8080:8080
     depends_on:
-      - database:
-          condition: service_healthy
+      - database
 
   database:
     container_name: database
@@ -30,11 +29,6 @@ services:
       - POSTGRES_PASSWORD=ChangeMe
     volumes:
       - postgis_volume:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d sensorthings -U sensorthings "]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
