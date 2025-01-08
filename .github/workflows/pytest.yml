@@ -70,7 +70,7 @@ jobs:
 
           index_check=$(echo "$index_check" | xargs)
 
-          if [ "$index_check" != "idx_observations_datastream_id" ]; then
+          if [[ "$index_check" != *"idx_observations_datastream_id"* ]]; then
             echo "Error: The index 'idx_observations_datastream_id' is missing! Output was: '$index_check'"
             exit 1
           else
