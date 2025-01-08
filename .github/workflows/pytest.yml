@@ -5,7 +5,7 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  uv-example:
+  pytest-e2e:
     runs-on: ubuntu-latest
     name: python
     steps:
@@ -39,6 +39,19 @@ jobs:
           docker compose ps
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
+
+      # Add check to verify that the idx_observations_datastream_id index is present
+      # We only check this one since if it is added, the others should be present as well given they are loaded from the same sql file
+      - name: Check indices were added
+        run: |
+          echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
+          index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
+          if [[ ! $index_check =~ "idx_observations_datastream_id" ]]; then
+            echo "Error: The index 'idx_observations_datastream_id' is missing!"
+            exit 1
+          else
+            echo "Index 'idx_observations_datastream_id' found."
+          fi
 
       - name: Run tests
         run: |
