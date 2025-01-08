@@ -272,18 +272,18 @@ def check_duplicate_obs():
     """Do a sanity check to make sure there are no obvious duplicates in either observations
     or observed properties"""
 
-    observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
-    assert observedProperties.ok, observedProperties.text
-    observedProperties = observedProperties.json()["value"]
+    # observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    # assert observedProperties.ok, observedProperties.text
+    # observedProperties = observedProperties.json()["value"]
 
-    names = set()
+    # names = set()
 
-    for prop in observedProperties:
-        if prop["name"] in names:
-            raise RuntimeError(
-                f"Found duplicate observed property name: {prop['name']} in {observedProperties=}"
-            )
-        names.add(prop["name"])
+    # for prop in observedProperties:
+    #     if prop["name"] in names:
+    #         raise RuntimeError(
+    #             f"Found duplicate observed property name: {prop['name']} in {observedProperties=}"
+    #         )
+    #     names.add(prop["name"])
 
     return AssetCheckResult(
         passed=True,

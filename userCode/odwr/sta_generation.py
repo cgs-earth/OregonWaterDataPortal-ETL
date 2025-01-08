@@ -22,6 +22,7 @@ def to_sensorthings_observation(
     id = deterministic_hash(
         (f"{associatedDatastream.name}{phenom_time}{resultTime}{datapoint}"), 10
     )
+
     return Observation(
         **{
             "phenomenonTime": phenom_time,
