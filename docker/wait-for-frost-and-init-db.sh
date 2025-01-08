@@ -1,16 +1,20 @@
 #!/bin/bash
 
+# This script is run inside the docker-compose project.
+# It waits for the frost server to be initialized, indicating that the desired tables will be added to the db.
+# Once this occurs, we can then apply the SQL indices.
+
 # Wait for the frost-http service to be ready
 echo "Waiting for frost-http to be ready..."
 
 # Define a max number of retries and delay time
 MAX_RETRIES=30
 RETRY_INTERVAL=3
-RETRY_COUNT=4
+RETRY_COUNT=0
 
 # Check for frost-http service readiness
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if docker exec -it frost-http curl -s --head http://localhost:8080/FROST-Server; then
+    if docker exec frost-http curl -s --head http://localhost:8080/FROST-Server; then
         echo "frost-http is ready."
         break
     else
@@ -28,6 +32,19 @@ fi
 # After frost-http is initialized, apply the SQL statements from the file
 echo "Running SQL commands to create indices in the database..."
 
+# Ensure the SQL file exists in the container
+if [ ! -f /indices.sql ]; then
+    echo "SQL file '/indices.sql' not found. Exiting."
+    exit 2
+fi
+
+# Execute the SQL commands using psql inside the database container
 docker exec -i database psql -U sensorthings -d sensorthings < /indices.sql
 
-echo "SQL commands executed successfully."
+# Check if the SQL execution was successful
+if [ $? -eq 0 ]; then
+    echo "SQL commands executed successfully."
+else
+    echo "Failed to execute SQL commands. Exiting."
+    exit 3
+fi
