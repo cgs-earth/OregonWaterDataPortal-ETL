@@ -52,7 +52,7 @@ jobs:
 
           # Check if the index is found
           if [ "$index_check" != "idx_observations_datastream_id" ]; then
-            echo "Error: The index 'idx_observations_datastream_id' is missing!""
+            echo "Error: The index 'idx_observations_datastream_id' is missing! Output was: '$index_check'"
             exit 1
           else
             echo "Index 'idx_observations_datastream_id' found."
