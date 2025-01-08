@@ -296,11 +296,11 @@ harvest_job = define_asset_job(
     selection=AssetSelection.all(),
 )
 
-DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST = "0 16 * * *"
+DAILY_AT_FOUR_AM_EST_1AM_PST = "0 9 * * *"
 
 
 @schedule(
-    cron_schedule=DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST,
+    cron_schedule=DAILY_AT_FOUR_AM_EST_1AM_PST,
     target=AssetSelection.all(),
     default_status=DefaultScheduleStatus.STOPPED,
 )
