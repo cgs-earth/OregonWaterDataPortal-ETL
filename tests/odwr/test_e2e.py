@@ -33,18 +33,18 @@ import pytest
 import requests
 
 from userCode import definitions
-from userCode.common.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.env import API_BACKEND_URL
 from userCode.odwr.dag import all_metadata, post_station, sta_station
 from userCode.odwr.helper_classes import get_datastream_time_range, MockValues
-from userCode.odwr.lib import to_oregon_datetime
-from userCode.odwr.tests.lib import (
+from .lib import (
     dates_are_within_X_days,
     wipe_locations,
     wipe_observed_properties,
     wipe_things,
 )
 from userCode.odwr.types import StationData
+from userCode.util import to_oregon_datetime
 
 
 @pytest.fixture(scope="module")

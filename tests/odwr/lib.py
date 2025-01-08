@@ -32,7 +32,6 @@ import datetime
 import requests
 
 from userCode.env import API_BACKEND_URL
-from userCode.odwr.lib import to_oregon_datetime
 
 
 @contextmanager
@@ -157,19 +156,6 @@ def add_mock_data_to_change_start_time_for_datastream(
     assert resp.ok, resp.text
     resp = requests.post(f"{API_BACKEND_URL}/Observations", json=associated_obs)
     assert resp.ok, resp.text
-
-
-def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
-    isoDate = datetime.datetime.fromisoformat(date)
-    assert isoDate.tzinfo == datetime.timezone.utc
-    assert isoDate >= start
-    assert isoDate <= end
-
-
-def now_as_oregon_datetime():
-    """Get the current time formatted in a way that the oregon api expects"""
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
-    return to_oregon_datetime(now)
 
 
 def dates_are_within_X_days(
