@@ -1,9 +1,37 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
+
 from contextlib import contextmanager
 import datetime
 import requests
-from userCode import API_BACKEND_URL
-from userCode.odwr.lib import to_oregon_datetime
-from datetime import timezone
+
+from userCode.env import API_BACKEND_URL
 
 
 @contextmanager
@@ -24,7 +52,7 @@ def wipe_things():
     if response.ok:
         things = response.json()["value"]
         for thing in things:
-            resp = requests.delete(f"{API_BACKEND_URL}/Things({thing['@iot.id']})")
+            resp = requests.delete(f"{API_BACKEND_URL}/Things('{thing['@iot.id']}')")
             assert resp.ok, resp.text
     else:
         raise RuntimeError(response.text)
@@ -37,7 +65,7 @@ def wipe_locations():
         locations = response.json()["value"]
         for location in locations:
             resp = requests.delete(
-                f"{API_BACKEND_URL}/Locations({location['@iot.id']})"
+                f"{API_BACKEND_URL}/Locations('{location['@iot.id']}')"
             )
             assert resp.ok
     else:
@@ -65,7 +93,7 @@ def wipe_datastreams():
         datastreams = response.json()["value"]
         for datastream in datastreams:
             resp = requests.delete(
-                f"{API_BACKEND_URL}/Datastreams({datastream['@iot.id']})"
+                f"{API_BACKEND_URL}/Datastreams('{datastream['@iot.id']}')"
             )
             assert resp.ok
     else:
@@ -130,19 +158,6 @@ def add_mock_data_to_change_start_time_for_datastream(
     assert resp.ok, resp.text
 
 
-def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
-    isoDate = datetime.datetime.fromisoformat(date)
-    assert isoDate.tzinfo == timezone.utc
-    assert isoDate >= start
-    assert isoDate <= end
-
-
-def now_as_oregon_datetime():
-    """Get the current time formatted in a way that the oregon api expects"""
-    now = datetime.datetime.now(tz=timezone.utc)
-    return to_oregon_datetime(now)
-
-
 def dates_are_within_X_days(
     date1: datetime.datetime, date2: datetime.datetime, days: int
 ):
@@ -153,3 +168,10 @@ def dates_are_within_X_days(
     time frame more coarsely
     """
     return abs((date1 - date2).days) <= days
+
+
+if __name__ == "__main__":
+    wipe_datastreams()
+    wipe_locations()
+    wipe_observed_properties()
+    wipe_things()

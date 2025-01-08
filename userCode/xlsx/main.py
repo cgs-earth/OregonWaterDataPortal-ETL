@@ -1,12 +1,38 @@
-import os
-import click
-import pytest
-import debugpy
-from pathlib import Path
-from lib import parse_xlsx
-import logging
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# =================================================================
 
-LOGGER = logging.getLogger(__name__)
+import click
+import debugpy
+from lib import parse_xlsx
+import os
+import pytest
+from pathlib import Path
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))
@@ -18,8 +44,7 @@ def load(ctx, file):
     parsed = parse_xlsx(path)
     sta = parsed.to_sta()
     parsed.send_to_frost(sta)
-    LOGGER.info(f"Finished uploading {path} to FROST")
-    click.echo("Done")
+    click.echo(f"Finished uploading {path} to FROST")
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))
