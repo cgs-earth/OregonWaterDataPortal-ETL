@@ -14,7 +14,7 @@ RETRY_COUNT=0
 
 # Check for frost-http service readiness
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if docker exec frost-http curl -s --head http://localhost:8080/FROST-Server; then
+    if docker exec frost-http curl -s --head http://frost-http:8080/FROST-Server; then
         echo "frost-http is ready."
         break
     else
@@ -33,13 +33,13 @@ fi
 echo "Running SQL commands to create indices in the database..."
 
 # Ensure the SQL file exists in the container
-if [ ! -f /indices.sql ]; then
-    echo "SQL file '/indices.sql' not found. Exiting."
+if [ ! -f indices.sql ]; then
+    echo "SQL file 'indices.sql' not found. Exiting."
     exit 2
 fi
 
 # Execute the SQL commands using psql inside the database container
-docker exec -i database psql -U sensorthings -d sensorthings < /indices.sql
+docker exec -i database psql -U sensorthings -d sensorthings < indices.sql
 
 # Check if the SQL execution was successful
 if [ $? -eq 0 ]; then
