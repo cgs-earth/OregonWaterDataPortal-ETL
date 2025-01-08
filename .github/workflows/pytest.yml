@@ -45,13 +45,19 @@ jobs:
       - name: Check indices were added
         run: |
           echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
-          index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
-          if [[ ! $index_check =~ "idx_observations_datastream_id" ]]; then
-            echo "Error: The index 'idx_observations_datastream_id' is missing!"
+          index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
+          
+          # Trim any surrounding whitespace
+          index_check=$(echo "$index_check" | xargs)
+
+          # Check if the index is found
+          if [ "$index_check" != "idx_observations_datastream_id" ]; then
+            echo "Error: The index 'idx_observations_datastream_id' is missing!""
             exit 1
           else
             echo "Index 'idx_observations_datastream_id' found."
           fi
+
 
       - name: Run tests
         run: |
