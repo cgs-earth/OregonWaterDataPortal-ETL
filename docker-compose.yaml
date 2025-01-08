@@ -13,6 +13,7 @@ services:
       - persistence_db_password=ChangeMe
       - persistence_autoUpdateDatabase=true
       - persistence_idGenerationMode=ServerAndClientGenerated
+      - mqtt_Enabled=false
     ports:
       - 1883:1883
       - 8080:8080
