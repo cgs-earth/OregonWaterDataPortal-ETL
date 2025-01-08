@@ -35,7 +35,7 @@ import requests
 from typing import Literal, NamedTuple, Optional
 
 from userCode.env import API_BACKEND_URL
-from userCode.odwr.lib import from_oregon_datetime
+from userCode.util import from_oregon_datetime
 from userCode.odwr.types import START_OF_DATA, FrostBatchRequest
 from userCode.types import Datastream, Observation
 

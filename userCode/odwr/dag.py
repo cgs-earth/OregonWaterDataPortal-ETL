@@ -42,6 +42,7 @@ from dagster import (
     schedule,
 )
 import httpx
+import requests
 from typing import Optional
 
 from userCode.env import API_BACKEND_URL
@@ -51,18 +52,14 @@ from userCode.odwr.helper_classes import (
 )
 from userCode.odwr.lib import (
     fetch_station_metadata,
-    from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    to_oregon_datetime,
 )
 from userCode.odwr.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-
-from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
 from userCode.odwr.helper_classes import MockValues
 from userCode.odwr.types import (
     ALL_RELEVANT_STATIONS,
@@ -73,7 +70,11 @@ from userCode.odwr.types import (
     StationData,
 )
 from userCode.types import Datastream, Observation
-import requests
+from userCode.util import (
+    assert_date_in_range,
+    now_as_oregon_datetime,
+    from_oregon_datetime,
+    to_oregon_datetime)
 
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
 

@@ -30,13 +30,13 @@
 import datetime
 import pytest
 
-from userCode.odwr.tests.lib import wipe_datastreams, wipe_locations, wipe_things
+from .lib import wipe_datastreams, wipe_locations, wipe_things
 from userCode.odwr.lib import (
     assert_valid_oregon_date,
     download_oregon_tsv,
     parse_oregon_tsv,
-    from_oregon_datetime,
 )
+from userCode.util import from_oregon_datetime
 
 
 def test_download():

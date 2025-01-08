@@ -28,6 +28,7 @@
 #
 # =================================================================
 
+import datetime
 from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
@@ -62,3 +63,27 @@ def slack_error_fn(context: RunFailureSensorContext) -> str:
         return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
     else:
         return f"Error: {context.failure_event.message}"
+
+def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
+    isoDate = datetime.datetime.fromisoformat(date)
+    assert isoDate.tzinfo == datetime.timezone.utc
+    assert isoDate >= start
+    assert isoDate <= end
+
+
+def now_as_oregon_datetime():
+    """Get the current time formatted in a way that the oregon api expects"""
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    return to_oregon_datetime(now)
+
+
+def to_oregon_datetime(date_str: datetime.datetime) -> str:
+    """Convert a datetime into the format that the Oregon API expects"""
+    return datetime.datetime.strftime(date_str, "%m/%d/%Y %I:%M:%S %p")
+
+
+def from_oregon_datetime(date_str: str) -> datetime.datetime:
+    """Convert a datetime string into a datetime object"""
+    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
+        tzinfo=datetime.timezone.utc
+    )

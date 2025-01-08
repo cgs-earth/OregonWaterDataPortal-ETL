@@ -29,7 +29,7 @@
 
 from typing import Optional
 
-from userCode.common.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.odwr.types import Attributes, StationData
 from userCode.types import Datastream, Observation
 from userCode.util import deterministic_hash

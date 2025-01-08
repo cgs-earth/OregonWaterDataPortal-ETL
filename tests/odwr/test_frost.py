@@ -35,7 +35,7 @@ from userCode.odwr.helper_classes import (
     TimeRange,
     get_datastream_time_range,
 )
-from userCode.odwr.tests.lib import (
+from .lib import (
     wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,

@@ -37,7 +37,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 
-from userCode.common.cache import ShelveCache
+from userCode.cache import ShelveCache
 from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
@@ -195,15 +195,3 @@ def assert_valid_oregon_date(date_str: str) -> None:
         raise ValueError(
             f"Date string '{date_str}' could not be parsed into the format that the Oregon API expects"
         )
-
-
-def to_oregon_datetime(date_str: datetime.datetime) -> str:
-    """Convert a datetime into the format that the Oregon API expects"""
-    return datetime.datetime.strftime(date_str, "%m/%d/%Y %I:%M:%S %p")
-
-
-def from_oregon_datetime(date_str: str) -> datetime.datetime:
-    """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
-        tzinfo=datetime.timezone.utc
-    )
