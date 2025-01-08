@@ -68,7 +68,7 @@ services:
     container_name: init-db
     image: busybox:1.35.0-uclibc
     volumes:
-      - ./Docker/indices.sql:/indices.sql  # Mount your SQL file here
+      - ./Docker/indices.sql:/indices.sql # Mount your SQL file here
       - ./Docker/wait-for-frost-and-init-db.sh:/wait-for-frost-and-init-db.sh
     depends_on:
       - frost-http
