@@ -40,15 +40,11 @@ jobs:
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
 
-      # Wait for the database to be ready
-      - name: Wait for database to be ready
+      # Run docker/wait-for-frost-and-init-db.sh
+      - name: Wait for Frost and Init DB
         run: |
-          echo "Waiting for database to be ready..."
-          until docker exec -t database psql -U sensorthings -d sensorthings -c "SELECT 1;" > /dev/null 2>&1; do
-            echo "Waiting for database to respond..."
-            sleep 5
-          done
-          echo "Database is ready."
+          echo "Running docker/wait-for-frost-and-init-db.sh..."
+          bash docker/wait-for-frost-and-init-db.sh
 
       # Check if the index exists in the database
       - name: Check indices were added
