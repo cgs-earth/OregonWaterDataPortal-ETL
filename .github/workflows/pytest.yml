@@ -40,12 +40,24 @@ jobs:
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
 
-      # Add check to verify that the idx_observations_datastream_id index is present
-      # We only check this one since if it is added, the others should be present as well given they are loaded from the same sql file
+      # Wait for the database to be ready
+      - name: Wait for database to be ready
+        run: |
+          echo "Waiting for database to be ready..."
+          until docker exec -t database psql -U sensorthings -d sensorthings -c "SELECT 1;" > /dev/null 2>&1; do
+            echo "Waiting for database to respond..."
+            sleep 5
+          done
+          echo "Database is ready."
+
+      # Check if the index exists in the database
       - name: Check indices were added
         run: |
           echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
           index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
+
+          # Log the query result for debugging
+          echo "Query result: $index_check"
 
           # Trim any surrounding whitespace
           index_check=$(echo "$index_check" | xargs)
