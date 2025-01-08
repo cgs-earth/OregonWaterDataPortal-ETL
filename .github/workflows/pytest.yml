@@ -46,7 +46,7 @@ jobs:
         run: |
           echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
           index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
-          
+
           # Trim any surrounding whitespace
           index_check=$(echo "$index_check" | xargs)
 
@@ -57,7 +57,6 @@ jobs:
           else
             echo "Index 'idx_observations_datastream_id' found."
           fi
-
 
       - name: Run tests
         run: |
