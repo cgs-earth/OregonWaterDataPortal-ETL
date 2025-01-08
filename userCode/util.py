@@ -64,6 +64,7 @@ def slack_error_fn(context: RunFailureSensorContext) -> str:
     else:
         return f"Error: {context.failure_event.message}"
 
+
 def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
     isoDate = datetime.datetime.fromisoformat(date)
     assert isoDate.tzinfo == datetime.timezone.utc

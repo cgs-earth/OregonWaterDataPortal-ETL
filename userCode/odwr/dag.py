@@ -74,7 +74,8 @@ from userCode.util import (
     assert_date_in_range,
     now_as_oregon_datetime,
     from_oregon_datetime,
-    to_oregon_datetime)
+    to_oregon_datetime,
+)
 
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
 
