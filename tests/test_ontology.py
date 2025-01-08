@@ -27,7 +27,7 @@
 #
 # =================================================================
 
-from userCode.common.ontology import (
+from userCode.ontology import (
     ONTOLOGY_MAPPING,
     construct_ontology_mapping,
     get_ontology,
