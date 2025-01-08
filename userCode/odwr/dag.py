@@ -268,7 +268,30 @@ def batch_post_observations(sta_all_observations: list[Observation]):
 
 
 @asset_check(asset=batch_post_observations)
-def check_duplicates():
+def check_duplicate_obs():
+    """Do a sanity check to make sure there are no obvious duplicates in either observations
+    or observed properties"""
+
+    observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
+    assert observedProperties.ok, observedProperties.text
+    observedProperties = observedProperties.json()["value"]
+
+    names = set()
+
+    for prop in observedProperties:
+        if prop["name"] in names:
+            raise RuntimeError(
+                f"Found duplicate observed property name: {prop['name']} in {observedProperties=}"
+            )
+        names.add(prop["name"])
+
+    return AssetCheckResult(
+        passed=True,
+    )
+
+
+@asset_check(asset=batch_post_observations)
+def check_duplicate_properties():
     """Do a sanity check to make sure there are no obvious duplicates in either observations
     or observed properties"""
 

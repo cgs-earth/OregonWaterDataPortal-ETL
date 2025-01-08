@@ -8,6 +8,18 @@ def test_deterministic_hash():
     ), "Hashes should be deterministic across runs"
 
 
+def test_iow_hash_is_deterministic():
+    datastreamName = "CROOKED R NR PRINEVILLE, OR mean_daily_flow"
+    phenomenonTime = "1941-10-01T00:00:00Z"
+    resultTime = "1941-10-01T00:00:00Z"
+    datapoint = 40
+
+    id = deterministic_hash(
+        (f"{datastreamName}{phenomenonTime}{resultTime}{datapoint}"), 10
+    )
+    assert id == 5247879195
+
+
 # Property: Hash is always positive
 @given(name=st.text(), desiredLength=st.integers(min_value=1, max_value=18))
 def test_hash_is_positive_fuzz(name, desiredLength):

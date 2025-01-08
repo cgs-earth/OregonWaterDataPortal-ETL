@@ -128,6 +128,15 @@ def test_full_pipeline(metadata: list[StationData]):
     assert dates_are_within_X_days(
         range2.end, today, 7
     ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
+
+    # make sure there are no duplicates in the datastream
+    url = f"{API_BACKEND_URL}/Datastreams({datastreams.json()['value'][0]['@iot.id']})/Observations?$filter=resultTime%20eq%201941-10-01T00"
+    resp = requests.get(url)
+    assert resp.ok
+    assert (
+        len(resp.json()["value"]) == 1
+    ), "There appear to be multiple observations for the same datasstream at the same time"
+
     wipe_locations()
     wipe_things()
     wipe_observed_properties()
