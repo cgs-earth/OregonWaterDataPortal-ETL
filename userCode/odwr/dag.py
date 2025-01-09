@@ -40,7 +40,11 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
+from userCode.odwr.tests.lib import (
+    assert_date_in_range,
+    assert_no_observations_with_same_iotid_in_first_page,
+    now_as_oregon_datetime,
+)
 from userCode.odwr.helper_classes import MockValues
 from .types import (
     ALL_RELEVANT_STATIONS,
@@ -283,7 +287,9 @@ def post_datastreams(sta_datastreams: list[Datastream]):
         )
         if not resp.ok:
             get_dagster_logger().error(f"Failed posting datastream: {datastream}")
-            raise RuntimeError(resp.text)
+            raise RuntimeError(
+                f"Failed posting datastream for {datastream.iotid} with response: {resp.text}"
+            )
 
 
 @asset(partitions_def=station_partition, deps=[post_datastreams])
@@ -310,6 +316,16 @@ def check_duplicate_properties():
             )
         names.add(prop["name"])
 
+    return AssetCheckResult(
+        passed=True,
+    )
+
+
+@asset_check(asset=batch_post_observations)
+def check_duplicate_observations():
+    """Sanity check to make sure there are no obvious duplicates in observations. This should already be checked by FROST,
+    but there is a possibility that the db doesn't catch it so we double check here"""
+    assert_no_observations_with_same_iotid_in_first_page()
     return AssetCheckResult(
         passed=True,
     )
