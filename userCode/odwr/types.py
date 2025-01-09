@@ -283,7 +283,7 @@ class Datastream(BaseModel, extra="forbid"):
 class Observation(BaseModel):
     """sta observation"""
 
-    # iotid: int = Field(alias="@iot.id")
+    iotid: int = Field(alias="@iot.id")
     resultTime: str
     phenomenonTime: str
     Datastream: dict
