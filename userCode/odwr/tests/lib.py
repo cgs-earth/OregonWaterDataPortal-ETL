@@ -98,7 +98,7 @@ def dates_are_within_X_days(
 
 
 def assert_observations_and_datastreams_empty():
-    """Make sure that the observations and datamstreams contain no data"""
+    """Make sure that the observations and datastreams contain no data"""
     datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
     assert datastreams.ok, "Failed to get datastreams"
     assert datastreams.json() == {
