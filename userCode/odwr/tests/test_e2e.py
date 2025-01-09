@@ -7,9 +7,10 @@ from userCode.common.test_lib import test_iow_hash_is_deterministic
 from userCode.odwr.helper_classes import get_datastream_time_range
 from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
-    assert_no_duplicates,
+    assert_no_duplicate_at_given_time,
     assert_observations_and_datastreams_empty,
     dates_are_within_X_days,
+    wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
     wipe_things,
@@ -50,6 +51,7 @@ def test_full_pipeline(metadata: list[StationData]):
     wipe_locations()
     wipe_observed_properties()
     wipe_things()
+    wipe_datastreams()
     # Make sure the hash function is not varied in different runtimes
     test_iow_hash_is_deterministic()
     assert_observations_and_datastreams_empty()
@@ -109,13 +111,10 @@ def test_full_pipeline(metadata: list[StationData]):
         range.end, mocked_date, 7
     ), "The end of the data in the database is significantly older than the mocked date. This could be ok if the upstream is lagging behind, but is generally a sign of an error"
 
-    assert_no_duplicates(
+    assert_no_duplicate_at_given_time(first_datastream_iotid, range.start)
+    assert_no_duplicate_at_given_time(
         first_datastream_iotid,
-        range.start.strftime("%Y-%m-%dT%H:%M:%SZ"),
-    )
-    assert_no_duplicates(
-        first_datastream_iotid,
-        range.end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        range.end,
     )
 
     # run again to see if the datastream is updated
@@ -123,21 +122,21 @@ def test_full_pipeline(metadata: list[StationData]):
         instance=instance, partition_key=first_station_number
     )
     assert crawl_update_result.success, "Although the previous run was successful, the second dagster run to update the data failed."
-    range2 = get_datastream_time_range(first_datastream_iotid)
+    update_crawl_range = get_datastream_time_range(first_datastream_iotid)
     assert (
-        range2.start < range2.end
+        update_crawl_range.start < update_crawl_range.end
     ), "The start of the datastream must be before the end"
     assert (
-        range2.start == range.start
+        update_crawl_range.start == range.start
     ), "The start of the datastream should not change as new data is added to the end"
-    assert range2.end >= range.end
+    assert update_crawl_range.end >= range.end
     today = datetime.datetime.now(tz=datetime.timezone.utc)
     assert dates_are_within_X_days(
-        range2.end, today, 7
+        update_crawl_range.end, today, 7
     ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
 
-    # make sure there are no duplicates in the datastream
-
+    assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.start)
+    assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.end)
     wipe_locations()
     wipe_things()
     wipe_observed_properties()
