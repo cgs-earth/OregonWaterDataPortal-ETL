@@ -144,6 +144,7 @@ def test_very_old_dates_are_the_same():
 
 
 def test_old_data_has_many_null_values():
+    """The old csv data is observed to have many null values which must be dropped"""
     tsv_url = generate_oregon_tsv_url(
         "mean_daily_flow_available",
         10371500,
@@ -194,3 +195,56 @@ def test_timezone_behavior():
         assert_date_in_range(
             date, from_oregon_datetime(begin), from_oregon_datetime(end)
         )
+
+
+@pytest.mark.parametrize(
+    "begin,end_time",
+    [
+        (
+            "2024-09-20T00:00:00Z",
+            (datetime.now(tz=timezone.utc) - timedelta(hours=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+        ),
+        ("2023-01-01T00:00:00Z", "2025-01-05T00:00:00Z"),
+        ("2022-07-01T00:00:00Z", "2022-12-31T00:00:00Z"),
+        ("2021-04-15T00:00:00Z", "2021-05-15T00:00:00Z"),
+    ],
+)
+def test_adding_one_minute_prevents_overlap(begin, end_time):
+    """Make sure adding one minute prevents overlap in downloaded data. Needed to test so
+    we arent downloading and uploading duplicates when crawling updates
+    """
+
+    # NOTE: I have experienced flakeness when testing this. It seems fine at the moment.
+    # If you specify data to oregon in a way that is differently formatted it almost seems like
+    # it ignores the minute extra. We don't want to add full hours however since we don't
+    # want to be ignoring any data.
+
+    begin = datetime.fromisoformat(begin)
+    end_time = datetime.fromisoformat(end_time)
+
+    response1: bytes = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10371500,
+        start_date=to_oregon_datetime(begin),
+        end_date=to_oregon_datetime(end_time),
+    )
+
+    new_begin = end_time + timedelta(minutes=1)
+    assert new_begin > end_time
+    assert new_begin < datetime.now(tz=timezone.utc)
+    new_begin_oregon_fmt = to_oregon_datetime(new_begin)
+
+    response2: bytes = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10371500,
+        start_date=new_begin_oregon_fmt,
+        end_date=now_as_oregon_datetime(),
+    )
+
+    parsedResp1 = parse_oregon_tsv(response1)
+    parsedResp2 = parse_oregon_tsv(response2)
+
+    for date in parsedResp1.dates:
+        assert date not in parsedResp2.dates
