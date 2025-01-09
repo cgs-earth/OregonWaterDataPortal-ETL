@@ -37,3 +37,14 @@ def test_hash_is_positive_fuzz(name, desiredLength):
     assert result > 0, f"Hash result should always be positive, got {result}"
     # can be less since the result may be padded at the start with 0s
     assert len(str(result)) <= desiredLength
+
+
+@given(st.lists(st.text(), unique=True))
+def test_dict_is_the_same_as_ordered_set(listOfArbitraryStrings: list[str]):
+    # Use fromkeys to create a dictionary
+    dict_from_keys = dict.fromkeys(listOfArbitraryStrings)
+    for _, v in dict_from_keys.items():
+        assert v is None
+
+    # Assert the order of keys is the same as the input order
+    assert list(dict_from_keys.keys()) == listOfArbitraryStrings
