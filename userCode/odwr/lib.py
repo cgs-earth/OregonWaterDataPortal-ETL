@@ -81,9 +81,9 @@ def parse_oregon_tsv(
                 data.append(float(row[2]))
 
             parsed_date = parse_date(str(DATE_COLUMN))
-            assert parsed_date not in unique_dates, (
-                f"Date '{parsed_date}' appeared twice in the data"
-            )
+            assert (
+                parsed_date not in unique_dates
+            ), f"Date '{parsed_date}' appeared twice in the data"
             unique_dates[parsed_date] = None
 
     return ParsedTSVData(data, units, list(unique_dates))

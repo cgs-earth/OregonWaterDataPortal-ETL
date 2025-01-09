@@ -3,9 +3,9 @@ from hypothesis import given, strategies as st
 
 
 def test_deterministic_hash():
-    assert deterministic_hash("test", 5) == 28374, (
-        "Hashes should be deterministic across runs"
-    )
+    assert (
+        deterministic_hash("test", 5) == 28374
+    ), "Hashes should be deterministic across runs"
 
 
 def test_iow_hash_is_deterministic():

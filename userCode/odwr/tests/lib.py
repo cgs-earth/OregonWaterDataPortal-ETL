@@ -101,14 +101,14 @@ def assert_observations_and_datastreams_empty():
     """Make sure that the observations and datastreams contain no data"""
     datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
     assert datastreams.ok, "Failed to get datastreams"
-    assert datastreams.json() == {"value": []}, (
-        "Datastreams are not empty at the start of the pipeline test"
-    )
+    assert datastreams.json() == {
+        "value": []
+    }, "Datastreams are not empty at the start of the pipeline test"
     obs = requests.get(f"{API_BACKEND_URL}/Observations")
     assert obs.ok, "Failed to get observations"
-    assert obs.json() == {"value": []}, (
-        "Observations are not empty at the start of the pipeline test"
-    )
+    assert obs.json() == {
+        "value": []
+    }, "Observations are not empty at the start of the pipeline test"
 
 
 def assert_no_duplicate_at_given_time(
@@ -119,9 +119,9 @@ def assert_no_duplicate_at_given_time(
     url = f"{API_BACKEND_URL}/Datastreams({datastream_int})/Observations?$filter=resultTime%20eq%20{date_to_check.strftime('%Y-%m-%dT%H:%M:%SZ')}"
     resp = requests.get(url)
     assert resp.ok, resp.text
-    assert len(resp.json()["value"]) <= 1, (
-        f"There appear to be multiple observations at the same resultTime for the datastream {datastream_int}"
-    )
+    assert (
+        len(resp.json()["value"]) <= 1
+    ), f"There appear to be multiple observations at the same resultTime for the datastream {datastream_int}"
 
 
 def assert_no_observations_with_same_iotid_in_first_page():
