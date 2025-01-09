@@ -114,6 +114,7 @@ def assert_observations_and_datastreams_empty():
 def assert_no_duplicate_at_given_time(
     datastream_int: int, date_to_check: datetime.datetime
 ):
+    """Checks if there are multiple observations at the same time for a given datastream"""
     # This is in a format like https://owdp-pilot.internetofwater.app/FROST-Server/v1.1/Datastreams(140805000)/Observations?$filter=resultTime%20eq%201941-10-01T00:00:00Z
     url = f"{API_BACKEND_URL}/Datastreams({datastream_int})/Observations?$filter=resultTime%20eq%20{date_to_check.strftime("%Y-%m-%dT%H:%M:%SZ")}"
     resp = requests.get(url)
@@ -121,3 +122,16 @@ def assert_no_duplicate_at_given_time(
     assert (
         len(resp.json()["value"]) <= 1
     ), f"There appear to be multiple observations at the same resultTime for the datastream {datastream_int}"
+
+
+def assert_no_observations_with_same_iotid_in_first_page():
+    """Just get a list of the observations in the first page and make sure there are no duplicate iotid."""
+    resp = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert resp.ok, resp.text
+    observations = resp.json()["value"]
+    iotids = [o["@iot.id"] for o in observations]
+    iotidSet = set()
+
+    for iotid in iotids:
+        assert iotid not in iotidSet, f"{iotid} is a duplicate iotid"
+        iotidSet.add(iotid)

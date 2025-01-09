@@ -8,6 +8,7 @@ from userCode.odwr.helper_classes import get_datastream_time_range
 from userCode.odwr.lib import to_oregon_datetime
 from userCode.odwr.tests.lib import (
     assert_no_duplicate_at_given_time,
+    assert_no_observations_with_same_iotid_in_first_page,
     assert_observations_and_datastreams_empty,
     dates_are_within_X_days,
     wipe_datastreams,
@@ -137,6 +138,7 @@ def test_full_pipeline(metadata: list[StationData]):
 
     assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.start)
     assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.end)
+    assert_no_observations_with_same_iotid_in_first_page()
     wipe_locations()
     wipe_things()
     wipe_observed_properties()
