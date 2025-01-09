@@ -52,10 +52,13 @@ def test_no_data_with_no_end_date(start_date):
     "start_date",
     ["10/7/2023 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
 )
-def test_requesting_today_is_not_the_same_as_requesting_no_end(start_date):
-    """If you specify the end date, you could have more data than if you don't specify an end date. "" and today are not equivalent. Not
-    giving a specific end date is undefined behavior and just gives some set of data that is reasonably recent. This has varied in the past
-    and not clear why
+def test_requesting_no_end_is_undefined_behavior(start_date):
+    """
+    Not specifying an end date is undefined behavior. Sometimes you can get
+    data not present that you would normally get when specifying today as the end date.
+    This should not be used.
+
+    This test is moreso for docs than actual testing. This response varies too much upstream to reliably test.
     """
     no_end_response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=start_date, end_date=""
@@ -72,23 +75,6 @@ def test_requesting_today_is_not_the_same_as_requesting_no_end(start_date):
 
     today_result = parse_oregon_tsv(response)
 
-    no_end_data_set = set(no_end_result.data)
-    today_data_set = set(today_result.data)
-
-    # Check that there is some data in today_result not in no_end_result
-    assert today_data_set != no_end_data_set, "Data sets should be different"
-
-    # Check that some data is in no_end_result but not in today_result
-    assert (
-        today_data_set - no_end_data_set
-    ), "Today result should contain data not in no_end_result"
-
-    # Check that some data is in no_end_result but not in today_result
-    assert (
-        no_end_data_set - today_data_set
-    ), "No end result should contain data not in today_result"
-
-    # Optionally, check lengths as a safeguard
     assert len(today_result.dates) >= len(no_end_result.dates)
     assert len(today_result.data) >= len(no_end_result.data)
 
