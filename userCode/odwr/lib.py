@@ -49,7 +49,10 @@ def parse_oregon_tsv(
     # url does not match the name in the result column. However,
     # it consistently is returned in the third column
     data: list[Optional[float]] = []
-    dates: set[str] = set()
+
+    # in python set is not ordered but a dict is
+    # so we can essentially use it as a set and ignore the values
+    unique_dates: dict[str, None] = {}
     units = "Unknown"
     tsv_data = io.StringIO(response.decode("utf-8"))
     reader = csv.reader(tsv_data, delimiter="\t")
@@ -78,12 +81,12 @@ def parse_oregon_tsv(
                 data.append(float(row[2]))
 
             parsed_date = parse_date(str(DATE_COLUMN))
-            assert (
-                parsed_date not in dates
-            ), f"Date '{parsed_date}' appeared twice in the data"
-            dates.add(parsed_date)
+            assert parsed_date not in unique_dates, (
+                f"Date '{parsed_date}' appeared twice in the data"
+            )
+            unique_dates[parsed_date] = None
 
-    return ParsedTSVData(data, units, list(dates))
+    return ParsedTSVData(data, units, list(unique_dates))
 
 
 def unix_offset_to_iso(unix_offset: int) -> str:

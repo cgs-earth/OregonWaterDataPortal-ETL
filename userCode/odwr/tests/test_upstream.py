@@ -234,3 +234,20 @@ def test_adding_one_minute_prevents_overlap(begin, end_time):
 
     for date in parsedResp1.dates:
         assert date not in parsedResp2.dates
+
+
+# run this multiple times to make sure it is consistent
+@pytest.mark.parametrize("execution_number", range(5))
+def test_our_download_matches_ui(execution_number):
+    res = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10378500,
+        start_date="1/1/2025",
+        end_date="1/9/2025",
+    )
+    # 'https://apps.wrd.state.or.us/apps/sw/hydro_near_real_time/hydro_download.aspx?station_nbr=10378500&start_date=1/1/2025&end_date=1/9/2025&dataset=MDF&format=tsv&units='
+    parsed = parse_oregon_tsv(res)
+    assert parsed.data[0] == 16.9
+    assert parsed.data[1] == 15.0
+    for i in range(8):
+        assert f"2025-01-0{i + 1}" in parsed.dates[i]
