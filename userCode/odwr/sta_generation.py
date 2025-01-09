@@ -2,6 +2,7 @@ from typing import Optional
 
 from userCode.common.lib import deterministic_hash
 
+
 from .types import Attributes, Datastream, Observation, StationData
 from userCode.common.ontology import ONTOLOGY_MAPPING
 
@@ -18,15 +19,25 @@ def to_sensorthings_observation(
         raise RuntimeError("Missing datapoint")
 
     # generate a unique hash for the observation since we don't have any other way of
-    # uniquely identifying it from the upstream api
-    id = deterministic_hash(
-        (f"{associatedDatastream.name}{phenom_time}{resultTime}{datapoint}"), 10
-    )
+    # uniquely identifying it from the upstream apii
+    # We have to use a hash since FROST limits the number of characters. We can't just
+    # concat the identifiers together sinec they might be too long
+    MAX_LENGTH_IOTID_FOR_FROST = 18
+    id = f"{associatedDatastream.name}{datapoint}{resultTime}"
+    hashedId = deterministic_hash(id, MAX_LENGTH_IOTID_FOR_FROST)
+
+    ###### Other option that could theoretically work but can't have a guarantee of uniqueness if datapoint is a long float
+    ###### or a date with the seconds / minutes specified
+    # strippedResultTime = resultTime.removesuffix("Z")
+    # assert strippedResultTime.endswith("00:00:00"), "resultTime is not a UTC timestamp"
+    # strippedResultTime = strippedResultTime.removesuffix("00:00:00")
+    # uniqueId = f"{associatedDatastream.iotid}{datapoint}{strippedResultTime}"
+    # uniqueIdJustNumerical = "".join(filter(str.isdigit, uniqueId))
 
     return Observation(
         **{
             "phenomenonTime": phenom_time,
-            "@iot.id": int(id),
+            "@iot.id": hashedId,
             "resultTime": resultTime,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,
