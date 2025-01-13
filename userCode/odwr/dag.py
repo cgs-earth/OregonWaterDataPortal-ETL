@@ -164,7 +164,7 @@ def sta_all_observations(
 
     async def fetch_obs(datastream: Datastream) -> List[Observation]:
         """Fetch observations for a single datastream and return them."""
-        local_observations = []
+        local_observations = []  # the observations array local to this function.
         range = get_datastream_time_range(datastream.iotid)
 
         new_end = (
@@ -212,9 +212,13 @@ def sta_all_observations(
             )
             local_observations.append(sta_representation)
 
-        assert (
-            len(local_observations) > 0
-        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
+        if len(local_observations) == 0:
+            # We don't raise an exception since this isn't a fatal error, but it is suspicious so we
+            # log it as a runtime error so it has high visibility. There are cases in the upstream API where
+            # there will be lots of missing data for an unknown reason
+            get_dagster_logger().error(
+                f"No observations found in range {range.end} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
+            )
 
         return local_observations
 
