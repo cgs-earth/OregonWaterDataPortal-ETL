@@ -164,7 +164,7 @@ def sta_all_observations(
 
     async def fetch_obs(datastream: Datastream) -> List[Observation]:
         """Fetch observations for a single datastream and return them."""
-        local_observations = [] # the observations array local to this function. 
+        local_observations = []  # the observations array local to this function.
         range = get_datastream_time_range(datastream.iotid)
 
         new_end = (
@@ -202,9 +202,9 @@ def sta_all_observations(
             RUNNING_AS_A_TEST_NOT_IN_PROD = "PYTEST_CURRENT_TEST" in os.environ
             if RUNNING_AS_A_TEST_NOT_IN_PROD:
                 key = (datastream.iotid, date)
-                assert key not in seen_obs, (
-                    f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
-                )
+                assert (
+                    key not in seen_obs
+                ), f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
                 seen_obs.add(key)
 
             sta_representation = to_sensorthings_observation(
