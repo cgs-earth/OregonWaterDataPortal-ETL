@@ -70,8 +70,7 @@ from userCode.odwr.types import (
     Attributes,
     OregonHttpResponse,
     ParsedTSVData,
-    StationData,
-    Datastream
+    StationData
 )
 from userCode.types import Datastream, Observation
 from userCode.util import (
