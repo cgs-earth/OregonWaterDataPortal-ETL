@@ -32,6 +32,7 @@ import datetime
 import requests
 
 from userCode.env import API_BACKEND_URL
+from userCode.util import to_oregon_datetime
 
 
 @contextmanager
@@ -100,62 +101,17 @@ def wipe_datastreams():
         raise RuntimeError(response.text)
 
 
-def add_mock_data_to_change_start_time_for_datastream(
-    associatedThingId: int, datastreamId: int
-):
-    """By adding a datastream with a recent observation, the e2e pipeline will only fetch
-    after it, thus reducing the time it takes to run the pipeline in CI
-    """
-    datastream = {
-        "name": "mock_test_datastream",
-        "@iot.id": datastreamId,
-        "description": "mock_test_description",
-        "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-        "unitOfMeasurement": {
-            "name": "Degree Celsius",
-            "symbol": "degC",
-            "definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#DegreeCelsius",
-        },
-        "ObservedProperty": {
-            "@iot.id": 1,
-            "name": "test",
-            "description": "test",
-            "definition": "Unknown",
-        },
-        "Thing": {
-            "@iot.id": associatedThingId,
-            "name": "test_thing",
-            "description": "test",
-        },
-        "Sensor": {
-            "@iot.id": 0,
-            "name": "Unknown",
-            "description": "Unknown",
-            "encodingType": "Unknown",
-            "metadata": "Unknown",
-        },
-    }
+def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
+    isoDate = datetime.datetime.fromisoformat(date)
+    assert isoDate.tzinfo == datetime.timezone.utc
+    assert isoDate >= start
+    assert isoDate <= end
 
-    firstTime = "2022-01-01T00:00:00Z"
-    associated_obs = {
-        "phenomenonTime": firstTime,
-        "@iot.id": 999,
-        "resultTime": firstTime,
-        "Datastream": {"@iot.id": datastreamId},
-        "result": 1234,
-        "FeatureOfInterest": {
-            "@iot.id": 999,
-            "name": "test",
-            "description": "test",
-            "encodingType": "application/vnd.geo+json",
-            "feature": {"type": "Point", "coordinates": [0, 0]},
-        },
-    }
 
-    resp = requests.post(f"{API_BACKEND_URL}/Datastreams", json=datastream)
-    assert resp.ok, resp.text
-    resp = requests.post(f"{API_BACKEND_URL}/Observations", json=associated_obs)
-    assert resp.ok, resp.text
+def now_as_oregon_datetime():
+    """Get the current time formatted in a way that the oregon api expects"""
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    return to_oregon_datetime(now)
 
 
 def dates_are_within_X_days(
@@ -170,8 +126,28 @@ def dates_are_within_X_days(
     return abs((date1 - date2).days) <= days
 
 
-if __name__ == "__main__":
-    wipe_datastreams()
-    wipe_locations()
-    wipe_observed_properties()
-    wipe_things()
+def assert_observations_and_datastreams_empty():
+    """Make sure that the observations and datastreams contain no data"""
+    datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
+    assert datastreams.ok, "Failed to get datastreams"
+    assert datastreams.json() == {
+        "value": []
+    }, "Datastreams are not empty at the start of the pipeline test"
+    obs = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert obs.ok, "Failed to get observations"
+    assert obs.json() == {
+        "value": []
+    }, "Observations are not empty at the start of the pipeline test"
+
+
+def assert_no_duplicate_at_given_time(
+    datastream_int: int, date_to_check: datetime.datetime
+):
+    """Checks if there are multiple observations at the same time for a given datastream"""
+    # This is in a format like https://owdp-pilot.internetofwater.app/FROST-Server/v1.1/Datastreams(140805000)/Observations?$filter=resultTime%20eq%201941-10-01T00:00:00Z
+    url = f"{API_BACKEND_URL}/Datastreams({datastream_int})/Observations?$filter=resultTime%20eq%20{date_to_check.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+    resp = requests.get(url)
+    assert resp.ok, resp.text
+    assert (
+        len(resp.json()["value"]) <= 1
+    ), f"There appear to be multiple observations at the same resultTime for the datastream {datastream_int}"

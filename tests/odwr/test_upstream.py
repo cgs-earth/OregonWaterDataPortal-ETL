@@ -27,7 +27,6 @@
 #
 # =================================================================
 
-from collections import Counter
 from datetime import datetime, timedelta, timezone
 import pytest
 import requests
@@ -81,7 +80,14 @@ def test_no_data_with_no_end_date(start_date):
     "start_date",
     ["10/7/2023 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
 )
-def test_today_same_as_no_end_date(start_date):
+def test_requesting_no_end_is_undefined_behavior(start_date):
+    """
+    Not specifying an end date is undefined behavior. Sometimes you can get
+    data not present that you would normally get when specifying today as the end date.
+    This should not be used.
+
+    This test is moreso for docs than actual testing. This response varies too much upstream to reliably test.
+    """
     no_end_response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=start_date, end_date=""
     )
@@ -97,15 +103,8 @@ def test_today_same_as_no_end_date(start_date):
 
     today_result = parse_oregon_tsv(response)
 
-    assert today_result.dates == no_end_result.dates
-    assert today_result.data == no_end_result.data
-    assert today_result.units == no_end_result.units
-    assert len(today_result.dates) == len(no_end_result.data)
-
-    isSubset = not (Counter(no_end_result.data) - Counter(today_result.data))
-    assert isSubset
-    isSubset = not (Counter(no_end_result.dates) - Counter(today_result.dates))
-    assert isSubset
+    assert len(today_result.dates) >= len(no_end_result.dates)
+    assert len(today_result.data) >= len(no_end_result.data)
 
 
 def test_very_old_date_same_as_no_start_date():
@@ -159,6 +158,7 @@ def test_very_old_dates_are_the_same():
 
 
 def test_old_data_has_many_null_values():
+    """The old csv data is observed to have many null values which must be dropped"""
     tsv_url = generate_oregon_tsv_url(
         "mean_daily_flow_available",
         10371500,
@@ -209,3 +209,73 @@ def test_timezone_behavior():
         assert_date_in_range(
             date, from_oregon_datetime(begin), from_oregon_datetime(end)
         )
+
+
+@pytest.mark.parametrize(
+    "begin,end_time",
+    [
+        (
+            "2024-09-20T00:00:00Z",
+            (datetime.now(tz=timezone.utc) - timedelta(hours=1)).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+        ),
+        ("2023-01-01T00:00:00Z", "2025-01-05T00:00:00Z"),
+        ("2022-07-01T00:00:00Z", "2022-12-31T00:00:00Z"),
+        ("2021-04-15T00:00:00Z", "2021-05-15T00:00:00Z"),
+    ],
+)
+def test_adding_one_minute_prevents_overlap(begin, end_time):
+    """Make sure adding one minute prevents overlap in downloaded data. Needed to test so
+    we arent downloading and uploading duplicates when crawling updates
+    """
+
+    # NOTE: I have experienced flakeness when testing this. It seems fine at the moment.
+    # If you specify data to oregon in a way that is differently formatted it almost seems like
+    # it ignores the minute extra. We don't want to add full hours however since we don't
+    # want to be ignoring any data.
+
+    begin = datetime.fromisoformat(begin)
+    end_time = datetime.fromisoformat(end_time)
+
+    response1: bytes = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10371500,
+        start_date=to_oregon_datetime(begin),
+        end_date=to_oregon_datetime(end_time),
+    )
+
+    new_begin = end_time + timedelta(minutes=1)
+    assert new_begin > end_time
+    assert new_begin < datetime.now(tz=timezone.utc)
+    new_begin_oregon_fmt = to_oregon_datetime(new_begin)
+
+    response2: bytes = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10371500,
+        start_date=new_begin_oregon_fmt,
+        end_date=now_as_oregon_datetime(),
+    )
+
+    parsedResp1 = parse_oregon_tsv(response1)
+    parsedResp2 = parse_oregon_tsv(response2)
+
+    for date in parsedResp1.dates:
+        assert date not in parsedResp2.dates
+
+
+# run this multiple times to make sure it is consistent
+@pytest.mark.parametrize("execution_number", range(5))
+def test_our_download_matches_ui(execution_number):
+    res = download_oregon_tsv(
+        "mean_daily_flow_available",
+        10378500,
+        start_date="1/1/2025",
+        end_date="1/9/2025",
+    )
+    # 'https://apps.wrd.state.or.us/apps/sw/hydro_near_real_time/hydro_download.aspx?station_nbr=10378500&start_date=1/1/2025&end_date=1/9/2025&dataset=MDF&format=tsv&units='
+    parsed = parse_oregon_tsv(res)
+    assert parsed.data[0] == 16.9
+    assert parsed.data[1] == 15.0
+    for i in range(8):
+        assert f"2025-01-0{i + 1}" in parsed.dates[i]

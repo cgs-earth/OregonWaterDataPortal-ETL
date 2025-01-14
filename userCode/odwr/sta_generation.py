@@ -32,7 +32,6 @@ from typing import Optional
 from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.odwr.types import Attributes, StationData
 from userCode.types import Datastream, Observation
-from userCode.util import deterministic_hash
 
 
 def to_sensorthings_observation(
@@ -46,15 +45,25 @@ def to_sensorthings_observation(
     if datapoint is None:
         raise RuntimeError("Missing datapoint")
 
-    # generate a unique hash for the observation since we don't have any other way of
-    # uniquely identifying it from the upstream api
-    id = deterministic_hash(
-        (f"{associatedDatastream.name}{phenom_time}{resultTime}{datapoint}"), 10
-    )
+    # generate a unique id by concatenating the datastream id and the resultTime
+    # we assume that the resultTime is in the format YYYY-MM-DDTHH:MM:SSZ and
+    # that when it is concat with the datastream id it will be unique and less than 18 characters in total
+    strippedResultTime = resultTime.removesuffix("Z")
+    assert strippedResultTime.endswith(
+        "00:00:00"
+    ), "resultTime does not end with 00:00:00 so we would lose information if we removed it"
+    strippedResultTime = strippedResultTime.removesuffix("00:00:00")
+    uniqueId = f"{associatedDatastream.iotid}{strippedResultTime}"
+    uniqueIdJustNumerical = "".join(filter(str.isdigit, uniqueId))
+    MAX_LENGTH_IOTID_FOR_FROST = 18
+    assert (
+        len(uniqueIdJustNumerical) <= MAX_LENGTH_IOTID_FOR_FROST
+    ), f"@iot.id {uniqueIdJustNumerical} is too long to insert into FROST when constructed with {associatedDatastream.iotid} and {strippedResultTime}"
+
     return Observation(
         **{
             "phenomenonTime": phenom_time,
-            "@iot.id": int(id),
+            "@iot.id": uniqueIdJustNumerical,
             "resultTime": resultTime,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,

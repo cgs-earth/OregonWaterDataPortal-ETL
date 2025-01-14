@@ -1,17 +1,24 @@
 services:
-  owdp-frost:
-    container_name: owdp-frost
-    build:
-      context: docker/frost
+  frost-http:
+    container_name: frost-http
+    image: fraunhoferiosb/frost-server:latest
     environment:
-      # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
-      - serviceRootUrl=http://localhost:8999/FROST-Server
-      - persistence_db_url=jdbc:postgresql://owdp-database:5432/sensorthings
+      - serviceRootUrl=${OWDP_URL}/FROST-Server
+      - plugins_multiDatastream.enable=false
+      - http_cors_enable=true
+      - http_cors_allowed_origins=*
+      - persistence_db_driver=org.postgresql.Driver
+      - persistence_db_url=jdbc:postgresql://database:5432/sensorthings
       - persistence_db_username=sensorthings
       - persistence_db_password=ChangeMe
+      - persistence_autoUpdateDatabase=true
+      - persistence_idGenerationMode=ServerAndClientGenerated
+      - mqtt_Enabled=false
+    ports:
+      - 1883:1883
+      - 8080:8080
     depends_on:
-      owdp-database:
-        condition: service_healthy
+      - database
 
   owdp-database:
     container_name: owdp-database
@@ -23,11 +30,6 @@ services:
       - POSTGRES_PASSWORD=ChangeMe
     volumes:
       - postgis_volume:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d sensorthings -U sensorthings "]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
