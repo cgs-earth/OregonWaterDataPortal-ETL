@@ -27,21 +27,13 @@ jobs:
       - name: Setup Docker Compose
         uses: docker/setup-buildx-action@v2
 
-      - name: Cache Docker layers for PostGIS image
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/**/*.Dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-docker-
-
-      - name: Cache Docker layers for Frost Server image
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache-frost-server
-          key: ${{ runner.os }}-docker-frost-${{ hashFiles('**/docker/frost-server.Dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-docker-frost-
+      # - name: Cache Docker layers
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: /tmp/.buildx-cache
+      #     key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/**/Dockerfile') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-docker-
 
       - name: Start Docker Compose services
         run: |
@@ -53,20 +45,20 @@ jobs:
         if: failure()
         run: |
           echo "Logging container output for debugging..."
-          docker compose logs database
+          docker compose logs owdp-database
           docker compose ps
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
 
       - name: Wait for Frost and Init DB
         run: |
-          echo "Running docker/wait-for-frost-and-init-db.sh..."
-          cd docker; bash wait-for-frost-and-init-db.sh
+          echo "Running docker/frost/wait-for-frost-and-init-db.sh..."
+          cd docker/frost; bash wait-for-frost-and-init-db.sh
 
       - name: Check indices were added
         run: |
           echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
-          index_check=$(docker exec -t database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
+          index_check=$(docker exec -t owdp-database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
 
           echo "Query result: $index_check"
 

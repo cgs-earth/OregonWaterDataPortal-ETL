@@ -65,7 +65,7 @@ def to_sensorthings_observation(
             "phenomenonTime": phenom_time,
             "@iot.id": uniqueIdJustNumerical,
             "resultTime": resultTime,
-            "Datastream": {"@iot.id": associatedDatastream.iotid},
+            "Datastream": {"@iot.id": str(associatedDatastream.iotid)},
             "result": datapoint,
             "FeatureOfInterest": {
                 "@iot.id": associatedDatastream.iotid,
