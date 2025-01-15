@@ -204,6 +204,7 @@ def assert_valid_oregon_date(date_str: str) -> None:
             f"Date string '{date_str}' could not be parsed into the format that the Oregon API expects"
         )
 
+
 def assert_no_observations_with_same_iotid_in_first_page():
     """Just get a list of the observations in the first page and make sure there are no duplicate iotid."""
     resp = requests.get(f"{API_BACKEND_URL}/Observations")

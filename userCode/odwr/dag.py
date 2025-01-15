@@ -56,7 +56,7 @@ from userCode.odwr.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    assert_no_observations_with_same_iotid_in_first_page
+    assert_no_observations_with_same_iotid_in_first_page,
 )
 from userCode.odwr.sta_generation import (
     to_sensorthings_datastream,
@@ -70,7 +70,7 @@ from userCode.odwr.types import (
     Attributes,
     OregonHttpResponse,
     ParsedTSVData,
-    StationData
+    StationData,
 )
 from userCode.types import Datastream, Observation
 from userCode.util import (
@@ -83,6 +83,7 @@ from userCode.util import (
 
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
 seen_obs: set[Tuple[str, str]] = set()
+
 
 @asset(group_name="owdp")
 def preflight_checks():
