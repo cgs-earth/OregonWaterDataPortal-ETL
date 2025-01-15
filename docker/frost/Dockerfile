@@ -9,3 +9,4 @@ ENV persistence_idGenerationMode=ServerAndClientGenerated
 ENV plugins_coreModel_idType_thing=STRING
 ENV plugins_coreModel_idType_location=STRING
 ENV plugins_coreModel_idType_datastream=STRING
+ENV mqtt_Enabled=false
