@@ -1,76 +1,79 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 import asyncio
 import datetime
-import os
-from typing import List, Optional, Tuple
 from dagster import (
     AssetCheckResult,
     AssetSelection,
     DefaultScheduleStatus,
-    DefaultSensorStatus,
-    Definitions,
     RunRequest,
     StaticPartitionsDefinition,
     asset,
     asset_check,
     define_asset_job,
     get_dagster_logger,
-    load_asset_checks_from_current_module,
-    load_assets_from_current_module,
     AssetExecutionContext,
     schedule,
 )
-import dagster_slack
 import httpx
+import os
+import requests
+from typing import List, Optional, Tuple
 
+from userCode.env import API_BACKEND_URL
 from userCode.odwr.helper_classes import (
     BatchHelper,
     get_datastream_time_range,
 )
 from userCode.odwr.lib import (
     fetch_station_metadata,
-    from_oregon_datetime,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    slack_error_fn,
-    strict_env,
-    to_oregon_datetime,
+    assert_no_observations_with_same_iotid_in_first_page,
 )
 from userCode.odwr.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.tests.lib import (
-    assert_date_in_range,
-    assert_no_observations_with_same_iotid_in_first_page,
-    now_as_oregon_datetime,
-)
 from userCode.odwr.helper_classes import MockValues
-from .types import (
+from userCode.odwr.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     Attributes,
-    Datastream,
-    Observation,
     OregonHttpResponse,
     ParsedTSVData,
     StationData,
 )
-from userCode import API_BACKEND_URL
-import requests
+from userCode.types import Datastream, Observation
+from userCode.util import (
+    assert_date_in_range,
+    now_as_oregon_datetime,
+    from_oregon_datetime,
+    to_oregon_datetime,
+)
 
 
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
+seen_obs: set[Tuple[str, str]] = set()
 
 
-@asset
+@asset(group_name="owdp")
 def preflight_checks():
     """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, f"FROST server is not running at {API_BACKEND_URL}"
 
 
-@asset(deps=[preflight_checks])
+@asset(deps=[preflight_checks], group_name="owdp")
 def all_metadata() -> list[StationData]:
     """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
 
@@ -97,7 +100,7 @@ def all_metadata() -> list[StationData]:
     return stations
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def station_metadata(
     context: AssetExecutionContext, all_metadata: list[StationData]
 ) -> StationData:
@@ -114,11 +117,11 @@ def station_metadata(
     return relevant_metadata
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     """The sensorthings representation of all datastreams for a given station"""
     attr = station_metadata.attributes
-    associatedThingId = int(attr.station_nbr)
+    associatedThingId = attr.station_nbr
 
     datastreams: list[Datastream] = []
     for id, stream in enumerate(POTENTIAL_DATASTREAMS):
@@ -143,17 +146,14 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     return datastreams
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_station(
     station_metadata: StationData,
 ):
     return to_sensorthings_station(station_metadata)
 
 
-seen_obs: set[Tuple[int, str]] = set()
-
-
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def sta_all_observations(
     station_metadata: StationData, sta_datastreams: list[Datastream], config: MockValues
 ):
@@ -235,11 +235,11 @@ def sta_all_observations(
     return observations
 
 
-@asset(partitions_def=station_partition)
+@asset(partitions_def=station_partition, group_name="owdp")
 def post_station(sta_station: dict):
     """Post a station to the Sensorthings API"""
     # get the station with the station number
-    resp = requests.get(f"{API_BACKEND_URL}/Things({sta_station['@iot.id']})")
+    resp = requests.get(f"{API_BACKEND_URL}/Things('{sta_station['@iot.id']}')")
     if resp.status_code == 404:
         get_dagster_logger().info(
             f"Station {sta_station['@iot.id']} not found. Posting..."
@@ -249,7 +249,7 @@ def post_station(sta_station: dict):
         raise RuntimeError(resp.text)
     else:
         id = resp.json()["@iot.id"]
-        if id == int(sta_station["@iot.id"]):
+        if id == sta_station["@iot.id"]:
             get_dagster_logger().warning(
                 f"Station {sta_station['@iot.id']} already exists so skipping adding it"
             )
@@ -263,12 +263,12 @@ def post_station(sta_station: dict):
     return
 
 
-@asset(partitions_def=station_partition, deps=[post_station])
+@asset(partitions_def=station_partition, deps=[post_station], group_name="owdp")
 def post_datastreams(sta_datastreams: list[Datastream]):
     """Post just the datastreams to the Sensorthings API"""
     # check if the datastreams exist
     for datastream in sta_datastreams:
-        resp = requests.get(f"{API_BACKEND_URL}/Datastreams({datastream.iotid})")
+        resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{datastream.iotid}')")
         if resp.status_code == 404:
             get_dagster_logger().info(
                 f"Datastream {datastream.iotid} not found. Posting..."
@@ -280,7 +280,7 @@ def post_datastreams(sta_datastreams: list[Datastream]):
             raise RuntimeError(resp.text)
         else:
             id = resp.json()["@iot.id"]
-            if id == int(datastream.iotid):
+            if id == datastream.iotid:
                 get_dagster_logger().warning(
                     f"Datastream {datastream.iotid} already exists so skipping adding it"
                 )
@@ -296,7 +296,7 @@ def post_datastreams(sta_datastreams: list[Datastream]):
             )
 
 
-@asset(partitions_def=station_partition, deps=[post_datastreams])
+@asset(partitions_def=station_partition, deps=[post_datastreams], group_name="owdp")
 def batch_post_observations(sta_all_observations: list[Observation]):
     """Post a group of observations for multiple datastreams to the Sensorthings API"""
     BatchHelper().send_observations(sta_all_observations)
@@ -335,10 +335,10 @@ def check_duplicate_observations():
     )
 
 
-harvest_job = define_asset_job(
-    "harvest_station",
-    description="harvest a station",
-    selection=AssetSelection.all(),
+odwr_job = define_asset_job(
+    "harvest_owdp",
+    description="harvest owdp data",
+    selection=AssetSelection.groups("owdp"),
 )
 
 DAILY_AT_4AM_EST_1AM_PST = "0 9 * * *"
@@ -346,10 +346,10 @@ DAILY_AT_4AM_EST_1AM_PST = "0 9 * * *"
 
 @schedule(
     cron_schedule=DAILY_AT_4AM_EST_1AM_PST,
-    target=AssetSelection.all(),
+    target=AssetSelection.groups("owdp"),
     default_status=DefaultScheduleStatus.STOPPED,
 )
-def crawl_entire_graph_schedule():
+def odwr_schedule():
     for partition_key in station_partition.get_partition_keys():
         yield RunRequest(
             partition_key=partition_key,
@@ -359,24 +359,3 @@ def crawl_entire_graph_schedule():
             # is handled by the phenomenonTime datastream storage inside FROST
             run_key=f"{partition_key} {now_as_oregon_datetime()}",
         )
-
-
-definitions = Definitions(
-    assets=load_assets_from_current_module(),
-    asset_checks=load_asset_checks_from_current_module(),
-    schedules=[crawl_entire_graph_schedule],
-    jobs=[harvest_job],
-    sensors=[
-        dagster_slack.make_slack_on_run_failure_sensor(
-            channel="#cgs-iow-bots",
-            slack_token=strict_env("DAGSTER_SLACK_TOKEN"),
-            text_fn=slack_error_fn,
-            default_status=DefaultSensorStatus.RUNNING,
-            monitor_all_code_locations=True,
-        )
-    ]
-    # only register the sensor if the token is set
-    # allow the token not to be set in case we don't want the integration or we are running in CI
-    if os.environ.get("DAGSTER_SLACK_TOKEN")
-    else [],
-)

@@ -1,13 +1,19 @@
-import logging
-from pathlib import Path
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
 
+import frost_sta_client as fsc
+from pathlib import Path
 import pytest
 
-from userCode import API_BACKEND_URL
-from ..lib import parse_xlsx
-import frost_sta_client as fsc
-
-logger = logging.getLogger(__name__)
+from userCode.env import API_BACKEND_URL
+from userCode.xlsx.lib import parse_xlsx
 
 
 def test_parse_xlsx():
@@ -16,7 +22,6 @@ def test_parse_xlsx():
     assert xlsx.dataSheet
     assert xlsx.metadataSheet
     assert xlsx.siteDataSheet
-    logger.error(xlsx.dataSheet)
     assert xlsx.dataSheet[0]["Data Quality"] == "Good"
     assert xlsx.metadataSheet[1]["Metadata Indetifier"] == "MD67890"
     assert (

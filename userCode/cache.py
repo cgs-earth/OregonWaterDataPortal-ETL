@@ -1,13 +1,20 @@
-import logging
-import shelve
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from datetime import timedelta
+import requests
+import shelve
 from typing import ClassVar, Optional, Tuple
 
-import requests
 
 HEADERS = {"accept": "application/vnd.api+json"}
-
-LOGGER = logging.getLogger(__name__)
 
 
 class ShelveCache:
@@ -25,7 +32,6 @@ class ShelveCache:
     def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
         with shelve.open(ShelveCache.db) as db:
             if url in db and not force_fetch:
-                LOGGER.info(f"Using cache for {url}")
                 return db[url], 200
             else:
                 res = requests.get(url, headers=HEADERS)

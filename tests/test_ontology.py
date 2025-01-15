@@ -1,4 +1,18 @@
-from .ontology import ONTOLOGY_MAPPING, construct_ontology_mapping, get_ontology
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
+from userCode.ontology import (
+    ONTOLOGY_MAPPING,
+    construct_ontology_mapping,
+    get_ontology,
+)
 
 
 def test_construct_ontology_mapping():

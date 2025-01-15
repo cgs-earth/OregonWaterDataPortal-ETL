@@ -31,4 +31,4 @@ build:
 
 # Check which indices are present on the observations table
 indexCheck:
-	docker exec -t database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS'"
+	docker exec -t owdp-database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS'"

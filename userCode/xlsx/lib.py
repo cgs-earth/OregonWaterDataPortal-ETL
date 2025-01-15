@@ -1,6 +1,17 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from pathlib import Path
 import pandas as pd
-from .helpers import OregonXLSX, Metadata, SiteData, Data
+
+from userCode.xlsx.helpers import OregonXLSX, Metadata, SiteData, Data
 
 
 # Reads a workbook sheet and returns a list of dictionaries
