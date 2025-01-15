@@ -88,7 +88,7 @@ def test_full_pipeline(metadata: list[StationData]):
     test_iow_hash_is_deterministic()
     assert_observations_and_datastreams_empty()
 
-    harvest_job = definitions.get_job_def("harvest_station")
+    harvest_job = definitions.get_job_def("harvest_owdp")
 
     instance = DagsterInstance.ephemeral()
 
