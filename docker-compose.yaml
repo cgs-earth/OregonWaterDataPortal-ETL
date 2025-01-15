@@ -23,7 +23,8 @@ services:
   database:
     container_name: database
     build:
-      context: ./docker
+      context: .
+      dockerfile: ./docker/Dockerfile_postgis
     environment:
       - POSTGRES_DB=sensorthings
       - POSTGRES_USER=sensorthings
@@ -63,6 +64,39 @@ services:
       - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - 8999:80
+
+  owdp-dagster:
+    container_name: owdp-dagster
+    build:  
+      context: .
+      dockerfile: ./docker/Dockerfile_dagster
+    ports:
+      - 3000:3000
+    restart: always
+    deploy:
+      resources:
+        limits:
+            cpus: "7"
+            memory: 1GB
+
+    # only spin up the docker container for dagster if we are in production
+    # otherwise we want to use uv with hot reloading using dagster dev 
+    profiles: [production]
+
+
+  container-monitor:
+    image: alpine:latest
+    container_name: container-monitor
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker/container_monitor/monitor.sh:/monitor.sh
+    environment:
+      - SLACK_HOOK_URL
+    command: >
+      /bin/sh -c "apk add --no-cache docker-cli curl grep && /bin/sh /monitor.sh"
+    profiles: [production]
+
+
 
 volumes:
   postgis_volume:
