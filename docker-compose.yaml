@@ -3,7 +3,6 @@ services:
     container_name: owdp-frost
     build:
       context: ./docker/frost
-      dockerfile: Dockerfile
     environment:
       - serviceRootUrl=${OWDP_URL}/FROST-Server
       - persistence_db_url=jdbc:postgresql://owdp-database:5432/sensorthings
