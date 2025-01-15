@@ -11,7 +11,7 @@ The Oregon Water Data portal crawls or ingests data from multiple different Oreg
 docker compose --env-file .env up
 ```
 
-3. Once you start the database and the frost server, you will likely want to add extra indices to make it faster. To do this run the [init script](./docker/wait-for-frost-and-init-db.sh)
+3. Once you start the database and the frost server, you will likely want to add extra indices to make it faster. To do this run the [init script](./docker/frost/wait-for-frost-and-init-db.sh)
 
 Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`, or edit `.env` and deploy at your own URL.
 

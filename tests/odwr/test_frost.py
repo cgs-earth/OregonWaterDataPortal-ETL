@@ -1,24 +1,34 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 import datetime
 import requests
 
+from userCode.env import API_BACKEND_URL
 from userCode.odwr.helper_classes import (
     TimeRange,
     get_datastream_time_range,
 )
-from userCode.odwr.tests.lib import (
+from .lib import (
     wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
     wipe_things,
     wipe_things_before_and_after,
 )
-from userCode import API_BACKEND_URL
 
 
 def test_duplicate():
     """Make sure that duplicate things are not allowed"""
     wipe_things()
-    resp = requests.get(f"{API_BACKEND_URL}")
+    resp = requests.get(API_BACKEND_URL)
     assert resp.ok
     # use a 10 digit number since that is what our hash is
     unique_id = "1234567890"  # @iot.id does not need to be an int on clientside but it does need to be serializable as an int
@@ -34,7 +44,7 @@ def test_duplicate():
     assert resp.ok, resp.text
     items = resp.json()["value"]
     assert len(items) == 1
-    assert items[0]["@iot.id"] == int(unique_id)
+    assert items[0]["@iot.id"] == unique_id
     resp = requests.post(f"{API_BACKEND_URL}/Things", json=payload)
     assert resp.status_code == 500
     wipe_things()
@@ -192,7 +202,7 @@ def test_insert_large_payload():
         items = resp.json()["value"]
         assert len(items) == 1
         # NOTE: iot.id will stay a int if it was originally an int. It is not always a string
-        assert items[0]["@iot.id"] == 10378500
+        assert items[0]["@iot.id"] == "10378500"
 
 
 def test_insert_same_id_different_obj():
@@ -224,13 +234,13 @@ def test_insert_same_id_different_obj():
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == 88888888888
+        assert items[0]["@iot.id"] == "88888888888"
 
         resp = requests.get(f"{API_BACKEND_URL}/Locations")
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == 88888888888
+        assert items[0]["@iot.id"] == "88888888888"
         # things dont wipe locations when deleted
         wipe_locations()
 
@@ -241,7 +251,7 @@ def test_post_station():
     wipe_locations()
     data = {
         "name": "HONEY CR NR PLUSH, OR",
-        "@iot.id": 10378500,
+        "@iot.id": "10378500",
         "description": "HONEY CR NR PLUSH, OR",
         "Locations": [
             {
@@ -371,7 +381,7 @@ def test_post_station():
     }
     resp = requests.post(f"{API_BACKEND_URL}/Things", json=data)
     assert resp.ok
-    resp = requests.get(f"{API_BACKEND_URL}/Things({data['@iot.id']})")
+    resp = requests.get(f"{API_BACKEND_URL}/Things('{data['@iot.id']}')")
     assert resp.ok
     assert resp.json()["@iot.id"] == data["@iot.id"]
     wipe_locations()
@@ -514,7 +524,7 @@ def test_adding_linked_obs_changes_datastream_time():
     )
 
     assert (
-        get_datastream_time_range(1)
+        get_datastream_time_range("1")
         == TimeRange(
             datetime.datetime.fromisoformat(firstTime),
             datetime.datetime.fromisoformat(newTime),

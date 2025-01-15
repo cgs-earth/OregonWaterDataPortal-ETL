@@ -1,5 +1,15 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from typing import Literal, Optional, TypedDict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from dataclasses import dataclass
 
 BASE_OREGON_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
@@ -259,68 +269,10 @@ class Threshold(BaseModel):
     ReferenceCode: str
 
 
-class ObservedProperty(BaseModel):
-    iotid: int = Field(alias="@iot.id")
-    name: str
-    definition: str
-    description: str
-    properties: dict
-
-
-class Datastream(BaseModel, extra="forbid"):
-    iotid: int = Field(alias="@iot.id")
-    name: str
-    description: str
-    observationType: str
-    unitOfMeasurement: UnitOfMeasurement
-    ObservedProperty: ObservedProperty
-    # phenomenonTime: str,
-    # resultTime: NotRequired[str],  # not present in python 3.9
-    Sensor: dict
-    Thing: dict
-
-
-class Observation(BaseModel):
-    """sta observation"""
-
-    iotid: int = Field(alias="@iot.id")
-    resultTime: str
-    phenomenonTime: str
-    Datastream: dict
-    result: Optional[float]
-    FeatureOfInterest: dict
-
-
 class OregonHttpResponse(BaseModel):
     geometryType: str
     fields: list
     features: list[StationData]
-
-
-OBSERVATION_COLLECTION_METADATA = {
-    "id": "Observations",
-    "title": "Observations",
-    "description": "SensorThings API Observations",
-    "keywords": ["observation", "dam"],
-    "links": ["https://gis.wrd.state.or.us/server/rest/services"],
-    "bbox": [-180, -90, 180, 90],
-    "time_field": "resultTime",
-    "id_field": "@iot.id",
-}
-
-DATASTREAM_COLLECTION_METADATA = {
-    "id": "Datastreams",
-    "title": "Datastreams",
-    "description": "SensorThings API Datastreams",
-    "keywords": ["datastream", "dam"],
-    "links": [
-        "https://gis.wrd.state.or.us/server/rest/services",
-        "https://gis.wrd.state.or.us/server/sdk/rest/index.html#/02ss00000029000000",
-    ],
-    "bbox": [-180, -90, 180, 90],
-    "id_field": "@iot.id",
-    "title_field": "name",
-}
 
 
 @dataclass

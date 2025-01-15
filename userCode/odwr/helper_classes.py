@@ -1,20 +1,24 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
+from dagster import Config, get_dagster_logger
 from dataclasses import dataclass
 import datetime
-import logging
-from typing import Literal, NamedTuple, Optional
-from dagster import Config, get_dagster_logger
-import requests
-from .lib import from_oregon_datetime
-from .types import (
-    START_OF_DATA,
-    Datastream,
-    FrostBatchRequest,
-    Observation,
-)
 from itertools import batched
-from userCode import API_BACKEND_URL
+import requests
+from typing import Literal, NamedTuple, Optional
 
-LOGGER = logging.getLogger(__name__)
+from userCode.env import API_BACKEND_URL
+from userCode.util import from_oregon_datetime
+from userCode.odwr.types import START_OF_DATA, FrostBatchRequest
+from userCode.types import Datastream, Observation
 
 
 @dataclass
@@ -121,11 +125,13 @@ class MockValues(Config):
     mocked_date_to_update_until: Optional[str]
 
 
-def get_datastream_time_range(iotid: int) -> TimeRange:
+def get_datastream_time_range(iotid: str | int) -> TimeRange:
     """Get the range of the observation times within a given STA datastream. This can be
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
-    resp = requests.get(f"{API_BACKEND_URL}/Datastreams({iotid})")
+    resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{iotid}')")
+    get_dagster_logger().debug(resp.url)
+
     # 404 represents that there is no datastream and thus the timerange is null
     # we represent null by setting both the start and end to the beginning of all
     # possible data

@@ -1,8 +1,18 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from typing import Optional
 
-
-from .types import Attributes, Datastream, Observation, StationData
-from userCode.common.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import ONTOLOGY_MAPPING
+from userCode.odwr.types import Attributes, StationData
+from userCode.types import Datastream, Observation
 
 
 def to_sensorthings_observation(
@@ -36,7 +46,7 @@ def to_sensorthings_observation(
             "phenomenonTime": phenom_time,
             "@iot.id": uniqueIdJustNumerical,
             "resultTime": resultTime,
-            "Datastream": {"@iot.id": associatedDatastream.iotid},
+            "Datastream": {"@iot.id": str(associatedDatastream.iotid)},
             "result": datapoint,
             "FeatureOfInterest": {
                 "@iot.id": associatedDatastream.iotid,
@@ -57,11 +67,11 @@ def to_sensorthings_station(station: StationData) -> dict:
     attr = station.attributes
     representation = {
         "name": attr.station_name,
-        "@iot.id": int(attr.station_nbr),
+        "@iot.id": str(attr.station_nbr),
         "description": attr.station_name,
         "Locations": [
             {
-                "@iot.id": int(attr.station_nbr),
+                "@iot.id": str(attr.station_nbr),
                 "name": attr.station_name,
                 "description": attr.station_name,
                 "encodingType": "application/vnd.geo+json",
@@ -84,7 +94,7 @@ def to_sensorthings_datastream(
     units: str,
     stream_name: str,
     id: int,
-    associatedThingId: int,
+    associatedThingId: str,
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     property = stream_name.removesuffix("_available").removesuffix("_avail")
@@ -97,7 +107,7 @@ def to_sensorthings_datastream(
 
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": int(f"{attr.station_nbr}{id}"),
+            "@iot.id": str(f"{attr.station_nbr}{id}"),
             "name": f"{attr.station_name} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",

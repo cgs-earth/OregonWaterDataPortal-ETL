@@ -1,21 +1,30 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from datetime import datetime, timedelta, timezone
-import logging
-
-from userCode.odwr.tests.lib import assert_date_in_range, now_as_oregon_datetime
-
-
-from ..lib import (
-    download_oregon_tsv,
-    from_oregon_datetime,
-    generate_oregon_tsv_url,
-    parse_oregon_tsv,
-    to_oregon_datetime,
-)
 import pytest
 import requests
-from ..types import START_OF_DATA
 
-LOGGER = logging.getLogger(__name__)
+
+from userCode.odwr.lib import (
+    download_oregon_tsv,
+    generate_oregon_tsv_url,
+    parse_oregon_tsv,
+)
+from userCode.odwr.types import START_OF_DATA
+from userCode.util import (
+    assert_date_in_range,
+    now_as_oregon_datetime,
+    from_oregon_datetime,
+    to_oregon_datetime,
+)
 
 
 @pytest.mark.parametrize(

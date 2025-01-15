@@ -1,7 +1,18 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
 import requests
-from .lib import deterministic_hash
+
+from userCode.util import deterministic_hash
 
 BASE_URL = "http://vocabulary.odm2.org/api/v1"
 

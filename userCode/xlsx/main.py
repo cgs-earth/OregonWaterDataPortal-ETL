@@ -1,12 +1,19 @@
-import os
-import click
-import pytest
-import debugpy
-from pathlib import Path
-from lib import parse_xlsx
-import logging
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
 
-LOGGER = logging.getLogger(__name__)
+import click
+import debugpy
+from lib import parse_xlsx
+import os
+import pytest
+from pathlib import Path
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))
@@ -18,8 +25,7 @@ def load(ctx, file):
     parsed = parse_xlsx(path)
     sta = parsed.to_sta()
     parsed.send_to_frost(sta)
-    LOGGER.info(f"Finished uploading {path} to FROST")
-    click.echo("Done")
+    click.echo(f"Finished uploading {path} to FROST")
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))

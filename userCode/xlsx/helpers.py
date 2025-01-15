@@ -1,12 +1,19 @@
-# This file represents the potential fields inside an Oregon XLSX file
-# The column data can be used to create a STA data model
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
 
-from typing import TypedDict, Union
 from dataclasses import dataclass
 import frost_sta_client as fsc
 import geojson
+from typing import TypedDict, Union
 
-from userCode import API_BACKEND_URL
+from userCode.env import API_BACKEND_URL
 
 SiteData = TypedDict(
     "SiteData",

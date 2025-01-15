@@ -1,16 +1,26 @@
+# =================================================================
+#
+# Authors: Colton Loftus <cloftus@lincolninst.edu>
+#
+# Copyright (c) 2025 Lincoln Institute of Land Policy
+#
+# Licensed under the MIT License.
+#
+# =================================================================
+
 import csv
+from dagster import get_dagster_logger
 import datetime
 import io
 import logging
-import os
-from urllib.parse import urlencode
-from typing import Optional
-
-from dagster import RunFailureSensorContext, get_dagster_logger
 import requests
+from typing import Optional
+from urllib.parse import urlencode
 
-from ..common.cache import ShelveCache
-from .types import (
+
+from userCode.cache import ShelveCache
+from userCode.env import API_BACKEND_URL
+from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
     OregonHttpResponse,
@@ -176,32 +186,14 @@ def assert_valid_oregon_date(date_str: str) -> None:
         )
 
 
-def to_oregon_datetime(date_str: datetime.datetime) -> str:
-    """Convert a datetime into the format that the Oregon API expects"""
-    return datetime.datetime.strftime(date_str, "%m/%d/%Y %I:%M:%S %p")
+def assert_no_observations_with_same_iotid_in_first_page():
+    """Just get a list of the observations in the first page and make sure there are no duplicate iotid."""
+    resp = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert resp.ok, resp.text
+    observations = resp.json()["value"]
+    iotids = [o["@iot.id"] for o in observations]
+    iotidSet = set()
 
-
-def from_oregon_datetime(date_str: str) -> datetime.datetime:
-    """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
-        tzinfo=datetime.timezone.utc
-    )
-
-
-def strict_env(key: str):
-    val = os.environ.get(key)
-    if val is None:
-        raise Exception(f"Missing ENV var: {key}")
-
-    return val
-
-
-def slack_error_fn(context: RunFailureSensorContext) -> str:
-    get_dagster_logger().info("Sending notification to Slack")
-    # The make_slack_on_run_failure_sensor automatically sends the job
-    # id and name so you can just send the error. We don't need other data in the string
-    source_being_crawled = context.partition_key
-    if source_being_crawled:
-        return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
-    else:
-        return f"Error: {context.failure_event.message}"
+    for iotid in iotids:
+        assert iotid not in iotidSet, f"{iotid} is a duplicate iotid"
+        iotidSet.add(iotid)

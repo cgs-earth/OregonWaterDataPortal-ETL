@@ -1,29 +1,24 @@
 services:
-  frost-http:
-    container_name: frost-http
-    image: fraunhoferiosb/frost-server:latest
+  owdp-frost:
+    container_name: owdp-frost
+    build:
+      context: ./docker/frost
     environment:
       - serviceRootUrl=${OWDP_URL}/FROST-Server
-      - plugins_multiDatastream.enable=false
-      - http_cors_enable=true
-      - http_cors_allowed_origins=*
-      - persistence_db_driver=org.postgresql.Driver
-      - persistence_db_url=jdbc:postgresql://database:5432/sensorthings
+      - persistence_db_url=jdbc:postgresql://owdp-database:5432/sensorthings
       - persistence_db_username=sensorthings
       - persistence_db_password=ChangeMe
       - persistence_autoUpdateDatabase=true
-      - persistence_idGenerationMode=ServerAndClientGenerated
-      - mqtt_Enabled=false
     ports:
       - 1883:1883
       - 8080:8080
     depends_on:
-      - database
+      - owdp-database
 
-  database:
-    container_name: database
+  owdp-database:
+    container_name: owdp-database
     build:
-      context: ./docker
+      context: ./docker/database
     environment:
       - POSTGRES_DB=sensorthings
       - POSTGRES_USER=sensorthings
@@ -33,19 +28,18 @@ services:
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
-    image: internetofwater/pygeoapi:owdp
-    volumes:
-      - ./config.yml:/pygeoapi/local.config.yml
+    build:
+      context: docker/pygeoapi
     depends_on:
-      - frost-http
-    restart: always
+      - owdp-frost
     environment:
-      - WIS2BOX_API_URL=${OWDP_URL}/oapi
-      - WIS2BOX_API_BACKEND_URL=http://frost-http:8080/FROST-Server/v1.1
+      - API_URL=${OWDP_URL}/oapi
+      - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
-  wis2box-ui:
+  owdp-ui:
     image: internetofwater/hub2box-ui:iow
+    container_name: owdp-ui
     depends_on:
       - owdp-pygeoapi
     environment:
@@ -55,12 +49,11 @@ services:
 
   web-proxy:
     container_name: web-proxy
-    image: nginx:alpine
+    build:
+      context: docker/nginx
     restart: always
     depends_on:
-      - wis2box-ui
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - owdp-ui
     ports:
       - 8999:80
 
