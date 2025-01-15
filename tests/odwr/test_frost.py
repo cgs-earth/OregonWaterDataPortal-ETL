@@ -259,7 +259,7 @@ def test_insert_same_id_different_obj():
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == "88888888888888"
+        assert items[0]["@iot.id"] == "88888888888"
         # things dont wipe locations when deleted
         wipe_locations()
 

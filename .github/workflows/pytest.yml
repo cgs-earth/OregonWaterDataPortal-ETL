@@ -27,21 +27,13 @@ jobs:
       - name: Setup Docker Compose
         uses: docker/setup-buildx-action@v2
 
-      - name: Cache Docker layers for PostGIS image
+      - name: Cache Docker layers
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/**/*.Dockerfile') }}
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/**/Dockerfile') }}
           restore-keys: |
             ${{ runner.os }}-docker-
-
-      - name: Cache Docker layers for Frost Server image
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache-frost-server
-          key: ${{ runner.os }}-docker-frost-${{ hashFiles('**/docker/frost-server.Dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-docker-frost-
 
       - name: Start Docker Compose services
         run: |
@@ -60,8 +52,8 @@ jobs:
 
       - name: Wait for Frost and Init DB
         run: |
-          echo "Running docker/wait-for-frost-and-init-db.sh..."
-          cd docker; bash wait-for-frost-and-init-db.sh
+          echo "Running docker/frost/wait-for-frost-and-init-db.sh..."
+          cd docker/frost; bash wait-for-frost-and-init-db.sh
 
       - name: Check indices were added
         run: |

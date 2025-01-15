@@ -53,11 +53,7 @@ def wipe_things():
     if response.ok:
         things = response.json()["value"]
         for thing in things:
-            print(thing)
             resp = requests.delete(thing["@iot.selfLink"])
-            print(resp.url)
-            print(resp.status_code)
-            print(resp.ok)
             assert resp.ok, resp.text
     else:
         raise RuntimeError(response.text)
@@ -69,11 +65,7 @@ def wipe_locations():
     if response.ok:
         locations = response.json()["value"]
         for location in locations:
-            print(location)
             resp = requests.delete(location["@iot.selfLink"])
-            print(resp.url)
-            print(resp.status_code)
-            print(resp.ok)
             assert resp.ok
     else:
         raise RuntimeError(response.text)
@@ -86,9 +78,6 @@ def wipe_observed_properties():
         observed_properties = response.json()["value"]
         for observed_property in observed_properties:
             resp = requests.delete(observed_property["@iot.selfLink"])
-            print(resp.url)
-            print(resp.status_code)
-            print(resp.ok)
             assert resp.ok
     else:
         raise RuntimeError(response.text)
@@ -101,9 +90,6 @@ def wipe_datastreams():
         datastreams = response.json()["value"]
         for datastream in datastreams:
             resp = requests.delete(datastream["@iot.selfLink"])
-            print(resp.url)
-            print(resp.status_code)
-            print(resp.ok)
             assert resp.ok
     else:
         raise RuntimeError(response.text)
