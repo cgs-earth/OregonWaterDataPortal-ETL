@@ -5,7 +5,6 @@ from .types import Attributes, Datastream, Observation, StationData
 from userCode.common.ontology import ONTOLOGY_MAPPING
 
 
-
 def to_sensorthings_observation(
     associatedDatastream: Datastream,
     datapoint: Optional[float],
