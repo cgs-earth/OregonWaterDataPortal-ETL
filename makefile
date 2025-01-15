@@ -28,3 +28,7 @@ build:
 	uv python install 3.12
 	uv sync 
 	source .venv/bin/activate
+
+# Check which indices are present on the observations table
+indexCheck:
+	docker exec -t owdp-database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS'"

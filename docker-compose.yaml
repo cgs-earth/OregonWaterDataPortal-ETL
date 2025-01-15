@@ -2,16 +2,18 @@ services:
   owdp-frost:
     container_name: owdp-frost
     build:
-      context: docker/frost
+      context: ./docker/frost
     environment:
-      # For all settings see: https://fraunhoferiosb.github.io/FROST-Server/settings/settings.html
-      - serviceRootUrl=http://localhost:8999/FROST-Server
+      - serviceRootUrl=${OWDP_URL}/FROST-Server
       - persistence_db_url=jdbc:postgresql://owdp-database:5432/sensorthings
       - persistence_db_username=sensorthings
       - persistence_db_password=ChangeMe
+      - persistence_autoUpdateDatabase=true
+    ports:
+      - 1883:1883
+      - 8080:8080
     depends_on:
-      owdp-database:
-        condition: service_healthy
+      - owdp-database
 
   owdp-database:
     container_name: owdp-database
@@ -23,11 +25,6 @@ services:
       - POSTGRES_PASSWORD=ChangeMe
     volumes:
       - postgis_volume:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d sensorthings -U sensorthings "]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
@@ -36,7 +33,7 @@ services:
     depends_on:
       - owdp-frost
     environment:
-      - API_URL=http://localhost:8999/oapi
+      - API_URL=${OWDP_URL}/oapi
       - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
 
@@ -46,9 +43,9 @@ services:
     depends_on:
       - owdp-pygeoapi
     environment:
-      - WIS2BOX_URL=http://localhost:8999
-      - WIS2BOX_API_URL=http://localhost:8999/oapi
-      - serviceRootUrl=http://localhost:8999/FROST-Server
+      - WIS2BOX_URL=${OWDP_URL}
+      - WIS2BOX_API_URL=${OWDP_URL}/oapi
+      - serviceRootUrl=${OWDP_URL}/FROST-Server
 
   web-proxy:
     container_name: web-proxy

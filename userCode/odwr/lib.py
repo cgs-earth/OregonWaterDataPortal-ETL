@@ -38,6 +38,7 @@ from urllib.parse import urlencode
 
 
 from userCode.cache import ShelveCache
+from userCode.env import API_BACKEND_URL
 from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
@@ -77,7 +78,10 @@ def parse_oregon_tsv(
     # url does not match the name in the result column. However,
     # it consistently is returned in the third column
     data: list[Optional[float]] = []
-    dates: list[str] = []
+
+    # in python set is not ordered but a dict is
+    # so we can essentially use it as a set and ignore the values
+    unique_dates: dict[str, None] = {}
     units = "Unknown"
     tsv_data = io.StringIO(response.decode("utf-8"))
     reader = csv.reader(tsv_data, delimiter="\t")
@@ -105,9 +109,13 @@ def parse_oregon_tsv(
             else:
                 data.append(float(row[2]))
 
-            dates.append(parse_date(str(DATE_COLUMN)))
+            parsed_date = parse_date(str(DATE_COLUMN))
+            assert (
+                parsed_date not in unique_dates
+            ), f"Date '{parsed_date}' appeared twice in the data"
+            unique_dates[parsed_date] = None
 
-    return ParsedTSVData(data, units, dates)
+    return ParsedTSVData(data, units, list(unique_dates))
 
 
 def unix_offset_to_iso(unix_offset: int) -> str:
@@ -195,3 +203,16 @@ def assert_valid_oregon_date(date_str: str) -> None:
         raise ValueError(
             f"Date string '{date_str}' could not be parsed into the format that the Oregon API expects"
         )
+
+
+def assert_no_observations_with_same_iotid_in_first_page():
+    """Just get a list of the observations in the first page and make sure there are no duplicate iotid."""
+    resp = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert resp.ok, resp.text
+    observations = resp.json()["value"]
+    iotids = [o["@iot.id"] for o in observations]
+    iotidSet = set()
+
+    for iotid in iotids:
+        assert iotid not in iotidSet, f"{iotid} is a duplicate iotid"
+        iotidSet.add(iotid)
