@@ -49,8 +49,7 @@ def test_duplicate():
     wipe_things()
     resp = requests.get(API_BACKEND_URL)
     assert resp.ok
-    # use a 10 digit number since that is what our hash is
-    unique_id = "1234567890"  # @iot.id does not need to be an int on clientside but it does need to be serializable as an int
+    unique_id = "1234"  # @iot.id does not need to be an int on clientside but it does need to be serializable as an int
     payload = {
         "name": "Kitchen",
         "@iot.id": unique_id,
@@ -230,12 +229,12 @@ def test_insert_same_id_different_obj():
     with wipe_things_before_and_after():
         wipe_locations()
         payload = {
-            "@iot.id": 88888888888,
+            "@iot.id": 888,
             "name": "test",
             "description": "test",
             "Locations": [
                 {
-                    "@iot.id": 88888888888,
+                    "@iot.id": 888,
                     "name": "test",
                     "description": "test",
                     "encodingType": "application/vnd.geo+json",
@@ -253,13 +252,13 @@ def test_insert_same_id_different_obj():
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == "88888888888"
+        assert items[0]["@iot.id"] == "888"
 
         resp = requests.get(f"{API_BACKEND_URL}/Locations")
         assert resp.ok, resp.text
         items = resp.json()["value"]
         assert len(items) == 1
-        assert items[0]["@iot.id"] == "88888888888"
+        assert items[0]["@iot.id"] == "888"
         # things dont wipe locations when deleted
         wipe_locations()
 

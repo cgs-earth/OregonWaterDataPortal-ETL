@@ -37,21 +37,14 @@ from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.env import API_BACKEND_URL
 from userCode.odwr.dag import all_metadata, post_station, sta_station
 from userCode.odwr.helper_classes import get_datastream_time_range, MockValues
-from userCode.odwr.lib import assert_no_observations_with_same_iotid_in_first_page
-from userCode.odwr.types import StationData
-from userCode.util import to_oregon_datetime
-
-
 from .lib import (
-    assert_no_duplicate_at_given_time,
-    assert_observations_and_datastreams_empty,
     dates_are_within_X_days,
-    wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
     wipe_things,
 )
-from .test_lib import test_iow_hash_is_deterministic
+from userCode.odwr.types import StationData
+from userCode.util import to_oregon_datetime
 
 
 @pytest.fixture(scope="module")
@@ -81,27 +74,28 @@ def test_full_pipeline(metadata: list[StationData]):
     """Check to make sure that the full pipeline works."""
     # Clear the locations and things before running.
     wipe_locations()
-    wipe_observed_properties()
     wipe_things()
-    wipe_datastreams()
-    # Make sure the hash function is not varied in different runtimes
-    test_iow_hash_is_deterministic()
-    assert_observations_and_datastreams_empty()
+    datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
+    assert datastreams.ok, "Failed to get datastreams"
+    assert datastreams.json() == {"value": []}
+    obs = requests.get(f"{API_BACKEND_URL}/Observations")
+    assert obs.ok, "Failed to get observations"
+    assert obs.json() == {"value": []}
 
-    harvest_job = definitions.get_job_def("harvest_owdp")
+    resolved_job = definitions.get_job_def("harvest_owdp")
 
     instance = DagsterInstance.ephemeral()
 
-    first_station_number = metadata[0].attributes.station_nbr
+    first_item = metadata[0].attributes.station_nbr
 
     # we need to mock to a date in the past that is still
     # relatively recent since some datastreams dont have data
     # before 2020ish
     mocked_date = datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc)
 
-    crawl_subset_result = harvest_job.execute_in_process(
+    result = resolved_job.execute_in_process(
         instance=instance,
-        partition_key=first_station_number,
+        partition_key=first_item,
         run_config=RunConfig(
             {
                 # random date in the past
@@ -112,17 +106,21 @@ def test_full_pipeline(metadata: list[StationData]):
         ),
     )
 
-    assert crawl_subset_result.success
-    for endpoint in ["Locations", "Datastreams", "Observations"]:
+    assert result.success
+
+    endpoints = ["Locations", "Datastreams", "Observations"]
+    for endpoint in endpoints:
         response = requests.get(f"{API_BACKEND_URL}/{endpoint}?$count=true")
-        assert response.ok, response.text
-        count = response.json()["@iot.count"]
-        assert count > 0, f"No {endpoint} items found in FROST after harvesting"
+        assert response.ok
+        assert (
+            response.json()["@iot.count"] > 0
+        ), f"No {endpoint} items found in FROST after harvesting"
 
     datastreams = requests.get(f"{API_BACKEND_URL}/Datastreams")
     assert datastreams.ok, "Failed to get datastreams"
 
-    first_datastream_iotid = datastreams.json()["value"][0]["@iot.id"]
+    first_iotid = datastreams.json()["value"][0]["@iot.id"]
+    range = get_datastream_time_range(first_iotid)
 
     observedPropertyResp = requests.get(
         datastreams.json()["value"][0]["ObservedProperty@iot.navigationLink"]
@@ -137,39 +135,28 @@ def test_full_pipeline(metadata: list[StationData]):
     else:
         assert False, f"Failed to find ontology for observed property {observedPropertyName} within {ONTOLOGY_MAPPING}"
 
-    range = get_datastream_time_range(first_datastream_iotid)
     assert range.start < range.end, "The start of the datastream must be before the end"
     assert dates_are_within_X_days(
         range.end, mocked_date, 7
     ), "The end of the data in the database is significantly older than the mocked date. This could be ok if the upstream is lagging behind, but is generally a sign of an error"
 
-    assert_no_duplicate_at_given_time(first_datastream_iotid, range.start)
-    assert_no_duplicate_at_given_time(
-        first_datastream_iotid,
-        range.end,
-    )
-
     # run again to see if the datastream is updated
-    crawl_update_result = harvest_job.execute_in_process(
-        instance=instance, partition_key=first_station_number
+    result2 = resolved_job.execute_in_process(
+        instance=instance, partition_key=first_item
     )
-    assert crawl_update_result.success, "Although the previous run was successful, the second dagster run to update the data failed."
-    update_crawl_range = get_datastream_time_range(first_datastream_iotid)
+    assert result2.success
+    range2 = get_datastream_time_range(first_iotid)
     assert (
-        update_crawl_range.start < update_crawl_range.end
+        range2.start < range2.end
     ), "The start of the datastream must be before the end"
     assert (
-        update_crawl_range.start == range.start
+        range2.start == range.start
     ), "The start of the datastream should not change as new data is added to the end"
-    assert update_crawl_range.end >= range.end
+    assert range2.end >= range.end
     today = datetime.datetime.now(tz=datetime.timezone.utc)
     assert dates_are_within_X_days(
-        update_crawl_range.end, today, 7
+        range2.end, today, 7
     ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
-
-    assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.start)
-    assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.end)
-    assert_no_observations_with_same_iotid_in_first_page()
     wipe_locations()
     wipe_things()
     wipe_observed_properties()

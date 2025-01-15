@@ -66,7 +66,6 @@ class Datastream(BaseModel):
 class Observation(BaseModel):
     """SensorThings API Observation"""
 
-    iotid: int = Field(alias="@iot.id")
     resultTime: str
     phenomenonTime: str
     Datastream: dict

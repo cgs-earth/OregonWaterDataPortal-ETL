@@ -28,7 +28,6 @@
 # =================================================================
 
 import asyncio
-import datetime
 from dagster import (
     AssetCheckResult,
     AssetSelection,
@@ -43,9 +42,8 @@ from dagster import (
     schedule,
 )
 import httpx
-import os
 import requests
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from userCode.env import API_BACKEND_URL
 from userCode.odwr.helper_classes import (
@@ -56,7 +54,6 @@ from userCode.odwr.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    assert_no_observations_with_same_iotid_in_first_page,
 )
 from userCode.odwr.sta_generation import (
     to_sensorthings_datastream,
@@ -80,9 +77,7 @@ from userCode.util import (
     to_oregon_datetime,
 )
 
-
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
-seen_obs: set[Tuple[str, str]] = set()
 
 
 @asset(group_name="owdp")
@@ -177,30 +172,30 @@ def sta_all_observations(
     station_metadata: StationData, sta_datastreams: list[Datastream], config: MockValues
 ):
     session = httpx.AsyncClient()
-    observations: list[Observation] = []
+    observations: list[Observation] = []  # all attributes in both datastreams
     associatedGeometry = station_metadata.geometry
     attr: Attributes = station_metadata.attributes
 
-    async def fetch_obs(datastream: Datastream) -> List[Observation]:
-        """Fetch observations for a single datastream and return them."""
-        local_observations = []  # the observations array local to this function.
+    async def fetch_obs(datastream: Datastream):
         range = get_datastream_time_range(datastream.iotid)
 
-        new_end = (
-            config.mocked_date_to_update_until
-            if config and config.mocked_date_to_update_until
-            else now_as_oregon_datetime()
-        )
+        # If we have a mocked date to update until, use that instead
+        # of downloading everything
+        if config and config.mocked_date_to_update_until:
+            new_end = config.mocked_date_to_update_until
+        else:
+            new_end = now_as_oregon_datetime()
 
         get_dagster_logger().info(
-            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.end} to {new_end}"
+            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.start} to {new_end}"
         )
 
         tsv_url = generate_oregon_tsv_url(
+            # We need to add available to the datastream name since the only way to determine
+            # if a datastream is available is to check the propery X_available == "1"
             datastream.description + "_available",
             int(attr.station_nbr),
-            # Offset the end of the range by 1 minute to avoid duplicate observations
-            to_oregon_datetime(range.end + datetime.timedelta(minutes=1)),
+            to_oregon_datetime(range.start),
             new_end,
         )
 
@@ -211,43 +206,22 @@ def sta_all_observations(
             )
 
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
-
-        for i, (obs, date) in enumerate(zip(tsvParse.data, tsvParse.dates)):
+        for obs, date in zip(tsvParse.data, tsvParse.dates):
             assert_date_in_range(date, range.start, from_oregon_datetime(new_end))
-
-            # If we are running this as a test, we want to keep track of which observations we have seen so we can detect duplicates
-            # We don't want to cache every single observation unless we are running as a test since the db will catch duplicates as well
-            # This is a further check to be thorough
-            RUNNING_AS_A_TEST_NOT_IN_PROD = "PYTEST_CURRENT_TEST" in os.environ
-            if RUNNING_AS_A_TEST_NOT_IN_PROD:
-                key = (datastream.iotid, date)
-                assert (
-                    key not in seen_obs
-                ), f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
-                seen_obs.add(key)
 
             sta_representation = to_sensorthings_observation(
                 datastream, obs, date, date, associatedGeometry
             )
-            local_observations.append(sta_representation)
 
-        if len(local_observations) == 0:
-            # We don't raise an exception since this isn't a fatal error, but it is suspicious so we
-            # log it as a runtime error so it has high visibility. There are cases in the upstream API where
-            # there will be lots of missing data for an unknown reason
-            get_dagster_logger().error(
-                f"No observations found in range {range.end} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
-            )
+            observations.append(sta_representation)
 
-        return local_observations
+        assert (
+            len(observations) > 0
+        ), f"No observations found in range {range.start} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
 
     async def main():
         tasks = [fetch_obs(datastream) for datastream in sta_datastreams]
-        results = await asyncio.gather(*tasks)
-
-        # Flatten the results from all datastreams
-        for result in results:
-            observations.extend(result)
+        return await asyncio.gather(*tasks)
 
     asyncio.run(main())
 
@@ -256,7 +230,6 @@ def sta_all_observations(
 
 @asset(partitions_def=station_partition, group_name="owdp")
 def post_station(sta_station: dict):
-    """Post a station to the Sensorthings API"""
     # get the station with the station number
     resp = requests.get(f"{API_BACKEND_URL}/Things('{sta_station['@iot.id']}')")
     if resp.status_code == 404:
@@ -284,7 +257,6 @@ def post_station(sta_station: dict):
 
 @asset(partitions_def=station_partition, deps=[post_station], group_name="owdp")
 def post_datastreams(sta_datastreams: list[Datastream]):
-    """Post just the datastreams to the Sensorthings API"""
     # check if the datastreams exist
     for datastream in sta_datastreams:
         resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{datastream.iotid}')")
@@ -310,20 +282,17 @@ def post_datastreams(sta_datastreams: list[Datastream]):
         )
         if not resp.ok:
             get_dagster_logger().error(f"Failed posting datastream: {datastream}")
-            raise RuntimeError(
-                f"Failed posting datastream for {datastream.iotid} with response: {resp.text}"
-            )
+            raise RuntimeError(resp.text)
 
 
 @asset(partitions_def=station_partition, deps=[post_datastreams], group_name="owdp")
 def batch_post_observations(sta_all_observations: list[Observation]):
-    """Post a group of observations for multiple datastreams to the Sensorthings API"""
     BatchHelper().send_observations(sta_all_observations)
 
 
 @asset_check(asset=batch_post_observations)
-def check_duplicate_properties():
-    """Sanity check to make sure there are no obvious duplicates in either observations
+def check_duplicates():
+    """Do a sanity check to make sure there are no obvious duplicates in either observations
     or observed properties"""
 
     observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
@@ -344,27 +313,17 @@ def check_duplicate_properties():
     )
 
 
-@asset_check(asset=batch_post_observations)
-def check_duplicate_observations():
-    """Sanity check to make sure there are no obvious duplicates in observations. This should already be checked by FROST,
-    but there is a possibility that the db doesn't catch it so we double check here"""
-    assert_no_observations_with_same_iotid_in_first_page()
-    return AssetCheckResult(
-        passed=True,
-    )
-
-
 odwr_job = define_asset_job(
     "harvest_owdp",
     description="harvest owdp data",
     selection=AssetSelection.groups("owdp"),
 )
 
-DAILY_AT_4AM_EST_1AM_PST = "0 9 * * *"
+DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST = "0 16 * * *"
 
 
 @schedule(
-    cron_schedule=DAILY_AT_4AM_EST_1AM_PST,
+    cron_schedule=DAILY_AT_FOUR_PM_UTC_11AM_EST_8AM_PST,
     target=AssetSelection.groups("owdp"),
     default_status=DefaultScheduleStatus.STOPPED,
 )

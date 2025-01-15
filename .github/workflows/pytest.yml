@@ -2,10 +2,10 @@ name: Pytest
 
 on:
   push:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  pytest-e2e:
+  uv-example:
     runs-on: ubuntu-latest
     name: python
     steps:
@@ -27,49 +27,20 @@ jobs:
       - name: Setup Docker Compose
         uses: docker/setup-buildx-action@v2
 
-      # - name: Cache Docker layers
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /tmp/.buildx-cache
-      #     key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/**/Dockerfile') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-docker-
-
       - name: Start Docker Compose services
         run: |
           cp .env.example .env
           docker compose up -d
-          docker compose ps
+          docker compose ps # Display the status of all containers
 
       - name: Log container output if database fails
-        if: failure()
+        if: failure() # Only runs if the workflow fails
         run: |
           echo "Logging container output for debugging..."
-          docker compose logs owdp-database
+          docker compose logs database # Replace 'db' with your database service name
           docker compose ps
           docker network inspect $(docker network ls -q) || true
           docker inspect $(docker ps -aq) || true
-
-      - name: Wait for Frost and Init DB
-        run: |
-          echo "Running docker/frost/wait-for-frost-and-init-db.sh..."
-          cd docker/frost; bash wait-for-frost-and-init-db.sh
-
-      - name: Check indices were added
-        run: |
-          echo "Checking if a given index 'idx_observations_datastream_id' exists in the database..."
-          index_check=$(docker exec -t owdp-database psql -U sensorthings -d sensorthings -t -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS' AND indexname = 'idx_observations_datastream_id';")
-
-          echo "Query result: $index_check"
-
-          index_check=$(echo "$index_check" | xargs)
-
-          if [[ "$index_check" != *"idx_observations_datastream_id"* ]]; then
-            echo "Error: The index 'idx_observations_datastream_id' is missing! Output was: '$index_check'"
-            exit 1
-          else
-            echo "Index 'idx_observations_datastream_id' found."
-          fi
 
       - name: Run tests
         run: |

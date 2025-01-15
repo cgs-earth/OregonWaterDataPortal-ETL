@@ -11,12 +11,11 @@ The Oregon Water Data portal crawls or ingests data from multiple different Oreg
 docker compose --env-file .env up
 ```
 
-3. Once you start the database and the frost server, you will likely want to add extra indices to make it faster. To do this run the [init script](./docker/frost/wait-for-frost-and-init-db.sh)
+Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`,
+or edit `.env` and deploy at your own URL.
 
-Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`, or edit `.env` and deploy at your own URL.
+3. Start Caddy with `make caddy` if you want to get https in production.
 
-4. Start Caddy with `make caddy` if you want to get https in production.
-5. Run dagster with `dagster dev`
+4. Run dagster with `dagster dev`
    - You must use python 3.12 or below since 3.13 is not supported by Dagster currently
    - This project uses `uv` since it makes it easier to manage the python version
-   - It is helpful to use `screen` to start a background shell, run `dagster dev` then detach the screen. You can then reattach to it at a later time with `screen -r` so it runs in the background but is still accessible via the cli.
