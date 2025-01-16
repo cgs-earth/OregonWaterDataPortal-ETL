@@ -60,11 +60,15 @@ services:
   owdp-dagster:
     container_name: owdp-dagster
     build:  
+      # have to use . as context so we can get requirements.txt in the context but 
+      # also have it at the root for local dev
       context: .
-      dockerfile: ./docker/Dockerfile_dagster
+      dockerfile: ./docker/dagster/Dockerfile
     ports:
       - 3000:3000
     restart: always
+    environment:
+      - SLACK_BOT_TOKEN
     deploy:
       resources:
         limits:
@@ -82,7 +86,11 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
       environment:
-        - SLACK_HOOK_URL
+        - SLACK_BOT_TOKEN
+        # NOTE, no # needed here
+        - SLACK_CHANNEL_NAME=cgs-iow-bots
+        - SLACK_BOT_NAME=Oregon Container Monitoring Bot
+        - SLACK_BOT_AVATAR=https://cida.usgs.gov/wsgi/ngwmn_ui/static/img/provider_logos/owrd_logo.50b3448a.png
       # Don't monitor containers in the dev env or CI/CD
       profiles: [production]
 

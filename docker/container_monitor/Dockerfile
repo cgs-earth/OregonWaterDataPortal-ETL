@@ -1,14 +1,23 @@
-FROM alpine:latest
+FROM golang:1.23 as builder
 
-COPY ./monitor.sh /monitor.sh
+WORKDIR /app
 
-# Ensure the script is executable
-RUN chmod +x /monitor.sh
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Install required packages
-RUN apk add --no-cache \
-    docker-cli \
-    curl \
-    grep
+COPY . ./
 
-CMD ["/bin/sh", "/monitor.sh"]
+ENV CGO_ENABLED=0
+RUN go build -o slack-container-monitor
+
+FROM debian:bullseye-slim
+
+WORKDIR /app
+
+# Install CA certificates. We need these to make HTTPS requests to the Slack API
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/slack-container-monitor ./
+
+CMD ["/app/slack-container-monitor"]
