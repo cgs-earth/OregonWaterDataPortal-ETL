@@ -37,6 +37,6 @@ func main() {
 			Patterns: patternList,
 		})
 	}()
-
+	// Block forever 
 	select {}
 }

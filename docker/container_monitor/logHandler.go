@@ -16,6 +16,7 @@ type LogWatcherConfig struct {
 	Patterns []string // Patterns to watch in the logs
 }
 
+// Watch a container's logs for specific patterns and send a Slack message when a pattern is matched
 func watchAndHandleLogs(docker *client.Client, slackAPI SlackClient, containerName string, logWatcherConfig LogWatcherConfig) {
 	logger.Printf("Listening for logs for container %s...\n", containerName)
 

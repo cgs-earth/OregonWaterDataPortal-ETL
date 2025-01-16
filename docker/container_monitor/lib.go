@@ -13,6 +13,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
+// Configuration needed to send a slack message
 type SlackConfig struct {
 	SlackToken       string
 	SlackChannelName string
@@ -20,11 +21,13 @@ type SlackConfig struct {
 	SlackBotAvatar   string
 }
 
+// A wrapper client that contains both the client and the necessary configuration to send th emessage
 type SlackClient struct {
 	API    *slack.Client
 	Config SlackConfig
 }
 
+// Create a new slack client
 func NewSlackClient() *SlackClient {
 	slackConfig := SlackConfig{
 		SlackToken:       strictEnv("SLACK_BOT_TOKEN"),
@@ -71,6 +74,7 @@ func (s *SlackClient) SendMessageThreaded(message, threadTimestamp string) (stri
 	return timestampIdentifier, err
 }
 
+// Get the value of an environment variable or panic if it is not set
 func strictEnv(envVarName string) string {
 	envVal := os.Getenv(envVarName)
 	if envVal == "" {
@@ -79,6 +83,7 @@ func strictEnv(envVarName string) string {
 	return envVal
 }
 
+// Get the logs for a container as a newline separated string
 func getContainerLogs(cli *client.Client, containerID string) (string, error) {
 	ctx := context.Background()
 	reader, err := cli.ContainerLogs(ctx, containerID, container.LogsOptions{
