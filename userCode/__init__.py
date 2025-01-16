@@ -30,7 +30,7 @@ definitions = Definitions(
     sensors=[
         dagster_slack.make_slack_on_run_failure_sensor(
             channel="#cgs-iow-bots",
-            slack_token=get_env("DAGSTER_SLACK_TOKEN"),
+            slack_token=get_env("SLACK_BOT_TOKEN"),
             text_fn=slack_error_fn,
             default_status=DefaultSensorStatus.RUNNING,
             monitor_all_code_locations=True,
