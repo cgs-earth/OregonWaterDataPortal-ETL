@@ -1,0 +1,911 @@
+b'<?xml version="1.0" encoding="utf-8"?>
+<wfs:FeatureCollection xmlns:awqms="http://awqms.goldsystems.com/api/wfs" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml/3.2" timeStamp="2025-01-07T12:40:23.2003171-07:00" numberMatched="97" numberReturned="1" xsi:schemaLocation="http://www.opengis.net/gml/3.2 http://www.opengis.net/wfs/2.0 https://ordeq.gselements.com/api/wfs?service=wfs&amp;amp;request=DescribeFeatureType" xmlns:wfs="http://www.opengis.net/wfs/2.0">
+  <wfs:boundedBy>
+    <gml:Envelope>
+      <gml:lowerCorner>17.1 -179.5</gml:lowerCorner>
+      <gml:upperCorner>71.6 -66.9</gml:upperCorner>
+    </gml:Envelope>
+  </wfs:boundedBy>
+  <wfs:member>
+    <awqms:MonitoringLocation gml:id="32060-ORDEQ">
+      <gml:boundedBy>
+        <gml:Envelope>
+          <gml:lowerCorner>45.18599471 -122.81389</gml:lowerCorner>
+          <gml:upperCorner>45.18599471 -122.81389</gml:upperCorner>
+        </gml:Envelope>
+      </gml:boundedBy>
+      <awqms:CountyName>Marion</awqms:CountyName>
+      <awqms:Huc8>17090009</awqms:Huc8>
+      <awqms:Huc12>170900090502</awqms:Huc12>
+      <awqms:MonitoringLocationId>32060-ORDEQ</awqms:MonitoringLocationId>
+      <awqms:MonitoringLocationName>Mill Creek upstream of Hubbard STP (Pudding River)</awqms:MonitoringLocationName>
+      <awqms:OrganizationIdentifier>OREGONDEQ</awqms:OrganizationIdentifier>
+      <awqms:ResultsUrl>https://ordeq.gselements.com/api/ResultsVer1?OrganizationIdentifiersCsv=OREGONDEQ&amp;MonitoringLocationIdentifiersCsv=32060-ORDEQ</awqms:ResultsUrl>
+      <awqms:MetricsUrl>https://ordeq.gselements.com/api/MetricsVer1?OrganizationIdentifiersCsv=OREGONDEQ&amp;MonitoringLocationIdentifiersCsv=32060-ORDEQ</awqms:MetricsUrl>
+      <awqms:IndexesUrl>https://ordeq.gselements.com/api/IndexesVer1?OrganizationIdentifiersCsv=OREGONDEQ&amp;MonitoringLocationIdentifier=32060-ORDEQ</awqms:IndexesUrl>
+      <awqms:ContinuousResultsUrl>https://ordeq.gselements.com/api/ContinuousResultsVer1?OrganizationIdentifiersCsv=OREGONDEQ&amp;MonitoringLocationIdentifiersCsv=32060-ORDEQ</awqms:ContinuousResultsUrl>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Conductivity</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Dissolved oxygen (DO)</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Dissolved oxygen saturation</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>pH</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Temperature, water</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Turbidity Field</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Field Msr/Obs-Portable Data Logger</awqms:ActivityType>
+        <awqms:CharacteristicName>Temperature, water</awqms:CharacteristicName>
+        <awqms:MaxDate>2004-12-02</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName />
+        <awqms:MinDate>2004-09-14</awqms:MinDate>
+        <awqms:ResultCount>116</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Conductivity</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Dissolved oxygen (DO)</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Dissolved oxygen saturation</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>pH</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Temperature, water</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Field Replicate Msr/Obs</awqms:ActivityType>
+        <awqms:CharacteristicName>Turbidity Field</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Alkalinity, total</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Aluminum</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Ammonia</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Antimony</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Arsenic</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Barium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Beryllium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Biochemical oxygen demand, non-standard conditions</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Biochemical oxygen demand, standard conditions</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Boron</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Cadmium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Calcium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Chloride</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Chromium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Cobalt</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Conductivity</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Copper</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Escherichia coli</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Hardness, Ca, Mg</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Iron</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Lead</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Lithium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Magnesium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Manganese</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Molybdenum</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Nickel</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Nitrate + Nitrite</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Organic carbon</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Orthophosphate</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>pH</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Potassium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Selenium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Silica</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Silver</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Sodium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Sulfate</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Thallium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Total Kjeldahl nitrogen</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Total Phosphorus, mixed forms</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Total suspended solids</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Turbidity</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Vanadium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Quality Control Sample-Field Replicate</awqms:ActivityType>
+        <awqms:CharacteristicName>Zinc</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Count</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Biological</awqms:MediaName>
+        <awqms:MediaSubdivisionName />
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>28</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Alkalinity, total</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Aluminum</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Ammonia</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Antimony</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Arsenic</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Barium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Beryllium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Biochemical oxygen demand, non-standard conditions</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Biochemical oxygen demand, standard conditions</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Boron</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Cadmium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Calcium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Chloride</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Chromium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Cobalt</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Copper</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Escherichia coli</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Hardness, Ca, Mg</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Iron</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Lead</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Lithium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Magnesium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Manganese</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Molybdenum</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Nickel</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Nitrate + Nitrite</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Organic carbon</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Orthophosphate</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Potassium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Selenium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Silica</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Silver</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Sodium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Sulfate</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Thallium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Total Kjeldahl nitrogen</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Total Phosphorus, mixed forms</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Total suspended solids</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-08-04</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>1</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Vanadium</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:ResultSummaries>
+        <awqms:ActivityType>Sample-Routine</awqms:ActivityType>
+        <awqms:CharacteristicName>Zinc</awqms:CharacteristicName>
+        <awqms:MaxDate>2005-11-16</awqms:MaxDate>
+        <awqms:MediaName>Water</awqms:MediaName>
+        <awqms:MediaSubdivisionName>Surface Water</awqms:MediaSubdivisionName>
+        <awqms:MinDate>2005-08-04</awqms:MinDate>
+        <awqms:ResultCount>2</awqms:ResultCount>
+      </awqms:ResultSummaries>
+      <awqms:StateCode>OR</awqms:StateCode>
+      <awqms:MonitoringLocationType>River/Stream</awqms:MonitoringLocationType>
+      <awqms:WaterbodyName>Mill Creek</awqms:WaterbodyName>
+      <awqms:WatershedManagementUnit />
+      <awqms:LocationLatitudeLongitude>
+        <gml:Point srsName="urn:ogc:def:crs:EPSG::4326" srsDimension="2" gml:id="P0">
+          <gml:pos>45.18599471 -122.81389</gml:pos>
+        </gml:Point>
+      </awqms:LocationLatitudeLongitude>
+    </awqms:MonitoringLocation>
+  </wfs:member>
+</wfs:FeatureCollection>'
