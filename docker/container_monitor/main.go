@@ -33,7 +33,7 @@ func main() {
 
 		patternList := strings.Split(patterns, ",")
 
-		watchAndHandleLogs(docker, *slackClient, strictEnv("LOG_WATCH_CONTAINER"), LogWatcherConfig{
+		watchAndHandleLogs(docker, *slackClient, strictEnv("LOG_WATCH_CONTAINER_NAME"), LogWatcherConfig{
 			Patterns: patternList,
 		})
 	}()
