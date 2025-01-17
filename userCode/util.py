@@ -13,6 +13,7 @@ import datetime
 from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
+from uuid import UUID
 
 
 def get_env(key: str) -> str:
@@ -63,8 +64,35 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
     return datetime.datetime.strftime(date_str, "%m/%d/%Y %I:%M:%S %p")
 
 
-def from_oregon_datetime(date_str: str) -> datetime.datetime:
+def from_oregon_datetime(date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p") -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, "%m/%d/%Y %I:%M:%S %p").replace(
+    return datetime.datetime.strptime(date_str, fmt).replace(
         tzinfo=datetime.timezone.utc
     )
+
+def make_uuid(input: str) -> str:
+    """
+    helper function to make uuid
+
+    :param input: string of source
+    :param raw: bool of str casting
+
+    :returns: str of resulting uuid
+    """
+    _uuid = UUID(hex=hashlib.md5(input.encode('utf-8')).hexdigest())
+    return str(_uuid)
+
+def url_join(*parts: str) -> str:
+    """
+    helper function to join a URL from a number of parts/fragments.
+    Implemented because urllib.parse.urljoin strips subpaths from
+    host urls if they are specified
+
+    Per https://github.com/geopython/pygeoapi/issues/695
+
+    :param parts: list of parts to join
+
+    :returns: str of resulting URL
+    """
+
+    return '/'.join([p.strip().strip('/') for p in parts]).rstrip('/')

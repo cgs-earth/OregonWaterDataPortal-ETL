@@ -931,7 +931,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp" },
+    { name = "aiohttp", specifier = ">=3.11.11" },
     { name = "click", specifier = ">=8.1.7" },
     { name = "dagster", specifier = ">=1.9.4" },
     { name = "dagster-slack", specifier = ">=0.25.4" },

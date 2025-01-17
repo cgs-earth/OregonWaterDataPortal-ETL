@@ -16,7 +16,7 @@ import requests
 from typing import Literal, NamedTuple, Optional
 
 from userCode.env import API_BACKEND_URL
-from userCode.util import from_oregon_datetime
+from userCode.util import from_oregon_datetime, url_join
 from userCode.odwr.types import START_OF_DATA, FrostBatchRequest
 from userCode.types import Datastream, Observation
 
@@ -37,7 +37,7 @@ class BatchHelper:
     def _send_payload(self, payload: list[dict]):
         frost_http_body: dict[Literal["requests"], list[dict]] = {"requests": payload}
         resp = requests.post(
-            f"{API_BACKEND_URL}/$batch",
+            url_join(API_BACKEND_URL, "$batch"),
             json=frost_http_body,
             headers={"Content-Type": "application/json"},
             timeout=None,
@@ -129,7 +129,7 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
     """Get the range of the observation times within a given STA datastream. This can be
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
-    resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{iotid}')")
+    resp = requests.get(f"{API_BACKEND_URL}Datastreams('{iotid}')")
     get_dagster_logger().debug(resp.url)
 
     # 404 represents that there is no datastream and thus the timerange is null

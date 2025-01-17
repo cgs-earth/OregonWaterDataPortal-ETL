@@ -10,9 +10,10 @@
 
 from typing import Optional
 
-from userCode.awqms.types import StationData, POTENTIAL_DATASTREAMS
+from userCode.awqms.types import StationData, GmlPoint, POTENTIAL_DATASTREAMS
 from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.types import Datastream, Observation
+from userCode.util import from_oregon_datetime, deterministic_hash
 
 
 def to_sensorthings_station(station: StationData) -> dict:
@@ -31,18 +32,14 @@ def to_sensorthings_station(station: StationData) -> dict:
                 "location": {
                     "type": "Point",
                     "coordinates": [
-                        station.Geometry.latitude,
                         station.Geometry.longitude,
+                        station.Geometry.latitude,
                     ]
                 },
             }
         ],
         "properties": {
             "county": station.CountyName,
-            "ResultsUrl": station.ResultsUrl,
-            "ContinuousResultsUrl": station.ContinuousResultsUrl,
-            "IndexesUrl": station.IndexesUrl,
-            "MetricsUrl": station.MetricsUrl,
             "OrganizationIdentifier": station.OrganizationIdentifier,
             "WaterbodyName": station.WaterbodyName
         }
@@ -60,24 +57,29 @@ def to_sensorthings_station(station: StationData) -> dict:
 
 
 def to_sensorthings_observation(
+    iotid: int,
     associatedDatastream: Datastream,
-    datapoint: Optional[float],
-    resultTime: str,
+    datapoint: float,
     phenom_time: str,
-    associatedGeometry: dict,
+    associatedGeometry: GmlPoint,
 ) -> Observation:
     """Return the json body for a sensorthings observation insert to FROST"""
     if datapoint is None:
         raise RuntimeError("Missing datapoint")
 
-    # generate a unique int by hashing the datastream name with the phenomenon time and result time
-    # we use mod with the max size in order to always get a positive int result
-    # id = abs(hash(f"{associatedDatastream.name}{phenom_time}{resultTime}")) % 10000000
+    phenom_time = from_oregon_datetime(phenom_time, fmt="%Y-%m-%d %I:%M:%S %p").strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+
+    # generate a unique id by concatenating the datastream id and the resultTime
+    # we assume that the resultTime is in the format YYYY-MM-DDTHH:MM:SSZ and
+    # that when it is concat with the datastream id it will be unique and less than 18 characters in total
+
     return Observation(
         **{
+            "@iot.id": iotid,
             "phenomenonTime": phenom_time,
-            # "@iot.id": int(id),
-            "resultTime": resultTime,
+            "resultTime": phenom_time,
             "Datastream": {"@iot.id": associatedDatastream.iotid},
             "result": datapoint,
             "FeatureOfInterest": {
@@ -87,7 +89,10 @@ def to_sensorthings_observation(
                 "encodingType": "application/vnd.geo+json",
                 "feature": {
                     "type": "Point",
-                    "coordinates": list(associatedGeometry.values()),
+                    "coordinates": [
+                        associatedGeometry.longitude,
+                        associatedGeometry.latitude,
+                    ]
                 },
             },
         }
@@ -102,7 +107,6 @@ def to_sensorthings_datastream(
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     
-    id = POTENTIAL_DATASTREAMS[property]
 
     ontology_mapped_property = ONTOLOGY_MAPPING.get(property)
     if not ontology_mapped_property:
@@ -110,10 +114,9 @@ def to_sensorthings_datastream(
             f"Datastream '{property}' not found in the ontology: '{ONTOLOGY_MAPPING}'. You need to map this term to a common vocabulary term to use it."
         )
 
-
     datastream: Datastream = Datastream(
         **{
-            "@iot.id": f"{attr.MonitoringLocationId}{id}",
+            "@iot.id": f"{associatedThingId}-{ontology_mapped_property.id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
             "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
@@ -123,7 +126,11 @@ def to_sensorthings_datastream(
                 "definition": units,
             },
             "ObservedProperty": {
-                "@iot.id": id,
+                "@iot.id": ontology_mapped_property.id,
+                "name": ontology_mapped_property.name,
+                "description": ontology_mapped_property.description,
+                "definition": ontology_mapped_property.definition,
+                "properties": {"uri": ontology_mapped_property.uri},
             },
             "Sensor": {
                 "@iot.id": 0,

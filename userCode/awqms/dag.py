@@ -21,6 +21,7 @@ from dagster import (
     get_dagster_logger,
     AssetExecutionContext,
     schedule,
+    failure_hook
 )
 import io
 
@@ -30,21 +31,20 @@ from userCode.helper_classes import (
 )
 from userCode.awqms.lib import (
     fetch_station,
-    fetch_datastream
-)
-from userCode.awqms.types import (
-    parse_monitoring_locations
+    fetch_observations,
+    fetch_observation_ids
 )
 from userCode.awqms.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.util import assert_date_in_range, now_as_oregon_datetime
-from .types import (
+from userCode.util import deterministic_hash, url_join
+from userCode.awqms.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
-    StationData
+    StationData,
+    parse_monitoring_locations
 )
 from userCode.types import Datastream, Observation
 from userCode.env import API_BACKEND_URL
@@ -57,22 +57,22 @@ def awqms_preflight_checks():
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, "FROST server is not running"
 
-@asset(deps=[awqms_preflight_checks], group_name="awqms")
+@asset(partitions_def=station_partition, deps=[awqms_preflight_checks], group_name="awqms")
 def awqms_metadata(
     context: AssetExecutionContext
 ) -> StationData:
     """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
     station_partition = context.partition_key
+    get_dagster_logger().debug(f"Handling {station_partition}")
+    return parse_monitoring_locations(fetch_station(station_partition))
 
-    _ = fetch_station(station_partition)
-    with io.BytesIO(_) as fh:
-        return next(parse_monitoring_locations(fh))
 
 @asset(partitions_def=station_partition, group_name="awqms")
 def post_awqms_station(awqms_metadata: StationData):
     station = to_sensorthings_station(awqms_metadata)
     # get the station with the station number
-    resp = requests.get(f"{API_BACKEND_URL}/Things('{station['@iot.id']}')")
+    url = url_join(API_BACKEND_URL, f"Things('{station['@iot.id']}')")
+    resp = requests.get(url)
     if resp.status_code == 404:
         get_dagster_logger().info(
             f"Station {station['@iot.id']} not found. Posting..."
@@ -88,7 +88,7 @@ def post_awqms_station(awqms_metadata: StationData):
             )
             return
 
-    resp = requests.post(f"{API_BACKEND_URL}/Things", json=station)
+    resp = requests.post(url_join(API_BACKEND_URL, "Things"), json=station)
     if not resp.ok:
         get_dagster_logger().error(f"Failed posting thing: {station}")
         raise RuntimeError(resp.text)
@@ -100,8 +100,6 @@ def post_awqms_station(awqms_metadata: StationData):
 def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
 
     associatedThingId = awqms_metadata.MonitoringLocationId
-    from dagster import get_dagster_logger
-    get_dagster_logger().debug(awqms_metadata.model_dump(by_alias=True))
 
     datastreams: list[Datastream] = []
     for datastream in awqms_metadata.Datastreams:
@@ -112,7 +110,7 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
         datastreams.append(
             to_sensorthings_datastream(
                 awqms_metadata,
-                "C°",
+                POTENTIAL_DATASTREAMS[datastream.observed_property],
                 datastream.observed_property,
                 associatedThingId
             )
@@ -127,7 +125,8 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
 def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
     # check if the datastreams exist
     for datastream in awqms_datastreams:
-        resp = requests.get(f"{API_BACKEND_URL}/Datastreams('{datastream.iotid}')")
+        url = url_join(API_BACKEND_URL, f"Datastreams('{datastream.iotid}')")
+        resp = requests.get(url)
         if resp.status_code == 404:
             get_dagster_logger().info(
                 f"Datastream {datastream.iotid} not found. Posting..."
@@ -146,17 +145,52 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
                 continue
 
         resp = requests.post(
-            f"{API_BACKEND_URL}/Datastreams", json=datastream.model_dump(by_alias=True)
+            url_join(API_BACKEND_URL, "Datastreams"), json=datastream.model_dump(by_alias=True)
         )
         if not resp.ok:
             get_dagster_logger().error(f"Failed posting datastream: {datastream}")
             raise RuntimeError(resp.text)
 
+@asset(partitions_def=station_partition, deps=[post_awqms_datastreams], group_name="awqms")
+async def awqms_observations(
+    awqms_metadata: StationData,
+    awqms_datastreams: list[Datastream]) -> list[Observation]:
+
+    associatedThing = awqms_metadata.MonitoringLocationId
+
+    observations: dict[int, Observation] = {}
+
+    async def fetch_and_process(datastream: Datastream):
+        observations_ids = fetch_observation_ids(datastream.iotid)
+        for result in fetch_observations(datastream.description, associatedThing):
+            if not result["ResultValue"]:
+                continue
+
+            id = "".join([datastream.iotid, result["StartDateTime"]])
+            iotid = deterministic_hash(id, 18)
+
+            if (iotid in observations or iotid in observations_ids) and result["Status"] != "Final":
+                continue
+
+            observations[iotid] = to_sensorthings_observation(
+                iotid, datastream, result["ResultValue"], result["StartDateTime"], awqms_metadata.Geometry
+            )
+
+    # Run fetch_and_process for all datastreams concurrently
+    await asyncio.gather(*(fetch_and_process(datastream) for datastream in awqms_datastreams))
+
+    return list(observations.values())
+        
+@asset(partitions_def=station_partition, deps=[post_awqms_datastreams], group_name="awqms")
+def batch_post_awqms_observations(awqms_observations: list[Observation]):
+    """Post a group of observations for multiple datastreams to the Sensorthings API"""
+    BatchHelper().send_observations(awqms_observations)
+
 
 awqms_job = define_asset_job(
     "harvest_awqms",
     description="harvest an awmqs station",
-    selection=AssetSelection.groups("awqms")
+    selection=AssetSelection.groups("awqms"),
 )
 
 @schedule(

@@ -12,6 +12,7 @@ from datetime import timedelta
 import requests
 import shelve
 from typing import ClassVar, Optional, Tuple
+from pickle import UnpicklingError
 
 
 HEADERS = {"accept": "application/vnd.api+json"}
@@ -32,7 +33,11 @@ class ShelveCache:
     def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
         with shelve.open(ShelveCache.db) as db:
             if url in db and not force_fetch:
-                return db[url], 200
+                try:
+                    return db[url], 200
+                except (KeyError, UnpicklingError):
+                    # Force fetch
+                    return self.get_or_fetch(url, True)
             else:
                 res = requests.get(url, headers=HEADERS)
                 db[url] = res.content
