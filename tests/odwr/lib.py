@@ -126,10 +126,3 @@ def assert_no_duplicate_at_given_time(
     assert (
         len(resp.json()["value"]) <= 1
     ), f"There appear to be multiple observations at the same resultTime for the datastream {datastream_int}"
-
-
-if __name__ == "__main__":
-    wipe_datastreams()
-    wipe_locations()
-    wipe_observed_properties()
-    wipe_things()

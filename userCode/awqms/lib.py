@@ -12,13 +12,13 @@ import csv
 import json
 import logging
 from pathlib import Path
-from urllib.parse import urlencode
-from typing import List
 import requests
+from typing import List
+from urllib.parse import urlencode
 
 from userCode.cache import ShelveCache
-from userCode.util import url_join
 from userCode.env import API_BACKEND_URL
+from userCode.util import url_join
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,11 +31,10 @@ def read_csv(filepath: Path) -> List[str]:
     try:
         with open(filepath, "r", newline='', encoding="utf-8") as csvfile:
             reader = csv.reader(csvfile)
-            
+
             # Skip the header row
             next(reader, None)
-            
-            # Append each value from the first column to the list
+
             for row in reader:
                 if row:  # Ensure the row is not empty
                     result_list.append(row[0])
@@ -50,9 +49,10 @@ def read_csv(filepath: Path) -> List[str]:
 def fetch_station(
     station_id: str
 ) -> bytes:
-    """Get the xml data for a specific dataset for a specific station in a given date range"""
+    """Get the xml data for a specific dataset for a specific
+    station in a given date range"""
 
-    params = {  
+    params = {
         "ContentType": "json",
         "IncludeResultSummary": "T",
         "MonitoringLocationIdentifiersCsv": station_id
@@ -69,6 +69,7 @@ def fetch_station(
         )
 
     return response
+
 
 def fetch_observations(
     observed_prop: str,
@@ -89,7 +90,7 @@ def fetch_observations(
         raise RuntimeError(
             f"Request to {results_url} failed with status {status_code}"
         )
-    
+
     try:
         serialized = json.loads(response)
     except json.decoder.JSONDecodeError:
@@ -97,7 +98,10 @@ def fetch_observations(
             f"Request to {results_url} failed with status {status_code}"
         )
 
-    return serialized[0]["ContinuousResults"]
+    return [
+        result for item in serialized for result in item["ContinuousResults"]
+    ]
+
 
 def fetch_observation_ids(datastream_id: str) -> set[int]:
     """
@@ -109,7 +113,8 @@ def fetch_observation_ids(datastream_id: str) -> set[int]:
     Returns:
         set: A set of Observations' @iot.id.
     """
-    url = url_join(API_BACKEND_URL, f"Datastreams('{datastream_id}')/Observations")
+    url = url_join(API_BACKEND_URL,
+                   f"Datastreams('{datastream_id}')/Observations")
     params = {
         "$select": "@iot.id"
     }

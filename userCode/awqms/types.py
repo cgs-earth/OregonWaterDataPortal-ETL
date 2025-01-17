@@ -8,17 +8,13 @@
 #
 # =================================================================
 
-from io import BytesIO
-from pathlib import Path
-from pydantic import BaseModel, HttpUrl
-from typing import Optional, Iterator, Union
 import json
-import xml.etree.ElementTree as ET
+from pathlib import Path
+from pydantic import BaseModel, Field
+from typing import Optional
 
 from userCode.awqms.lib import read_csv
 
-
-THINGS_COLLECTION = "Things"
 
 POTENTIAL_DATASTREAMS: dict[str, str] = {
     "Temperature, water": "°C",
@@ -27,15 +23,19 @@ POTENTIAL_DATASTREAMS: dict[str, str] = {
 }
 
 THISDIR = Path(__file__).parent.resolve()
-ALL_RELEVANT_STATIONS = read_csv(THISDIR / "valid_stations.csv")
+ALL_RELEVANT_STATIONS = read_csv(THISDIR / "valid_stations.csv")[::8]
+ALL_RELEVANT_STATIONS.append("101572-BLM")
+
 
 class GmlPoint(BaseModel):
     latitude: float
     longitude: float
 
+
 class ResultSummary(BaseModel):
     activity_type: str
     observed_property: str
+
 
 class StationData(BaseModel):
     CountyName: Optional[str] = None
@@ -58,7 +58,7 @@ def parse_monitoring_locations(features: bytes) -> StationData:
 
     location_data = {
         "Datastreams": [],
-        "CountyName": feature["CountyName"], # type: ignore
+        "CountyName": feature["CountyName"],  # type: ignore
         "MonitoringLocationId": feature["MonitoringLocationIdentifier"],
         "MonitoringLocationName": feature["MonitoringLocationName"],
         "OrganizationIdentifier": feature["OrganizationIdentifier"],
@@ -67,25 +67,27 @@ def parse_monitoring_locations(features: bytes) -> StationData:
         "WaterbodyName": feature["WaterbodyName"],
         "WatershedManagementUnit": feature["WatershedManagementUnit"],
     }
-    
+
     if feature.get("Huc8"):
         location_data["Huc8"] = feature["Huc8"]
 
     if feature.get("Huc12"):
         location_data["Huc12"] = feature["Huc12"]
 
-
     location_data["Geometry"] = GmlPoint(
         latitude=feature["Latitude"],
         longitude=feature["Longitude"]
     )
 
+    datastreams = set()
     for ds in feature["ResultSummaries"]:
         activity_type = ds["ActivityType"]
         characteristic = ds["CharacteristicName"]
 
-        if activity_type != "Field Msr/Obs":
+        if characteristic in datastreams:
             continue
+        else:
+            datastreams.add(characteristic)
 
         location_data["Datastreams"].append(ResultSummary(
             activity_type=activity_type,

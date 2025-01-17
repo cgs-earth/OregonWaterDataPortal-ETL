@@ -9,8 +9,6 @@
 # =================================================================
 
 import asyncio
-from typing import Optional, Iterator
-from urllib.parse import urlencode
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -21,14 +19,9 @@ from dagster import (
     get_dagster_logger,
     AssetExecutionContext,
     schedule,
-    failure_hook
 )
-import io
+import requests
 
-from userCode.helper_classes import (
-    BatchHelper,
-    get_datastream_time_range,
-)
 from userCode.awqms.lib import (
     fetch_station,
     fetch_observations,
@@ -39,29 +32,37 @@ from userCode.awqms.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.util import deterministic_hash, url_join
 from userCode.awqms.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     StationData,
     parse_monitoring_locations
 )
-from userCode.types import Datastream, Observation
 from userCode.env import API_BACKEND_URL
-import requests
+from userCode.helper_classes import BatchHelper
+from userCode.util import deterministic_hash, url_join
+from userCode.types import Datastream, Observation
 
-station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
+
+station_partition = StaticPartitionsDefinition(
+    [str(i) for i in ALL_RELEVANT_STATIONS])
+
 
 @asset(group_name="awqms")
 def awqms_preflight_checks():
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, "FROST server is not running"
 
-@asset(partitions_def=station_partition, deps=[awqms_preflight_checks], group_name="awqms")
+
+@asset(
+        partitions_def=station_partition,
+        deps=[awqms_preflight_checks],
+        group_name="awqms")
 def awqms_metadata(
     context: AssetExecutionContext
 ) -> StationData:
-    """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
+    """Get the metadata for all stations that describes what
+    properties they have in the other timeseries API"""
     station_partition = context.partition_key
     get_dagster_logger().debug(f"Handling {station_partition}")
     return parse_monitoring_locations(fetch_station(station_partition))
@@ -78,13 +79,14 @@ def post_awqms_station(awqms_metadata: StationData):
             f"Station {station['@iot.id']} not found. Posting..."
         )
     elif not resp.ok:
-        get_dagster_logger().error(f"Failed checking if station '{station}' exists")
+        msg = f"Failed checking if station '{station}' exists"
+        get_dagster_logger().error(msg)
         raise RuntimeError(resp.text)
     else:
         id = resp.json()["@iot.id"]
         if id == station["@iot.id"]:
             get_dagster_logger().warning(
-                f"Station {station['@iot.id']} already exists so skipping adding it"
+                f"Station {station['@iot.id']} already exists"
             )
             return
 
@@ -99,11 +101,10 @@ def post_awqms_station(awqms_metadata: StationData):
 @asset(partitions_def=station_partition, group_name="awqms")
 def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
 
-    associatedThingId = awqms_metadata.MonitoringLocationId
+    thingid = awqms_metadata.MonitoringLocationId
 
     datastreams: list[Datastream] = []
     for datastream in awqms_metadata.Datastreams:
-        get_dagster_logger().debug(datastream.model_dump(by_alias=True))
         if datastream.observed_property not in POTENTIAL_DATASTREAMS:
             continue
 
@@ -112,16 +113,19 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
                 awqms_metadata,
                 POTENTIAL_DATASTREAMS[datastream.observed_property],
                 datastream.observed_property,
-                associatedThingId
+                thingid
             )
         )
 
-    assert len(datastreams) > 0, f"No datastreams found for {associatedThingId}"
+    assert len(datastreams) > 0, f"No datastreams found for {thingid}"
 
     return datastreams
 
 
-@asset(partitions_def=station_partition, deps=[post_awqms_station], group_name="awqms")
+@asset(
+        partitions_def=station_partition,
+        deps=[post_awqms_station],
+        group_name="awqms")
 def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
     # check if the datastreams exist
     for datastream in awqms_datastreams:
@@ -140,21 +144,27 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
             id = resp.json()["@iot.id"]
             if id == datastream.iotid:
                 get_dagster_logger().warning(
-                    f"Datastream {datastream.iotid} already exists so skipping adding it"
+                    f"Datastream {datastream.iotid} already exists"
                 )
                 continue
 
         resp = requests.post(
-            url_join(API_BACKEND_URL, "Datastreams"), json=datastream.model_dump(by_alias=True)
+            url_join(API_BACKEND_URL, "Datastreams"),
+            json=datastream.model_dump(by_alias=True)
         )
         if not resp.ok:
-            get_dagster_logger().error(f"Failed posting datastream: {datastream}")
+            msg = f"Failed posting datastream: {datastream}"
+            get_dagster_logger().error(msg)
             raise RuntimeError(resp.text)
 
-@asset(partitions_def=station_partition, deps=[post_awqms_datastreams], group_name="awqms")
-async def awqms_observations(
-    awqms_metadata: StationData,
-    awqms_datastreams: list[Datastream]) -> list[Observation]:
+
+@asset(
+        partitions_def=station_partition,
+        deps=[post_awqms_datastreams],
+        group_name="awqms")
+async def awqms_observations(awqms_metadata: StationData,
+                             awqms_datastreams: list[Datastream]
+                             ) -> list[Observation]:
 
     associatedThing = awqms_metadata.MonitoringLocationId
 
@@ -162,28 +172,39 @@ async def awqms_observations(
 
     async def fetch_and_process(datastream: Datastream):
         observations_ids = fetch_observation_ids(datastream.iotid)
-        for result in fetch_observations(datastream.description, associatedThing):
+        get_dagster_logger().info(f"Fetching observations for {datastream.iotid}")
+        for result in fetch_observations(datastream.description,
+                                         associatedThing):
             if not result["ResultValue"]:
                 continue
 
             id = "".join([datastream.iotid, result["StartDateTime"]])
             iotid = deterministic_hash(id, 18)
 
-            if (iotid in observations or iotid in observations_ids) and result["Status"] != "Final":
+            _test = (iotid in observations or
+                     iotid in observations_ids) and result["Status"] != "Final"
+            if _test:
                 continue
 
             observations[iotid] = to_sensorthings_observation(
-                iotid, datastream, result["ResultValue"], result["StartDateTime"], awqms_metadata.Geometry
+                iotid, datastream, result["ResultValue"],
+                result["StartDateTime"], awqms_metadata.Geometry
             )
 
     # Run fetch_and_process for all datastreams concurrently
-    await asyncio.gather(*(fetch_and_process(datastream) for datastream in awqms_datastreams))
+    await asyncio.gather(*(fetch_and_process(datastream)
+                           for datastream in awqms_datastreams))
 
     return list(observations.values())
-        
-@asset(partitions_def=station_partition, deps=[post_awqms_datastreams], group_name="awqms")
+
+
+@asset(
+        partitions_def=station_partition,
+        deps=[post_awqms_datastreams],
+        group_name="awqms")
 def batch_post_awqms_observations(awqms_observations: list[Observation]):
-    """Post a group of observations for multiple datastreams to the Sensorthings API"""
+    """Post a group of observations for multiple datastreams
+    to the Sensorthings API"""
     BatchHelper().send_observations(awqms_observations)
 
 
@@ -192,6 +213,7 @@ awqms_job = define_asset_job(
     description="harvest an awmqs station",
     selection=AssetSelection.groups("awqms"),
 )
+
 
 @schedule(
     cron_schedule="@daily",

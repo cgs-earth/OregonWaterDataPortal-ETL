@@ -8,12 +8,10 @@
 #
 # =================================================================
 
-from typing import Optional
-
-from userCode.awqms.types import StationData, GmlPoint, POTENTIAL_DATASTREAMS
+from userCode.awqms.types import StationData, GmlPoint
 from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.types import Datastream, Observation
-from userCode.util import from_oregon_datetime, deterministic_hash
+from userCode.util import from_oregon_datetime
 
 
 def to_sensorthings_station(station: StationData) -> dict:
@@ -44,14 +42,10 @@ def to_sensorthings_station(station: StationData) -> dict:
             "WaterbodyName": station.WaterbodyName
         }
     }
-    
+
     if station.Huc8:
         representation["properties"]["hu08"] = \
             f"https://geoconnex.us/ref/hu08/{station.Huc8}"
-
-    if station.Huc12:
-        representation["properties"]["hu12"] = \
-            f"https://geoconnex.us/ref/hu12/{station.Huc12}"
 
     return representation
 
@@ -67,13 +61,10 @@ def to_sensorthings_observation(
     if datapoint is None:
         raise RuntimeError("Missing datapoint")
 
-    phenom_time = from_oregon_datetime(phenom_time, fmt="%Y-%m-%d %I:%M:%S %p").strftime(
+    phenom_time = from_oregon_datetime(
+        phenom_time, fmt="%Y-%m-%d %I:%M:%S %p").strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
-
-    # generate a unique id by concatenating the datastream id and the resultTime
-    # we assume that the resultTime is in the format YYYY-MM-DDTHH:MM:SSZ and
-    # that when it is concat with the datastream id it will be unique and less than 18 characters in total
 
     return Observation(
         **{
@@ -105,13 +96,15 @@ def to_sensorthings_datastream(
     property: str,
     associatedThingId: str,
 ) -> Datastream:
-    """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
-    
+    """Generate a sensorthings representation of a station's datastreams.
+      Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
 
     ontology_mapped_property = ONTOLOGY_MAPPING.get(property)
     if not ontology_mapped_property:
         raise RuntimeError(
-            f"Datastream '{property}' not found in the ontology: '{ONTOLOGY_MAPPING}'. You need to map this term to a common vocabulary term to use it."
+            f"Datastream '{property}' not found in the ontology: "
+            "'{ONTOLOGY_MAPPING}'."
+            "You need to map this term to a common vocabulary term to use it."
         )
 
     datastream: Datastream = Datastream(
@@ -119,7 +112,7 @@ def to_sensorthings_datastream(
             "@iot.id": f"{associatedThingId}-{ontology_mapped_property.id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
-            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement", # noqa
             "unitOfMeasurement": {
                 "name": units,
                 "symbol": units,

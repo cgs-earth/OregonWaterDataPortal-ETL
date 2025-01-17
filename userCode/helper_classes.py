@@ -129,7 +129,7 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
     """Get the range of the observation times within a given STA datastream. This can be
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
-    resp = requests.get(f"{API_BACKEND_URL}Datastreams('{iotid}')")
+    resp = requests.get(url_join(API_BACKEND_URL, f"Datastreams('{iotid}')"))
     get_dagster_logger().debug(resp.url)
 
     # 404 represents that there is no datastream and thus the timerange is null
