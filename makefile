@@ -32,3 +32,8 @@ build:
 # Check which indices are present on the observations table
 indexCheck:
 	docker exec -t owdp-database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS'"
+
+# Send a sample log message to the frost server log output
+# this should trigger the slow query log and is mainly just for testing
+mimicSlowLog:
+	docker exec owdp-frost sh -c "echo 'Slow Query 200000000000' > /proc/1/fd/1"
