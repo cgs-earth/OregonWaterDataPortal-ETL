@@ -9,6 +9,7 @@
 # =================================================================
 
 import csv
+import os
 from dagster import get_dagster_logger
 import datetime
 import io
@@ -158,8 +159,17 @@ def download_oregon_tsv(
     """Get the tsv data for a specific dataset for a specific station in a given date range"""
     tsv_url = generate_oregon_tsv_url(dataset, station_nbr, start_date, end_date)
 
-    cache = ShelveCache()
-    response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
+    RUNNING_AS_A_TEST_NOT_IN_PROD = "PYTEST_CURRENT_TEST" in os.environ
+
+    if RUNNING_AS_A_TEST_NOT_IN_PROD:
+        # If we are in a test, we want to use the cache to avoid making too many requests while testing
+        # But in production, we always want to fetch and not cache anything to avoid extra data
+        cache = ShelveCache()
+        response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
+    else:
+        fetch_result = requests.get(tsv_url)
+        status_code = fetch_result.status_code
+        response = fetch_result.content
 
     if status_code != 200 or "An Error Has Occured" in response.decode("utf-8"):
         raise RuntimeError(
