@@ -3,11 +3,14 @@ caddy:
 	cp ./Caddyfile /etc/caddy/Caddyfile
 	sudo systemctl restart caddy
 
-composeUp:
+prodUp:
 	docker compose --profile production up -d
 
-composeBuild:
+prodBuild:
 	docker compose --profile production build
+
+prodDown:
+	docker compose --profile production down
 
 # get rid of the sensorthings db, mainly for testing purposes
 wipedb:
