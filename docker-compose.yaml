@@ -92,7 +92,7 @@ services:
       - SLACK_BOT_NAME=Oregon Container Monitoring Bot
       - SLACK_BOT_AVATAR=https://cida.usgs.gov/wsgi/ngwmn_ui/static/img/provider_logos/owrd_logo.50b3448a.png
       - LOG_WATCH_CONTAINER_NAME=owdp-frost
-      - LOG_WATCH_COMMA_SEPARATED_PATTERNS=Slow Query,error,Error
+      - LOG_WATCH_COMMA_SEPARATED_PATTERNS=Slow Query
     # Don't monitor containers in the dev env or CI/CD
     profiles: [production]
 

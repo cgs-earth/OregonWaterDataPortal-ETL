@@ -16,7 +16,7 @@ server:
   templates:
     path: "/pygeoapi/pygeoapi/templates"
 logging:
-  level: "ERROR"
+  level: DEBUG
 metadata:
   identification:
     title:

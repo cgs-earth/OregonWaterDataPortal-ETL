@@ -3,10 +3,8 @@ caddy:
 	cp ./Caddyfile /etc/caddy/Caddyfile
 	sudo systemctl restart caddy
 
-# start dagster. Requires the docker compose to be running to access the infrastructure
-start:
-	source ./venv/bin/activate
-	dagster dev
+up:
+	docker compose --profile production up -d
 
 # get rid of the sensorthings db, mainly for testing purposes
 wipedb:
