@@ -13,7 +13,6 @@ import datetime
 from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
-from typing import Any
 
 
 def get_env(key: str) -> str:

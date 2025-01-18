@@ -24,7 +24,6 @@ from dagster import (
     schedule,
 )
 import httpx
-import os
 import requests
 from typing import List, Optional, Tuple
 
