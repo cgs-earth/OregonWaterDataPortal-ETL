@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 
 
 from userCode.cache import ShelveCache
-from userCode.env import API_BACKEND_URL
+from userCode.env import API_BACKEND_URL, RUNNING_AS_A_TEST_NOT_IN_PROD
 from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
@@ -158,8 +158,6 @@ def download_oregon_tsv(
 ) -> bytes:
     """Get the tsv data for a specific dataset for a specific station in a given date range"""
     tsv_url = generate_oregon_tsv_url(dataset, station_nbr, start_date, end_date)
-
-    RUNNING_AS_A_TEST_NOT_IN_PROD = "PYTEST_CURRENT_TEST" in os.environ
 
     if RUNNING_AS_A_TEST_NOT_IN_PROD:
         # If we are in a test, we want to use the cache to avoid making too many requests while testing

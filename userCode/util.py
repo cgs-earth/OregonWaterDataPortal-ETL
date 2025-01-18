@@ -16,9 +16,9 @@ import os
 from typing import Any
 
 
-def get_env(key: str, fallback: Any = None) -> str:
+def get_env(key: str) -> str:
     """Fetch environment variable"""
-    val = os.environ.get(key, fallback)
+    val = os.environ.get(key)
     if val is None:
         raise Exception(f"Missing ENV var: {key}")
 

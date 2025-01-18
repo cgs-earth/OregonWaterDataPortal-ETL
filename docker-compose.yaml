@@ -69,6 +69,7 @@ services:
     restart: always
     environment:
       - SLACK_BOT_TOKEN
+      - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
     deploy:
       resources:
         limits:

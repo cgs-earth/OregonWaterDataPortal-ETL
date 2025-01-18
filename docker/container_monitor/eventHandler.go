@@ -33,7 +33,8 @@ func watchAndHandleEvents(docker *client.Client, slackAPI SlackClient, tailLengt
 					// Retrieve and send container logs
 					logs, err := getContainerLogs(docker, containerID)
 					if err != nil {
-						logger.Fatalf("Failed to retrieve logs for container %s: %v\n", containerName, err)
+						logger.Print("Failed to retrieve logs for container %s: %v\n", containerName, err)
+						return 
 					}
 
 					logMsg := fmt.Sprintf("Last %d lines of logs for container `%s`:\n```%s```", tailLength, containerName, logs)
