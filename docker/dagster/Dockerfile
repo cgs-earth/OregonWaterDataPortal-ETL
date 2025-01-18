@@ -17,4 +17,4 @@ WORKDIR /opt/dagster/app
 
 EXPOSE 3000
 
-ENTRYPOINT ["dagster", "dev"]
+ENTRYPOINT ["dagster", "dev", "-h", "0.0.0.0"]
