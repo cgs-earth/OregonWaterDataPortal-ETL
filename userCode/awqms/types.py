@@ -43,13 +43,16 @@ class StationData(BaseModel):
     Huc12: Optional[str] = None
     MonitoringLocationId: str
     MonitoringLocationName: str
-    OrganizationIdentifier: str
+    organization: str = Field(alias="OrganizationIdentifier")
     StateCode: Optional[str] = None
     MonitoringLocationType: str
     WaterbodyName: Optional[str] = None
     WatershedManagementUnit: Optional[str] = None
     Geometry: GmlPoint
     Datastreams: list[ResultSummary] = []
+
+    class Config:
+        populate_by_name = True
 
 
 def parse_monitoring_locations(features: bytes) -> StationData:

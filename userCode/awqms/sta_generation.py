@@ -38,7 +38,7 @@ def to_sensorthings_station(station: StationData) -> dict:
         ],
         "properties": {
             "county": station.CountyName,
-            "OrganizationIdentifier": station.OrganizationIdentifier,
+            "organization": station.organization,
             "WaterbodyName": station.WaterbodyName
         }
     }
