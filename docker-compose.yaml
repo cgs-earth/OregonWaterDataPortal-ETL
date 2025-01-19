@@ -74,7 +74,7 @@ services:
       resources:
         limits:
           cpus: "7"
-          memory: 1GB
+          memory: 4GB
 
     # only spin up the docker container for dagster if we are in production
     # otherwise we want to use uv with hot reloading using dagster dev
