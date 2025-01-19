@@ -23,7 +23,7 @@ from userCode.odwr.types import StationData
 from userCode.util import to_oregon_datetime
 
 
-from .lib import (
+from ..lib import (
     assert_no_duplicate_at_given_time,
     assert_observations_and_datastreams_empty,
     dates_are_within_X_days,
