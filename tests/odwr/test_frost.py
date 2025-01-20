@@ -12,7 +12,7 @@ import datetime
 import requests
 
 from userCode.env import API_BACKEND_URL
-from userCode.odwr.helper_classes import (
+from userCode.helper_classes import (
     TimeRange,
     get_datastream_time_range,
 )
