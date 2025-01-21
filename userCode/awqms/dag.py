@@ -146,7 +146,7 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
 )
 async def awqms_observations(
     awqms_metadata: StationData, awqms_datastreams: list[Datastream]
-) -> bool:
+):
     associatedThing = awqms_metadata.MonitoringLocationId
 
     observations: dict[int, Observation] = {}

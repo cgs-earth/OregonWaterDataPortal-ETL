@@ -8,8 +8,8 @@
 #
 # =================================================================
 
-from unittest.mock import Mock
 import pytest
+from typing import cast
 
 from userCode.awqms.sta_generation import (
     to_sensorthings_station,
@@ -59,13 +59,11 @@ def test_to_sensorthings_observation(sample_datastream):
 
 
 def test_to_sensorthings_observation_none_datapoint(sample_datastream):
-    mocked_none = Mock(return_value=None)
-
     with pytest.raises(RuntimeError, match="Missing datapoint"):
         to_sensorthings_observation(
             iotid=1,
             associatedDatastream=sample_datastream,
-            datapoint=mocked_none(),
+            datapoint=cast(float, None),
             phenom_time="2024-01-17 02:30:00 PM",
             associatedGeometry=GmlPoint(longitude=-123.45, latitude=45.67),
         )
