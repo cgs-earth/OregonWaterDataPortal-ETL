@@ -9,6 +9,7 @@
 # =================================================================
 
 from datetime import timedelta
+from dagster import get_dagster_logger
 from pickle import UnpicklingError
 import requests
 import shelve
@@ -26,22 +27,24 @@ class ShelveCache:
 
     db: ClassVar[str] = "oregondb"
 
-    def set(self, url: str, json_data: dict, _ttl: Optional[timedelta] = None):
-        with shelve.open(ShelveCache.db, "w") as db:
-            db[url] = json_data
+    def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
+        try:
+            with shelve.open(ShelveCache.db, "w") as db:
+                db[url] = content
+        except Exception:
+            get_dagster_logger().warning(f"Unable to cache: {url}")
 
     def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
-        with shelve.open(ShelveCache.db) as db:
-            if url in db and not force_fetch:
-                try:
-                    return db[url], 200
-                except (KeyError, UnpicklingError):
-                    # Force fetch
-                    return self.get_or_fetch(url, True)
-            else:
-                res = requests.get(url, headers=HEADERS, timeout=300)
-                db[url] = res.content
-                return res.content, res.status_code
+        if self.contains(url) and not force_fetch:
+            try:
+                return self.get(url), 200
+            except (KeyError, UnpicklingError):
+                # Force fetch
+                return self.get_or_fetch(url, True)
+        else:
+            res = requests.get(url, headers=HEADERS, timeout=300)
+            self.set(url, res.content)
+            return res.content, res.status_code
 
     def reset(self):
         with shelve.open(ShelveCache.db, "w") as db:
