@@ -22,11 +22,7 @@ from dagster import (
 )
 import requests
 
-from userCode.awqms.lib import (
-    fetch_station,
-    fetch_observations,
-    fetch_observation_ids
-)
+from userCode.awqms.lib import fetch_station, fetch_observations, fetch_observation_ids
 from userCode.awqms.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
@@ -36,7 +32,7 @@ from userCode.awqms.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     StationData,
-    parse_monitoring_locations
+    parse_monitoring_locations,
 )
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import BatchHelper
@@ -46,8 +42,7 @@ from userCode.types import Datastream, Observation
 LOGGER = get_dagster_logger()
 
 
-station_partition = StaticPartitionsDefinition(
-    [str(i) for i in ALL_RELEVANT_STATIONS])
+station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
 
 
 @asset(group_name="awqms")
@@ -57,12 +52,9 @@ def awqms_preflight_checks():
 
 
 @asset(
-        partitions_def=station_partition,
-        deps=[awqms_preflight_checks],
-        group_name="awqms")
-def awqms_metadata(
-    context: AssetExecutionContext
-) -> StationData:
+    partitions_def=station_partition, deps=[awqms_preflight_checks], group_name="awqms"
+)
+def awqms_metadata(context: AssetExecutionContext) -> StationData:
     """Get the metadata for all stations that describes what
     properties they have in the other timeseries API"""
     station_partition = context.partition_key
@@ -99,7 +91,6 @@ def post_awqms_station(awqms_metadata: StationData):
 
 @asset(partitions_def=station_partition, group_name="awqms")
 def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
-
     thingid = awqms_metadata.MonitoringLocationId
 
     datastreams: list[Datastream] = []
@@ -112,7 +103,7 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
                 awqms_metadata,
                 POTENTIAL_DATASTREAMS[datastream.observed_property],
                 datastream.observed_property,
-                thingid
+                thingid,
             )
         )
 
@@ -121,10 +112,7 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
     return datastreams
 
 
-@asset(
-        partitions_def=station_partition,
-        deps=[post_awqms_station],
-        group_name="awqms")
+@asset(partitions_def=station_partition, deps=[post_awqms_station], group_name="awqms")
 def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
     # check if the datastreams exist
     for datastream in awqms_datastreams:
@@ -145,7 +133,7 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
 
         resp = requests.post(
             url_join(API_BACKEND_URL, "Datastreams"),
-            json=datastream.model_dump(by_alias=True)
+            json=datastream.model_dump(by_alias=True),
         )
         if not resp.ok:
             LOGGER.error(f"Failed posting datastream: {datastream}")
@@ -153,13 +141,11 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
 
 
 @asset(
-        partitions_def=station_partition,
-        deps=[post_awqms_datastreams],
-        group_name="awqms")
-async def awqms_observations(awqms_metadata: StationData,
-                             awqms_datastreams: list[Datastream]
-                             ) -> bool:
-
+    partitions_def=station_partition, deps=[post_awqms_datastreams], group_name="awqms"
+)
+async def awqms_observations(
+    awqms_metadata: StationData, awqms_datastreams: list[Datastream]
+) -> bool:
     associatedThing = awqms_metadata.MonitoringLocationId
 
     observations: dict[int, Observation] = {}
@@ -167,28 +153,32 @@ async def awqms_observations(awqms_metadata: StationData,
     async def fetch_and_process(datastream: Datastream):
         observations_ids = fetch_observation_ids(datastream.iotid)
         LOGGER.info(f"Fetching observations for {datastream.iotid}")
-        for result in fetch_observations(datastream.description,
-                                         associatedThing):
+        for result in fetch_observations(datastream.description, associatedThing):
             if not result["ResultValue"]:
                 continue
 
             id = "".join([datastream.iotid, result["StartDateTime"]])
             iotid = deterministic_hash(id, 18)
 
-            _test = (iotid in observations and result["Status"] != "Final"
-                     ) or iotid in observations_ids
+            _test = (
+                iotid in observations and result["Status"] != "Final"
+            ) or iotid in observations_ids
             if _test:
                 continue
 
             observations[iotid] = to_sensorthings_observation(
-                iotid, datastream, result["ResultValue"],
-                result["StartDateTime"], awqms_metadata.Geometry
+                iotid,
+                datastream,
+                result["ResultValue"],
+                result["StartDateTime"],
+                awqms_metadata.Geometry,
             )
 
     # Run fetch_and_process for all datastreams concurrently
     try:
-        await asyncio.gather(*(fetch_and_process(datastream)
-                               for datastream in awqms_datastreams))
+        await asyncio.gather(
+            *(fetch_and_process(datastream) for datastream in awqms_datastreams)
+        )
     except Exception as err:
         LOGGER.error(err)
         return False

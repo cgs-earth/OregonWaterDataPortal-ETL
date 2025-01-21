@@ -34,7 +34,7 @@ def test_read_csv_file_not_found():
     assert result == []
 
 
-@patch('userCode.cache.ShelveCache', autospec=True)
+@patch("userCode.cache.ShelveCache", autospec=True)
 def test_fetch_station(mock_shelve_cache_cls):
     with tempfile.NamedTemporaryFile() as temp_db:
         mock_shelve_cache_cls.db = temp_db.name + ".db"
@@ -43,7 +43,7 @@ def test_fetch_station(mock_shelve_cache_cls):
         assert len(result) == 99994
 
 
-@patch('userCode.cache.ShelveCache', autospec=True)
+@patch("userCode.cache.ShelveCache", autospec=True)
 def test_fetch_station_error(mock_shelve_cache_cls):
     with tempfile.NamedTemporaryFile() as temp_db:
         # Configure the mocked ShelveCache class to use a temporary database
@@ -51,16 +51,15 @@ def test_fetch_station_error(mock_shelve_cache_cls):
 
         # Mock the behavior of the cache instance
         mock_cache_instance = Mock()
-        mock_cache_instance.get_or_fetch.return_value = (b'error', 404)
+        mock_cache_instance.get_or_fetch.return_value = (b"error", 404)
         mock_shelve_cache_cls.return_value = mock_cache_instance
 
         # Test that a RuntimeError is raised for a failed fetch
-        with pytest.raises(RuntimeError,
-                           match="Request.*failed with status 404"):
+        with pytest.raises(RuntimeError, match="Request.*failed with status 404"):
             fetch_station("120016-ORDEQ")
 
 
-@patch('userCode.cache.ShelveCache', autospec=True)
+@patch("userCode.cache.ShelveCache", autospec=True)
 def test_fetch_observations(mock_shelve_cache_cls):
     with tempfile.NamedTemporaryFile() as temp_db:
         # Configure the mocked ShelveCache class to use a temporary database
@@ -76,7 +75,7 @@ def test_fetch_observations(mock_shelve_cache_cls):
         assert len(result) == 3354
 
 
-@patch('userCode.cache.ShelveCache', autospec=True)
+@patch("userCode.cache.ShelveCache", autospec=True)
 def test_fetch_observations_invalid_json(mock_shelve_cache_cls):
     with tempfile.NamedTemporaryFile() as temp_db:
         # Configure the mocked ShelveCache class to use a temporary database
@@ -84,10 +83,9 @@ def test_fetch_observations_invalid_json(mock_shelve_cache_cls):
 
         # Mock an invalid JSON response
         mock_cache_instance = Mock()
-        mock_cache_instance.get_or_fetch.return_value = (b'invalid json', 200)
+        mock_cache_instance.get_or_fetch.return_value = (b"invalid json", 200)
         mock_shelve_cache_cls.return_value = mock_cache_instance
 
         # Test that a RuntimeError is raised for invalid JSON data
-        with pytest.raises(RuntimeError,
-                           match="Request to.*failed with status 404"):
+        with pytest.raises(RuntimeError, match="Request to.*failed with status 404"):
             fetch_observations("Temperature", "TEST123")

@@ -55,7 +55,12 @@ __ontology_definition = (
         get_ontology(f"{BASE_URL}/variablename/waterLevel"),
     ),
     (
-        ("water_temp_mean", "water temperature", "water_temp_mean_available", "Temperature, water"),
+        (
+            "water_temp_mean",
+            "water temperature",
+            "water_temp_mean_available",
+            "Temperature, water",
+        ),
         get_ontology(f"{BASE_URL}/variablename/temperatureSensor"),
     ),
 )

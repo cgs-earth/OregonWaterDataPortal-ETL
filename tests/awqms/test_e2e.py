@@ -12,30 +12,32 @@ import pytest
 from unittest.mock import patch
 
 from userCode.awqms.dag import (
-    awqms_preflight_checks, post_awqms_station,
-    post_awqms_datastreams, awqms_datastreams,
-    awqms_observations, awqms_schedule
+    awqms_preflight_checks,
+    post_awqms_station,
+    post_awqms_datastreams,
+    awqms_datastreams,
+    awqms_observations,
+    awqms_schedule,
 )
-from userCode.helper_classes import BatchHelper
 
 
 def test_awqms_preflight_checks():
-    with patch('requests.get') as mock_get:
+    with patch("requests.get") as mock_get:
         mock_get.return_value.ok = True
         result = awqms_preflight_checks()
         assert result is None
 
-    with patch('requests.get') as mock_get:
+    with patch("requests.get") as mock_get:
         mock_get.return_value.ok = False
         with pytest.raises(AssertionError):
             awqms_preflight_checks()
 
 
 def test_post_awqms_station(sample_station_data):
-    with patch('requests.get') as mock_get:
+    with patch("requests.get") as mock_get:
         # Simulate station not found
         mock_get.return_value.status_code = 500
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             mock_post.return_value.ok = True
             post_awqms_station(sample_station_data)
             mock_post.assert_called_once()
@@ -47,9 +49,9 @@ def test_awqms_datastreams(sample_station_data):
 
 
 def test_post_awqms_datastreams(sample_datastream):
-    with patch('requests.get') as mock_get:
+    with patch("requests.get") as mock_get:
         mock_get.return_value.status_code = 404
-        with patch('requests.post') as mock_post:
+        with patch("requests.post") as mock_post:
             mock_post.return_value.ok = True
             post_awqms_datastreams([sample_datastream])
             mock_post.assert_called_once()
@@ -57,26 +59,26 @@ def test_post_awqms_datastreams(sample_datastream):
 
 @pytest.mark.asyncio
 async def test_awqms_observations(sample_station_data, sample_datastream):
-    datastreams = [sample_datastream,]
+    datastreams = [
+        sample_datastream,
+    ]
 
-    with patch('userCode.awqms.lib.fetch_observation_ids'
-               ) as mock_fetch_observation_ids:
+    with patch(
+        "userCode.awqms.lib.fetch_observation_ids"
+    ) as mock_fetch_observation_ids:
         mock_fetch_observation_ids.return_value = set()
 
-        with patch('userCode.awqms.lib.fetch_observations'
-                   ) as mock_fetch_observations:
+        with patch("userCode.awqms.lib.fetch_observations") as mock_fetch_observations:
             mock_fetch_observations.return_value = [
-                {"ResultValue": 10,
-                 "StartDateTime": "2025-01-01",
-                 "Status": "Final"}]
+                {"ResultValue": 10, "StartDateTime": "2025-01-01", "Status": "Final"}
+            ]
 
-            observations = await awqms_observations(
-                sample_station_data, datastreams)  # type: ignore
+            observations = await awqms_observations(sample_station_data, datastreams)  # type: ignore
             assert len(observations) > 0
 
 
 def test_awqms_schedule_triggering():
-    pch = 'userCode.awqms.dag.station_partition.get_partition_keys'
+    pch = "userCode.awqms.dag.station_partition.get_partition_keys"
     with patch(pch) as mock_get_partition_keys:
         mock_get_partition_keys.return_value = ["1234", "5678"]
         schedule = awqms_schedule()

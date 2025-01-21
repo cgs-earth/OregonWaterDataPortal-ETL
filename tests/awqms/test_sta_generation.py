@@ -13,7 +13,7 @@ import pytest
 from userCode.awqms.sta_generation import (
     to_sensorthings_station,
     to_sensorthings_observation,
-    to_sensorthings_datastream
+    to_sensorthings_datastream,
 )
 from userCode.awqms.types import GmlPoint
 from userCode.ontology import ONTOLOGY_MAPPING
@@ -24,11 +24,12 @@ def test_to_sensorthings_station(sample_station_data):
 
     assert result["@iot.id"] == "12005-ORDEQ"
     assert result["name"] == "McKay Creek at Kirk Road (Pendleton)"
-    assert result["Locations"][0]["location"][
-        "coordinates"] == [-118.8239942, 45.65429575]
+    assert result["Locations"][0]["location"]["coordinates"] == [
+        -118.8239942,
+        45.65429575,
+    ]
     assert result["properties"]["county"] == "Umatilla"
-    assert result["properties"]["hu08"] == \
-        "https://geoconnex.us/ref/hu08/17070103"
+    assert result["properties"]["hu08"] == "https://geoconnex.us/ref/hu08/17070103"
 
 
 def test_to_sensorthings_station_without_hucs(sample_station_data):
@@ -47,14 +48,13 @@ def test_to_sensorthings_observation(sample_datastream):
         associatedDatastream=sample_datastream,
         datapoint=25.5,
         phenom_time="2024-01-17 02:30:00 PM",
-        associatedGeometry=GmlPoint(longitude=-123.45, latitude=45.67)
+        associatedGeometry=GmlPoint(longitude=-123.45, latitude=45.67),
     )
 
     assert result.iotid == 1
     assert result.phenomenonTime == "2024-01-17T14:30:00Z"
     assert result.result == 25.5
-    assert result.FeatureOfInterest["feature"][
-        "coordinates"] == [-123.45, 45.67]
+    assert result.FeatureOfInterest["feature"]["coordinates"] == [-123.45, 45.67]
 
 
 def test_to_sensorthings_observation_none_datapoint(sample_datastream):
@@ -64,7 +64,7 @@ def test_to_sensorthings_observation_none_datapoint(sample_datastream):
             associatedDatastream=sample_datastream,
             datapoint=None,  # type: ignore
             phenom_time="2024-01-17 02:30:00 PM",
-            associatedGeometry=GmlPoint(longitude=-123.45, latitude=45.67)
+            associatedGeometry=GmlPoint(longitude=-123.45, latitude=45.67),
         )
 
 
@@ -75,7 +75,7 @@ def test_to_sensorthings_datastream(sample_station_data):
         attr=sample_station_data,
         units="celsius",
         property=property_name,
-        associatedThingId="TEST123"
+        associatedThingId="TEST123",
     )
 
     assert result.iotid == f"TEST123-{ONTOLOGY_MAPPING[property_name].id}"
@@ -89,5 +89,5 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
             attr=sample_station_data,
             units="celsius",
             property="unknown_property",
-            associatedThingId="TEST123"
+            associatedThingId="TEST123",
         )

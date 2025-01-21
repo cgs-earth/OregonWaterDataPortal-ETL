@@ -63,7 +63,9 @@ def to_oregon_datetime(date_str: datetime.datetime) -> str:
     return datetime.datetime.strftime(date_str, "%m/%d/%Y %I:%M:%S %p")
 
 
-def from_oregon_datetime(date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p") -> datetime.datetime:
+def from_oregon_datetime(
+    date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p"
+) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
     return datetime.datetime.strptime(date_str, fmt).replace(
         tzinfo=datetime.timezone.utc
@@ -83,4 +85,4 @@ def url_join(*parts: str) -> str:
     :returns: str of resulting URL
     """
 
-    return '/'.join([p.strip().strip('/') for p in parts]).rstrip('/')
+    return "/".join([p.strip().strip("/") for p in parts]).rstrip("/")

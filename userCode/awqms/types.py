@@ -55,7 +55,6 @@ class StationData(BaseModel):
 
 
 def parse_monitoring_locations(features: bytes) -> StationData:
-
     feature = json.loads(features)[0]
 
     location_data = {
@@ -77,8 +76,7 @@ def parse_monitoring_locations(features: bytes) -> StationData:
         location_data["Huc12"] = feature["Huc12"]
 
     location_data["Geometry"] = GmlPoint(
-        latitude=feature["Latitude"],
-        longitude=feature["Longitude"]
+        latitude=feature["Latitude"], longitude=feature["Longitude"]
     )
 
     datastreams = set()
@@ -91,9 +89,8 @@ def parse_monitoring_locations(features: bytes) -> StationData:
         else:
             datastreams.add(characteristic)
 
-        location_data["Datastreams"].append(ResultSummary(
-            activity_type=activity_type,
-            observed_property=characteristic
-        ))
+        location_data["Datastreams"].append(
+            ResultSummary(activity_type=activity_type, observed_property=characteristic)
+        )
 
     return StationData(**location_data)

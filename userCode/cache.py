@@ -37,8 +37,7 @@ class ShelveCache:
         except Exception:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
-    def get_or_fetch(self, url: str, force_fetch: bool = False
-                     ) -> Tuple[bytes, int]:
+    def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
         if self.contains(url) and not force_fetch:
             try:
                 return self.get(url), 200

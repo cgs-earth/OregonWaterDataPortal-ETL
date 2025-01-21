@@ -32,20 +32,21 @@ def to_sensorthings_station(station: StationData) -> dict:
                     "coordinates": [
                         station.Geometry.longitude,
                         station.Geometry.latitude,
-                    ]
+                    ],
                 },
             }
         ],
         "properties": {
             "county": station.CountyName,
             "organization": station.organization,
-            "WaterbodyName": station.WaterbodyName
-        }
+            "WaterbodyName": station.WaterbodyName,
+        },
     }
 
     if station.Huc8:
-        representation["properties"]["hu08"] = \
+        representation["properties"]["hu08"] = (
             f"https://geoconnex.us/ref/hu08/{station.Huc8}"
+        )
 
     return representation
 
@@ -62,9 +63,8 @@ def to_sensorthings_observation(
         raise RuntimeError("Missing datapoint")
 
     phenom_time = from_oregon_datetime(
-        phenom_time, fmt="%Y-%m-%d %I:%M:%S %p").strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
+        phenom_time, fmt="%Y-%m-%d %I:%M:%S %p"
+    ).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     return Observation(
         **{
@@ -83,7 +83,7 @@ def to_sensorthings_observation(
                     "coordinates": [
                         associatedGeometry.longitude,
                         associatedGeometry.latitude,
-                    ]
+                    ],
                 },
             },
         }
@@ -97,7 +97,7 @@ def to_sensorthings_datastream(
     associatedThingId: str,
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams.
-      Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
+    Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
 
     ontology_mapped_property = ONTOLOGY_MAPPING.get(property)
     if not ontology_mapped_property:
@@ -112,7 +112,7 @@ def to_sensorthings_datastream(
             "@iot.id": f"{associatedThingId}-{ontology_mapped_property.id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
-            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement", # noqa
+            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",  # noqa
             "unitOfMeasurement": {
                 "name": units,
                 "symbol": units,

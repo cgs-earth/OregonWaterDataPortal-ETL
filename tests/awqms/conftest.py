@@ -29,10 +29,9 @@ def sample_station_data():
         Geometry=GmlPoint(longitude=-118.8239942, latitude=45.65429575),
         Datastreams=[
             ResultSummary(
-                activity_type="Field Msr/Obs",
-                observed_property="Temperature, water"
+                activity_type="Field Msr/Obs", observed_property="Temperature, water"
             )
-        ]
+        ],
     )
 
 
@@ -47,7 +46,7 @@ def sample_datastream():
             "unitOfMeasurement": {
                 "name": "celsius",
                 "symbol": "°C",
-                "definition": "degree celsius"
+                "definition": "degree celsius",
             },
             "ObservedProperty": {
                 "@iot.id": 12,
@@ -56,18 +55,16 @@ def sample_datastream():
                 "definition": "http://vocabulary.odm2.org/variablename/temperature/",
                 "properties": {
                     "uri": "http://vocabulary.odm2.org/variablename/temperature/"
-                }
+                },
             },
             "Sensor": {
                 "@iot.id": 0,
                 "name": "Unknown",
                 "description": "Unknown",
                 "encodingType": "Unknown",
-                "metadata": "Unknown"
+                "metadata": "Unknown",
             },
-            "Thing": {
-                "@iot.id": "12005-ORDEQ"
-            }
+            "Thing": {"@iot.id": "12005-ORDEQ"},
         }
     )
 
@@ -80,9 +77,7 @@ def sample_observation(sample_datastream, sample_station_data):
             "result": 20.5,
             "phenomenonTime": datetime.now().isoformat(),
             "resultTime": datetime.now().isoformat(),
-            "Datastream": {
-                "@iot.id": sample_datastream.iotid
-            },
+            "Datastream": {"@iot.id": sample_datastream.iotid},
             "FeatureOfInterest": {
                 "name": sample_station_data.MonitoringLocationName,
                 "description": "Monitoring Location",
@@ -91,9 +86,9 @@ def sample_observation(sample_datastream, sample_station_data):
                     "type": "Point",
                     "coordinates": [
                         sample_station_data.Geometry.longitude,
-                        sample_station_data.Geometry.latitude
-                    ]
-                }
+                        sample_station_data.Geometry.latitude,
+                    ],
+                },
             },
         }
     )
