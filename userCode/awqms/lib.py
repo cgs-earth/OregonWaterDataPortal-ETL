@@ -79,7 +79,8 @@ def fetch_observations(
         "ContentType": "json"
     }
     encoded_params = urlencode(params)
-    results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
+    results_url = url_join(AWQMS_URL,
+                           f"ContinuousResultsVer1?{encoded_params}")
 
     cache = ShelveCache()
     response, status_code = cache.get_or_fetch(results_url, force_fetch=False)
