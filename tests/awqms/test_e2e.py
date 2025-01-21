@@ -14,8 +14,7 @@ from unittest.mock import patch
 from userCode.awqms.dag import (
     awqms_preflight_checks, post_awqms_station,
     post_awqms_datastreams, awqms_datastreams,
-    batch_post_awqms_observations, awqms_observations,
-    awqms_schedule
+    awqms_observations, awqms_schedule
 )
 from userCode.helper_classes import BatchHelper
 
@@ -74,13 +73,6 @@ async def test_awqms_observations(sample_station_data, sample_datastream):
             observations = await awqms_observations(
                 sample_station_data, datastreams)  # type: ignore
             assert len(observations) > 0
-
-
-def test_batch_post_awqms_observations(sample_observation):
-    with patch.object(BatchHelper,
-                      'send_observations') as mock_send_observations:
-        batch_post_awqms_observations([sample_observation])
-        mock_send_observations.assert_called_once()
 
 
 def test_awqms_schedule_triggering():
