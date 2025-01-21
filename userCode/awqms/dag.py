@@ -189,7 +189,6 @@ async def awqms_observations(
     BatchHelper().send_observations(awqms_observations)
 
 
-
 awqms_job = define_asset_job(
     "harvest_awqms",
     description="harvest an awmqs station",
