@@ -23,8 +23,7 @@ POTENTIAL_DATASTREAMS: dict[str, str] = {
 }
 
 THISDIR = Path(__file__).parent.resolve()
-ALL_RELEVANT_STATIONS = read_csv(THISDIR / "valid_stations.csv")[::8]
-ALL_RELEVANT_STATIONS.append("101572-BLM")
+ALL_RELEVANT_STATIONS = read_csv(THISDIR / "valid_stations.csv")
 
 
 class GmlPoint(BaseModel):

@@ -175,8 +175,8 @@ async def awqms_observations(awqms_metadata: StationData,
             id = "".join([datastream.iotid, result["StartDateTime"]])
             iotid = deterministic_hash(id, 18)
 
-            _test = (iotid in observations or iotid in observations_ids
-                     ) and result["Status"] != "Final"
+            _test = (iotid in observations and result["Status"] != "Final"
+                     ) or iotid in observations_ids
             if _test:
                 continue
 
@@ -205,9 +205,11 @@ awqms_job = define_asset_job(
     selection=AssetSelection.groups("awqms"),
 )
 
+DAILY_AT_5AM_EST_2AM_PST = "0 10 * * *"
+
 
 @schedule(
-    cron_schedule="@daily",
+    cron_schedule=DAILY_AT_5AM_EST_2AM_PST,
     target=AssetSelection.groups("awqms"),
     default_status=DefaultScheduleStatus.STOPPED,
 )
