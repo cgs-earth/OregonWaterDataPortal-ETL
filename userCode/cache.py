@@ -1,6 +1,7 @@
 # =================================================================
 #
 # Authors: Colton Loftus <cloftus@lincolninst.edu>
+# Authors: Ben Webb <bwebb@lincolninst.edu>
 #
 # Copyright (c) 2025 Lincoln Institute of Land Policy
 #
@@ -14,6 +15,8 @@ from pickle import UnpicklingError
 import requests
 import shelve
 from typing import ClassVar, Optional, Tuple
+
+from userCode.util import deterministic_hash
 
 
 HEADERS = {"accept": "application/vnd.api+json"}
@@ -30,11 +33,12 @@ class ShelveCache:
     def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
         try:
             with shelve.open(ShelveCache.db, "w") as db:
-                db[url] = content
+                db[self.hash_url(url)] = content
         except Exception:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
-    def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
+    def get_or_fetch(self, url: str, force_fetch: bool = False
+                     ) -> Tuple[bytes, int]:
         if self.contains(url) and not force_fetch:
             try:
                 return self.get(url), 200
@@ -48,20 +52,25 @@ class ShelveCache:
 
     def reset(self):
         with shelve.open(ShelveCache.db, "w") as db:
-            for key in db:
+            for key in db.keys():
                 del db[key]
 
     def clear(self, url: str):
+        url_hash = self.hash_url(url)
         with shelve.open(ShelveCache.db, "w") as db:
-            if url not in db:
+            if self.hash_url(url) not in db:
                 return
 
-            del db[url]
+            del db[url_hash]
 
     def contains(self, url: str) -> bool:
         with shelve.open(ShelveCache.db) as db:
-            return url in db
+            return self.hash_url(url) in db
 
     def get(self, url: str):
         with shelve.open(ShelveCache.db) as db:
-            return db[url]
+            return db[self.hash_url(url)]
+
+    @staticmethod
+    def hash_url(url: str):
+        return str(deterministic_hash(url, 16))
