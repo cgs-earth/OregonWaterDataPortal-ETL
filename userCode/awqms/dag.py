@@ -164,7 +164,7 @@ def post_awqms_datastreams(awqms_datastreams: list[Datastream]):
         group_name="awqms")
 async def awqms_observations(awqms_metadata: StationData,
                              awqms_datastreams: list[Datastream]
-                             ) -> list[Observation]:
+                             ) -> bool:
 
     associatedThing = awqms_metadata.MonitoringLocationId
 
@@ -181,8 +181,8 @@ async def awqms_observations(awqms_metadata: StationData,
             id = "".join([datastream.iotid, result["StartDateTime"]])
             iotid = deterministic_hash(id, 18)
 
-            _test = (iotid in observations or
-                     iotid in observations_ids) and result["Status"] != "Final"
+            _test = (iotid in observations or iotid in observations_ids
+                     ) and result["Status"] != "Final"
             if _test:
                 continue
 
@@ -192,20 +192,17 @@ async def awqms_observations(awqms_metadata: StationData,
             )
 
     # Run fetch_and_process for all datastreams concurrently
-    await asyncio.gather(*(fetch_and_process(datastream)
-                           for datastream in awqms_datastreams))
+    try:
+        await asyncio.gather(*(fetch_and_process(datastream)
+                            for datastream in awqms_datastreams))
+    except Exception as err:
+        get_dagster_logger().error(err)
+        return False
 
-    return list(observations.values())
-
-
-@asset(
-        partitions_def=station_partition,
-        deps=[post_awqms_datastreams],
-        group_name="awqms")
-def batch_post_awqms_observations(awqms_observations: list[Observation]):
-    """Post a group of observations for multiple datastreams
-    to the Sensorthings API"""
+    awqms_observations = list(observations.values())
     BatchHelper().send_observations(awqms_observations)
+
+    return True
 
 
 awqms_job = define_asset_job(
