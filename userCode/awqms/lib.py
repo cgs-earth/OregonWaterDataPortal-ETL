@@ -17,12 +17,10 @@ from typing import List
 from urllib.parse import urlencode
 
 from userCode.cache import ShelveCache
-from userCode.env import API_BACKEND_URL
+from userCode.env import API_BACKEND_URL, AWQMS_URL
 from userCode.util import url_join
 
 LOGGER = logging.getLogger(__name__)
-
-BASE_URL = "https://ordeq.gselements.com/api"
 
 
 def read_csv(filepath: Path) -> List[str]:
@@ -58,7 +56,7 @@ def fetch_station(
         "MonitoringLocationIdentifiersCsv": station_id
     }
     encoded_params = urlencode(params)
-    xml_url = url_join(BASE_URL, f"MonitoringLocationsVer1?{encoded_params}")
+    xml_url = url_join(AWQMS_URL, f"MonitoringLocationsVer1?{encoded_params}")
 
     cache = ShelveCache()
     response, status_code = cache.get_or_fetch(xml_url, force_fetch=False)
@@ -81,7 +79,7 @@ def fetch_observations(
         "ContentType": "json"
     }
     encoded_params = urlencode(params)
-    results_url = f"{BASE_URL}/ContinuousResultsVer1?{encoded_params}"
+    results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
     cache = ShelveCache()
     response, status_code = cache.get_or_fetch(results_url, force_fetch=False)
