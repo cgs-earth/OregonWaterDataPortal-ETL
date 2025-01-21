@@ -242,9 +242,6 @@ class Attributes(BaseModel):
     air_temp_min_available: int
     precipitation_available: int
 
-    class Config:
-        populate_by_name = True
-
 
 class StationData(BaseModel, extra="forbid"):
     attributes: Attributes

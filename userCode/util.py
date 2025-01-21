@@ -13,7 +13,6 @@ import datetime
 from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
-from uuid import UUID
 
 
 def get_env(key: str) -> str:
@@ -70,17 +69,6 @@ def from_oregon_datetime(date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p") -> da
         tzinfo=datetime.timezone.utc
     )
 
-def make_uuid(input: str) -> str:
-    """
-    helper function to make uuid
-
-    :param input: string of source
-    :param raw: bool of str casting
-
-    :returns: str of resulting uuid
-    """
-    _uuid = UUID(hex=hashlib.md5(input.encode('utf-8')).hexdigest())
-    return str(_uuid)
 
 def url_join(*parts: str) -> str:
     """
