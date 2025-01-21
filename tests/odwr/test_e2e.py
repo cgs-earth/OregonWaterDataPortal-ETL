@@ -17,13 +17,13 @@ from userCode import definitions
 from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.env import API_BACKEND_URL
 from userCode.odwr.dag import all_metadata, post_station, sta_station
-from userCode.odwr.helper_classes import get_datastream_time_range, MockValues
+from userCode.helper_classes import get_datastream_time_range, MockValues
 from userCode.odwr.lib import assert_no_observations_with_same_iotid_in_first_page
 from userCode.odwr.types import StationData
 from userCode.util import to_oregon_datetime
 
 
-from .lib import (
+from ..lib import (
     assert_no_duplicate_at_given_time,
     assert_observations_and_datastreams_empty,
     dates_are_within_X_days,

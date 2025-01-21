@@ -9,7 +9,7 @@
 # =================================================================
 
 from typing import Literal, Optional, TypedDict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dataclasses import dataclass
 
 BASE_OREGON_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
@@ -199,7 +199,7 @@ class Attributes(BaseModel):
     elevation: Optional[int]
     elevation_datum: Optional[float]
     current_operation_mode: Optional[str]
-    most_recent_operator: str
+    organization: str = Field(alias="most_recent_operator")
     cooperators: Optional[str]
     published_area: Optional[float]
     owrd_area: Optional[float]

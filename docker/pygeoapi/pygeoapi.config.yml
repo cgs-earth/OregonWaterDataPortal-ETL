@@ -20,21 +20,19 @@ logging:
 metadata:
   identification:
     title:
-      en: "HubKit in a box"
+      en: "Oregon Water Data Portal OGC API Server"
     description:
       en: |
-        HubKit provides a platform for organizations to integrate their
-        data holdings and publish them according to Internet of Water
-        principles and Spatial Data on the Web Best Practices with
-        plug-and-play capability supporting data access through OGC
-        API standards and data discovery through geoconnex.us.
-        It leverages several open source projects, including
-        pygeoapi, FROST-Server, and the WMO wis2box.
+        The Oregon Water Data Portal (OWDP) is a pilot project aiming to
+        create a comprehensive, user-friendly platform for accessing and 
+        analyzing water-related data specific to Oregon. The initial phase 
+        focuses on integrating key data sources, with an emphasis on water 
+        temperature data, to demonstrate the value of a centralized water 
+        data hub in supporting research, policymaking, and public awareness.
     keywords:
       en:
-        - "hubkit"
-        - "hub2box"
-        - "wis2box"
+        - "owdp"
+        - "oregon"
     keywords_type: "theme"
     terms_of_service: "https://creativecommons.org/licenses/by/4.0/"
     url: "https://github.com/internetofwater/"
@@ -116,7 +114,6 @@ resources:
         title_field: "name"
         intralink: true
         expand: Thing/Locations,Observations($select=@iot.id;$orderby=phenomenonTime desc;$top=1),Observations/FeatureOfInterest($select=feature),Sensor,ObservedProperty
-        storage_crs: http://www.opengis.net/def/crs/EPSG/0/3857
     links:
       - type: "text/html"
         rel: "canonical"
@@ -151,7 +148,6 @@ resources:
         id_field: "@iot.id"
         time_field: "resultTime"
         intralink: true
-        storage_crs: http://www.opengis.net/def/crs/EPSG/0/3857
     links:
       - type: "text/html"
         rel: "canonical"

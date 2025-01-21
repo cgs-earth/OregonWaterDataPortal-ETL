@@ -81,7 +81,7 @@ def to_sensorthings_station(station: StationData) -> dict:
                 },
             }
         ],
-        "properties": attr.model_dump(by_alias=True),
+        "properties": attr.model_dump(),
     }
     if attr.elevation is not None:
         representation["Locations"][0]["location"]["coordinates"].append(attr.elevation)

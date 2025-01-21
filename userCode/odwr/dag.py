@@ -28,10 +28,7 @@ import requests
 from typing import List, Optional, Tuple
 
 from userCode.env import API_BACKEND_URL, RUNNING_AS_A_TEST_NOT_IN_PROD
-from userCode.odwr.helper_classes import (
-    BatchHelper,
-    get_datastream_time_range,
-)
+from userCode.helper_classes import BatchHelper, get_datastream_time_range, MockValues
 from userCode.odwr.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
@@ -43,7 +40,6 @@ from userCode.odwr.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.helper_classes import MockValues
 from userCode.odwr.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
