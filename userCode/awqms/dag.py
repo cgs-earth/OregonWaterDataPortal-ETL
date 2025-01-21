@@ -47,6 +47,7 @@ station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STA
 
 @asset(group_name="awqms")
 def awqms_preflight_checks():
+    """Check we can connect to essential infrastructure before starting the pipeline"""
     sta_ping = requests.get(API_BACKEND_URL)
     assert sta_ping.ok, "FROST server is not running"
 
@@ -157,13 +158,14 @@ async def awqms_observations(
             if not result["ResultValue"]:
                 continue
 
-            id = "".join([datastream.iotid, result["StartDateTime"]])
+            # Create deterministic hash based on datastream id and result time
+            id = f"{datastream.iotid}{result['StartDateTime']}"
             iotid = deterministic_hash(id, 18)
 
-            _test = (
+            is_not_new_obs = (
                 iotid in observations and result["Status"] != "Final"
             ) or iotid in observations_ids
-            if _test:
+            if is_not_new_obs:
                 continue
 
             observations[iotid] = to_sensorthings_observation(
@@ -181,12 +183,11 @@ async def awqms_observations(
         )
     except Exception as err:
         LOGGER.error(err)
-        return False
+        raise RuntimeError(err)
 
     awqms_observations = list(observations.values())
     BatchHelper().send_observations(awqms_observations)
 
-    return True
 
 
 awqms_job = define_asset_job(

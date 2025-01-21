@@ -50,16 +50,13 @@ class StationData(BaseModel):
     Geometry: GmlPoint
     Datastreams: list[ResultSummary] = []
 
-    class Config:
-        populate_by_name = True
-
 
 def parse_monitoring_locations(features: bytes) -> StationData:
     feature = json.loads(features)[0]
 
     location_data = {
         "Datastreams": [],
-        "CountyName": feature["CountyName"],  # type: ignore
+        "CountyName": feature["CountyName"],
         "MonitoringLocationId": feature["MonitoringLocationIdentifier"],
         "MonitoringLocationName": feature["MonitoringLocationName"],
         "OrganizationIdentifier": feature["OrganizationIdentifier"],
