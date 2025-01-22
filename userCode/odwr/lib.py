@@ -19,7 +19,7 @@ from urllib.parse import urlencode
 
 
 from userCode.cache import ShelveCache
-from userCode.env import API_BACKEND_URL, RUNNING_AS_A_TEST_NOT_IN_PROD
+from userCode.env import API_BACKEND_URL
 from userCode.odwr.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
@@ -92,9 +92,9 @@ def parse_oregon_tsv(
                 data.append(float(row[2]))
 
             parsed_date = parse_date(str(DATE_COLUMN))
-            assert (
-                parsed_date not in unique_dates
-            ), f"Date '{parsed_date}' appeared twice in the data"
+            assert parsed_date not in unique_dates, (
+                f"Date '{parsed_date}' appeared twice in the data"
+            )
             unique_dates[parsed_date] = None
 
     return ParsedTSVData(data, units, list(unique_dates))
@@ -159,15 +159,8 @@ def download_oregon_tsv(
     """Get the tsv data for a specific dataset for a specific station in a given date range"""
     tsv_url = generate_oregon_tsv_url(dataset, station_nbr, start_date, end_date)
 
-    if RUNNING_AS_A_TEST_NOT_IN_PROD:
-        # If we are in a test, we want to use the cache to avoid making too many requests while testing
-        # But in production, we always want to fetch and not cache anything to avoid extra data
-        cache = ShelveCache()
-        response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
-    else:
-        fetch_result = requests.get(tsv_url)
-        status_code = fetch_result.status_code
-        response = fetch_result.content
+    cache = ShelveCache()
+    response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
 
     if status_code != 200 or "An Error Has Occured" in response.decode("utf-8"):
         raise RuntimeError(

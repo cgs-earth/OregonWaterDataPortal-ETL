@@ -15,4 +15,7 @@ import os
 API_BACKEND_URL = get_env("API_BACKEND_URL")
 AWQMS_URL = "https://ordeq.gselements.com/api"
 
-RUNNING_AS_A_TEST_NOT_IN_PROD = "PYTEST_CURRENT_TEST" in os.environ
+# If we are running inside of pytest, pytest will set this environment variable
+# We can use this to cache data, check more strictly, or do other optimizations
+# we wouldn't necessarily want to do in production
+RUNNING_IN_TEST_ENVIRONMENT = "PYTEST_CURRENT_TEST" in os.environ
