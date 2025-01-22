@@ -11,7 +11,7 @@
 from dagster import DagsterInstance
 import pytest
 import requests
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from userCode import definitions
 from userCode.awqms.dag import (
@@ -36,39 +36,117 @@ from ..lib import (
 
 
 def test_awqms_preflight_checks():
-    with patch("requests.get") as mock_get:
+    with patch("userCode.awqms.dag.requests.get") as mock_get:
         mock_get.return_value.ok = True
         result = awqms_preflight_checks()
         assert result is None
 
-    with patch("requests.get") as mock_get:
+    with patch("userCode.awqms.dag.requests.get") as mock_get:
         mock_get.return_value.ok = False
         with pytest.raises(AssertionError):
             awqms_preflight_checks()
 
 
 def test_post_awqms_station(sample_station_data):
-    with patch("requests.get") as mock_get:
-        # Simulate station not found
-        mock_get.return_value.status_code = 500
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.ok = True
+    api_url = url_join(API_BACKEND_URL, "Things")
+
+    # Test: Station not found (404) -> should trigger POST
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        mock_get.return_value = MagicMock(status_code=404)
+        mock_post.return_value = MagicMock(ok=True)
+
+        # Run code
+        post_awqms_station(sample_station_data)
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_post.assert_called_once()
+
+    # Test: FROST error (500) -> should raise RuntimeError
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        msg = f"Failed checking if station '{sample_station_data.MonitoringLocationId}' exists"
+        mock_get.return_value = MagicMock(status_code=500,
+                                          ok=False,
+                                          text=msg)
+
+        # Run code
+        with pytest.raises(RuntimeError, match="Failed checking if station.*exists"):
             post_awqms_station(sample_station_data)
-            mock_post.assert_called_once()
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_post.assert_not_called()
+
+    # Test: Station not found (404) -> failed POST
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        mock_get.return_value = MagicMock(status_code=404)
+        mock_post.return_value = MagicMock(ok=False)
+
+        # Run code
+        with pytest.raises(RuntimeError):
+            post_awqms_station(sample_station_data)
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_post.assert_called_once()
 
 
 def test_awqms_datastreams(sample_station_data):
     datastreams = awqms_datastreams(sample_station_data)
-    assert len(datastreams) > 0  # type: ignore
+    assert len(datastreams) > 0
 
 
 def test_post_awqms_datastreams(sample_datastream):
-    with patch("requests.get") as mock_get:
-        mock_get.return_value.status_code = 404
-        with patch("requests.post") as mock_post:
-            mock_post.return_value.ok = True
+    api_url = url_join(API_BACKEND_URL, "Datastreams")
+
+    # Test: Datastream not found (404) -> should trigger POST
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        mock_get.return_value = MagicMock(status_code=404)
+        mock_post.return_value = MagicMock(ok=True)
+
+        # Run code
+        post_awqms_datastreams([sample_datastream])
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_datastream.iotid}')")
+        mock_post.assert_called_once()
+
+    # Test: FROST error (500) -> should raise RuntimeError
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        mock_get.return_value = MagicMock(status_code=500, ok=False, )
+
+        # Run code
+        with pytest.raises(RuntimeError):
             post_awqms_datastreams([sample_datastream])
-            mock_post.assert_called_once()
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_datastream.iotid}')")
+        mock_post.assert_not_called()
+
+    # Test: Station not found (404) -> failed POST
+    with (patch("userCode.awqms.dag.requests.get") as mock_get,
+          patch("userCode.awqms.dag.requests.post") as mock_post):
+        # Mock responses
+        mock_get.return_value = MagicMock(status_code=404)
+        mock_post.return_value = MagicMock(ok=False)
+
+        # Run code
+        with pytest.raises(RuntimeError):
+            post_awqms_datastreams([sample_datastream])
+
+        # Assertions
+        mock_get.assert_called_once_with(f"{api_url}('{sample_datastream.iotid}')")
+        mock_post.assert_called_once()
 
 
 def test_awqms_schedule_triggering():
@@ -77,7 +155,7 @@ def test_awqms_schedule_triggering():
         mock_get_partition_keys.return_value = ["1234", "5678"]
         schedule = awqms_schedule()
         # Verify that RunRequest is yielded for each partition
-        runs = list(schedule)  # type: ignore
+        runs = list(schedule)
         assert len(runs) == 2
         assert runs[0].partition_key == "1234"
         assert runs[1].partition_key == "5678"
