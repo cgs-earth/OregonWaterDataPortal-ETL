@@ -51,8 +51,10 @@ def test_post_awqms_station(sample_station_data):
     api_url = url_join(API_BACKEND_URL, "Things")
 
     # Test: Station not found (404) -> should trigger POST
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
         mock_get.return_value = MagicMock(status_code=404)
         mock_post.return_value = MagicMock(ok=True)
@@ -61,29 +63,35 @@ def test_post_awqms_station(sample_station_data):
         post_awqms_station(sample_station_data)
 
         # Assertions
-        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_get.assert_called_once_with(
+            f"{api_url}('{sample_station_data.MonitoringLocationId}')"
+        )
         mock_post.assert_called_once()
 
     # Test: FROST error (500) -> should raise RuntimeError
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
         msg = f"Failed checking if station '{sample_station_data.MonitoringLocationId}' exists"
-        mock_get.return_value = MagicMock(status_code=500,
-                                          ok=False,
-                                          text=msg)
+        mock_get.return_value = MagicMock(status_code=500, ok=False, text=msg)
 
         # Run code
         with pytest.raises(RuntimeError, match="Failed checking if station.*exists"):
             post_awqms_station(sample_station_data)
 
         # Assertions
-        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_get.assert_called_once_with(
+            f"{api_url}('{sample_station_data.MonitoringLocationId}')"
+        )
         mock_post.assert_not_called()
 
     # Test: Station not found (404) -> failed POST
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
         mock_get.return_value = MagicMock(status_code=404)
         mock_post.return_value = MagicMock(ok=False)
@@ -93,7 +101,9 @@ def test_post_awqms_station(sample_station_data):
             post_awqms_station(sample_station_data)
 
         # Assertions
-        mock_get.assert_called_once_with(f"{api_url}('{sample_station_data.MonitoringLocationId}')")
+        mock_get.assert_called_once_with(
+            f"{api_url}('{sample_station_data.MonitoringLocationId}')"
+        )
         mock_post.assert_called_once()
 
 
@@ -106,8 +116,10 @@ def test_post_awqms_datastreams(sample_datastream):
     api_url = url_join(API_BACKEND_URL, "Datastreams")
 
     # Test: Datastream not found (404) -> should trigger POST
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
         mock_get.return_value = MagicMock(status_code=404)
         mock_post.return_value = MagicMock(ok=True)
@@ -120,10 +132,15 @@ def test_post_awqms_datastreams(sample_datastream):
         mock_post.assert_called_once()
 
     # Test: FROST error (500) -> should raise RuntimeError
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
-        mock_get.return_value = MagicMock(status_code=500, ok=False, )
+        mock_get.return_value = MagicMock(
+            status_code=500,
+            ok=False,
+        )
 
         # Run code
         with pytest.raises(RuntimeError):
@@ -134,8 +151,10 @@ def test_post_awqms_datastreams(sample_datastream):
         mock_post.assert_not_called()
 
     # Test: Station not found (404) -> failed POST
-    with (patch("userCode.awqms.dag.requests.get") as mock_get,
-          patch("userCode.awqms.dag.requests.post") as mock_post):
+    with (
+        patch("userCode.awqms.dag.requests.get") as mock_get,
+        patch("userCode.awqms.dag.requests.post") as mock_post,
+    ):
         # Mock responses
         mock_get.return_value = MagicMock(status_code=404)
         mock_post.return_value = MagicMock(ok=False)
