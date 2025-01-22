@@ -110,7 +110,7 @@ def test_post_awqms_station(sample_station_data):
 
 def test_awqms_datastreams(sample_station_data):
     datastreams = awqms_datastreams(sample_station_data)
-    assert len(datastreams) > 0
+    assert len(datastreams) > 0  # type: ignore
 
 
 def test_post_awqms_datastreams(sample_datastream):
@@ -175,7 +175,7 @@ def test_awqms_schedule_triggering():
         mock_get_partition_keys.return_value = ["1234", "5678"]
         schedule = awqms_schedule()
         # Verify that RunRequest is yielded for each partition
-        runs = list(schedule)
+        runs = list(schedule) # type: ignore
         assert len(runs) == 2
         assert runs[0].partition_key == "1234"
         assert runs[1].partition_key == "5678"
