@@ -17,16 +17,17 @@ from dagster import (
 import dagster_slack
 
 from userCode.util import get_env, slack_error_fn
+import userCode.awqms.dag as awqms
 import userCode.odwr.dag as odwr
 
-assets = load_assets_from_modules([odwr])
-asset_checks = load_asset_checks_from_modules([odwr])
+assets = load_assets_from_modules([awqms, odwr])
+asset_checks = load_asset_checks_from_modules([awqms, odwr])
 
 definitions = Definitions(
     assets=assets,
     asset_checks=asset_checks,
-    jobs=[odwr.odwr_job],
-    schedules=[odwr.odwr_schedule],
+    jobs=[awqms.awqms_job, odwr.odwr_job],
+    schedules=[awqms.awqms_schedule, odwr.odwr_schedule],
     sensors=[
         dagster_slack.make_slack_on_run_failure_sensor(
             channel="#cgs-iow-bots",

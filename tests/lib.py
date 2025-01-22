@@ -120,7 +120,7 @@ def assert_no_duplicate_at_given_time(
 ):
     """Checks if there are multiple observations at the same time for a given datastream"""
     # This is in a format like https://owdp-pilot.internetofwater.app/FROST-Server/v1.1/Datastreams(140805000)/Observations?$filter=resultTime%20eq%201941-10-01T00:00:00Z
-    url = f"{API_BACKEND_URL}/Datastreams({datastream_int})/Observations?$filter=resultTime%20eq%20{date_to_check.strftime('%Y-%m-%dT%H:%M:%SZ')}"
+    url = f"{API_BACKEND_URL}/Datastreams('{datastream_int}')/Observations?$filter=resultTime%20eq%20{date_to_check.strftime('%Y-%m-%dT%H:%M:%SZ')}"
     resp = requests.get(url)
     assert resp.ok, resp.text
     assert (
