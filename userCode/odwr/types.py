@@ -199,6 +199,11 @@ class Attributes(BaseModel):
     elevation: Optional[int]
     elevation_datum: Optional[float]
     current_operation_mode: Optional[str]
+
+    # owdr outputs most_recent_operator
+    # however, we want to have a string for organization for the UI
+    # so we use an alias to map most_recent_operator to organization.
+    # When we dump the Attributes class, it will use the 'organization' alias
     organization: str = Field(alias="most_recent_operator")
     cooperators: Optional[str]
     published_area: Optional[float]
