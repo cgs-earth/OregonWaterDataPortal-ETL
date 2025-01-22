@@ -13,7 +13,12 @@ import pytest
 import tempfile
 from unittest.mock import patch, Mock
 
-from userCode.awqms.lib import read_csv, fetch_station, fetch_observations, fetch_observation_ids
+from userCode.awqms.lib import (
+    read_csv,
+    fetch_station,
+    fetch_observations,
+    fetch_observation_ids,
+)
 
 
 @pytest.fixture
@@ -94,22 +99,21 @@ def test_fetch_observations_invalid_json(mock_shelve_cache_cls):
 def test_fetch_observation_ids():
     datastream_id = "12005-ORDEQ-2704"
     api_url = f"https://localhost:8080/FROST-Server/v1.1/Datastreams('{datastream_id}')/Observations"
-    
+
     mock_response_1 = {
         "value": [{"@iot.id": 1}, {"@iot.id": 2}],
-        "@iot.nextLink": f"{api_url}?$skip=2"
+        "@iot.nextLink": f"{api_url}?$skip=2",
     }
-    
+
     mock_response_2 = {"value": [{"@iot.id": 3}, {"@iot.id": 4}]}
 
     with patch("userCode.awqms.lib.requests.get") as mock_get:
-
         mock_get.side_effect = [
             Mock(status_code=200, json=Mock(return_value=mock_response_1)),
-            Mock(status_code=200, json=Mock(return_value=mock_response_2))
+            Mock(status_code=200, json=Mock(return_value=mock_response_2)),
         ]
-        
+
         result = fetch_observation_ids(datastream_id)
-        
+
         assert result == {1, 2, 3, 4}
         assert mock_get.call_count == 2

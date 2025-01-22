@@ -21,13 +21,9 @@ from userCode.awqms.dag import (
     awqms_datastreams,
     awqms_schedule,
 )
-from userCode.awqms.types import (
-    ALL_RELEVANT_STATIONS
-)
+from userCode.awqms.types import ALL_RELEVANT_STATIONS
 from userCode.env import API_BACKEND_URL
-from userCode.helper_classes import (
-    get_datastream_time_range
-)
+from userCode.helper_classes import get_datastream_time_range
 
 from ..lib import (
     wipe_datastreams,
@@ -135,7 +131,9 @@ def test_full_pipeline():
 
     # Verify updated time range
     update_range = get_datastream_time_range(first_datastream_iotid)
-    assert update_range.start < update_range.end, "Updated range start must be before end"
+    assert (
+        update_range.start < update_range.end
+    ), "Updated range start must be before end"
     assert update_range.start == range.start, "Start date should not change on update"
     assert update_range.end >= range.end, "End date should advance or stay same"
 
