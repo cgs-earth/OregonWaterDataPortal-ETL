@@ -116,13 +116,15 @@ def test_full_pipeline(metadata: list[StationData]):
         if observedPropertyName in ONTOLOGY_MAPPING[ontology].name:
             break
     else:
-        assert False, f"Failed to find ontology for observed property {observedPropertyName} within {ONTOLOGY_MAPPING}"
+        assert False, (
+            f"Failed to find ontology for observed property {observedPropertyName} within {ONTOLOGY_MAPPING}"
+        )
 
     range = get_datastream_time_range(first_datastream_iotid)
     assert range.start < range.end, "The start of the datastream must be before the end"
-    assert dates_are_within_X_days(
-        range.end, mocked_date, 7
-    ), "The end of the data in the database is significantly older than the mocked date. This could be ok if the upstream is lagging behind, but is generally a sign of an error"
+    assert dates_are_within_X_days(range.end, mocked_date, 7), (
+        "The end of the data in the database is significantly older than the mocked date. This could be ok if the upstream is lagging behind, but is generally a sign of an error"
+    )
 
     assert_no_duplicate_at_given_time(first_datastream_iotid, range.start)
     assert_no_duplicate_at_given_time(
@@ -134,19 +136,21 @@ def test_full_pipeline(metadata: list[StationData]):
     crawl_update_result = harvest_job.execute_in_process(
         instance=instance, partition_key=first_station_number
     )
-    assert crawl_update_result.success, "Although the previous run was successful, the second dagster run to update the data failed."
+    assert crawl_update_result.success, (
+        "Although the previous run was successful, the second dagster run to update the data failed."
+    )
     update_crawl_range = get_datastream_time_range(first_datastream_iotid)
-    assert (
-        update_crawl_range.start < update_crawl_range.end
-    ), "The start of the datastream must be before the end"
-    assert (
-        update_crawl_range.start == range.start
-    ), "The start of the datastream should not change as new data is added to the end"
+    assert update_crawl_range.start < update_crawl_range.end, (
+        "The start of the datastream must be before the end"
+    )
+    assert update_crawl_range.start == range.start, (
+        "The start of the datastream should not change as new data is added to the end"
+    )
     assert update_crawl_range.end >= range.end
     today = datetime.datetime.now(tz=datetime.timezone.utc)
-    assert dates_are_within_X_days(
-        update_crawl_range.end, today, 7
-    ), "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
+    assert dates_are_within_X_days(update_crawl_range.end, today, 7), (
+        "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
+    )
 
     assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.start)
     assert_no_duplicate_at_given_time(first_datastream_iotid, update_crawl_range.end)
