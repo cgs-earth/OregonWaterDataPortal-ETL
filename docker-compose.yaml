@@ -96,6 +96,7 @@ services:
       - LOG_WATCH_COMMA_SEPARATED_PATTERNS=Slow Query
     # Don't monitor containers in the dev env or CI/CD
     profiles: [production]
+    restart: always
 
 volumes:
   postgis_volume:
