@@ -10,4 +10,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Golangci-lint
         uses: golangci/golangci-lint-action@v6.1.1
+        with:
+          working-directory: docker/container_monitor
 
