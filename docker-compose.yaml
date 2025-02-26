@@ -38,7 +38,7 @@ services:
       - SCRIPT_NAME=/oapi
 
   owdp-ui:
-    image: internetofwater/hub2box-ui:owdp
+    image: internetofwater/hub2box-ui:owdp-limited
     container_name: owdp-ui
     depends_on:
       - owdp-pygeoapi
