@@ -13,4 +13,8 @@ crawler.owdp-pilot.internetofwater.app {
 	}
 	respond @block_methods 403
 	reverse_proxy :3000
+
+	basic_auth {
+		iow $2a$14$3FEpAUSrD6rD2j9Tfflrt.OU5DLBmehoySE7lDtarO3uxQ7hZ.zVm
+	}
 }
