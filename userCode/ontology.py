@@ -52,7 +52,7 @@ def get_ontology(uri: str) -> Ontology:
 __ontology_definition = (
     (
         ("mean_daily_flow", "mean daily flow", "mean_daily_flow_available"),
-        get_ontology(f"{BASE_URL}/variablename/waterLevel"),
+        get_ontology(f"{BASE_URL}/variablename/streamflow"),
     ),
     (
         (

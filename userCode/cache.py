@@ -16,6 +16,7 @@ import requests
 import shelve
 from typing import ClassVar, Optional, Tuple
 
+from userCode.env import RUNNING_IN_TEST_ENVIRONMENT
 from userCode.util import deterministic_hash
 
 
@@ -38,6 +39,11 @@ class ShelveCache:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
     def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
+        # If we are in prod we want to ignore using the cache and not store anything
+        if not RUNNING_IN_TEST_ENVIRONMENT:
+            response = requests.get(url, headers=HEADERS, timeout=300)
+            return response.content, response.status_code
+
         if self.contains(url) and not force_fetch:
             try:
                 return self.get(url), 200

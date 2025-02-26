@@ -1,7 +1,6 @@
-# start the reverse proxy which gives our server https and points to the proper domain
-caddy:
-	cp ./Caddyfile /etc/caddy/Caddyfile
-	sudo systemctl restart caddy
+###### Docker Compose Commands
+## We use these since there is a production profile and without specifying the profile
+## docker will not start those services. This can be a footgun
 
 prodUp:
 	docker compose --profile production up -d
@@ -12,7 +11,15 @@ prodBuild:
 prodDown:
 	docker compose --profile production down
 
+####### Helper Commands
+
+# start the reverse proxy which gives our server https and points to the proper domain
+caddy:
+	cp ./Caddyfile /etc/caddy/Caddyfile
+	sudo systemctl restart caddy
+
 # get rid of the sensorthings db, mainly for testing purposes
+# or if you need to recrawl. NOTE that you may need to reapply the indices after
 wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
