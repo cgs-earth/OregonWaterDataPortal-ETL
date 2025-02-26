@@ -1,8 +1,16 @@
 # Place at /etc/caddy/Caddyfile and run with sudo caddy run --config /etc/caddy/Caddyfile
 owdp-pilot.internetofwater.app {
+	@block_methods {
+		method PATCH PUT DELETE
+	}
+	respond @block_methods 403
 	reverse_proxy :8999
 }
 
 crawler.owdp-pilot.internetofwater.app {
+	@block_methods {
+		method PATCH PUT DELETE
+	}
+	respond @block_methods 403
 	reverse_proxy :3000
 }
