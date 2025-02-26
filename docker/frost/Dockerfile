@@ -12,4 +12,4 @@ ENV plugins_coreModel_idType_datastream=STRING
 ENV plugins_coreModel_idType_feature=STRING
 ENV mqtt_Enabled=false
 # log after 1000ms or 1 second queries
-ENV persistence.slowQueryThreshold=1000
+ENV persistence.slowQueryThreshold=2300
