@@ -196,9 +196,9 @@ def sta_all_observations(
             # This is a further check to be thorough
             if RUNNING_IN_TEST_ENVIRONMENT:
                 key = (datastream.iotid, date)
-                assert (
-                    key not in seen_obs
-                ), f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
+                assert key not in seen_obs, (
+                    f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
+                )
                 seen_obs.add(key)
 
             sta_representation = to_sensorthings_observation(

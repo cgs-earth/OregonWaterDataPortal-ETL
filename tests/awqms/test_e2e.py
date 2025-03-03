@@ -229,9 +229,9 @@ def test_full_pipeline():
 
     # Verify updated time range
     update_range = get_datastream_time_range(first_datastream_iotid)
-    assert (
-        update_range.start < update_range.end
-    ), "Updated range start must be before end"
+    assert update_range.start < update_range.end, (
+        "Updated range start must be before end"
+    )
     assert update_range.start == range.start, "Start date should not change on update"
     assert update_range.end >= range.end, "End date should advance or stay same"
 
