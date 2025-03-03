@@ -30,7 +30,7 @@ services:
     container_name: postgres-exporter
     image: prometheuscommunity/postgres-exporter:latest
     restart: unless-stopped
-    environment: 
+    environment:
       - DATA_SOURCE_NAME=postgresql://sensorthings:ChangeMe@owdp-database:5432/sensorthings?sslmode=disable
     ports:
       - 9187:9187
@@ -45,7 +45,6 @@ services:
       - "--path.procfs=/host/proc"
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)"
-
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
@@ -124,7 +123,7 @@ services:
     image: prom/prometheus
     container_name: owdp-prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - 9090:9090
     restart: unless-stopped
