@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+- name: Prometheus
+  type: prometheus
+  url: http://owdp-prometheus:9090 
+  isDefault: true
+  access: proxy
+  editable: true
+- name: Postgresql
+  type: postgres
+  url: http://owdp-postgresql:5432
+  user: sensorthings
+  secureJsonData:
+      password: 'ChangeMe'

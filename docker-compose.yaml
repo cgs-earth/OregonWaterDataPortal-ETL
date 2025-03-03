@@ -26,12 +26,34 @@ services:
     volumes:
       - postgis_volume:/var/lib/postgresql/data
 
+  postgres-exporter:
+    container_name: postgres-exporter
+    image: prometheuscommunity/postgres-exporter:latest
+    restart: unless-stopped
+    environment: 
+      - DATA_SOURCE_NAME=postgresql://sensorthings:ChangeMe@owdp-database:5432/sensorthings?sslmode=disable
+    ports:
+      - 9187:9187
+
+  node-exporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)"
+
+
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
     build:
       context: docker/pygeoapi
     depends_on:
       - owdp-frost
+    restart: unless-stopped
     environment:
       - API_URL=${OWDP_URL}/oapi
       - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
@@ -98,5 +120,29 @@ services:
     profiles: [production]
     restart: always
 
+  owdp-prometheus:
+    image: prom/prometheus
+    container_name: owdp-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./docker/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  owdp-grafana:
+    image: grafana/grafana
+    container_name: owdp-grafana
+    ports:
+      - 4000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./docker/grafana:/etc/grafana/provisioning/datasources
+
 volumes:
   postgis_volume:
+  prom_data:
