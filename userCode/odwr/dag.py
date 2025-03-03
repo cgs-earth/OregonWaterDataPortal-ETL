@@ -27,7 +27,10 @@ import httpx
 import requests
 from typing import List, Optional, Tuple
 
-from userCode.env import API_BACKEND_URL, RUNNING_IN_TEST_ENVIRONMENT
+from userCode.env import (
+    API_BACKEND_URL,
+    RUNNING_AS_TEST_OR_DEV,
+)
 from userCode.helper_classes import BatchHelper, get_datastream_time_range, MockValues
 from userCode.odwr.lib import (
     fetch_station_metadata,
@@ -194,11 +197,11 @@ def sta_all_observations(
             # If we are running this as a test, we want to keep track of which observations we have seen so we can detect duplicates
             # We don't want to cache every single observation unless we are running as a test since the db will catch duplicates as well
             # This is a further check to be thorough
-            if RUNNING_IN_TEST_ENVIRONMENT:
+            if RUNNING_AS_TEST_OR_DEV():
                 key = (datastream.iotid, date)
-                assert (
-                    key not in seen_obs
-                ), f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
+                assert key not in seen_obs, (
+                    f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
+                )
                 seen_obs.add(key)
 
             sta_representation = to_sensorthings_observation(
@@ -341,7 +344,9 @@ DAILY_AT_4AM_EST_1AM_PST = "0 9 * * *"
 @schedule(
     cron_schedule=DAILY_AT_4AM_EST_1AM_PST,
     target=AssetSelection.groups("owdp"),
-    default_status=DefaultScheduleStatus.STOPPED,
+    default_status=DefaultScheduleStatus.STOPPED
+    if RUNNING_AS_TEST_OR_DEV()
+    else DefaultScheduleStatus.RUNNING,
 )
 def odwr_schedule():
     for partition_key in station_partition.get_partition_keys():
