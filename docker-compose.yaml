@@ -3,7 +3,6 @@ include:
 
 # The services below run in both production and locally in development
 services:
-
   owdp-database:
     container_name: owdp-database
     build:
@@ -33,7 +32,7 @@ services:
       - 8080:8080
     depends_on:
       - owdp-database
-    restart: no 
+    restart: no
 
   owdp-pygeoapi:
     container_name: owdp-pygeoapi
