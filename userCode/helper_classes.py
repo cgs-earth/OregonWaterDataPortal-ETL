@@ -130,7 +130,7 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
     resp = requests.get(url_join(API_BACKEND_URL, f"Datastreams('{iotid}')"))
-    get_dagster_logger().debug(resp.url)
+    get_dagster_logger().debug(f"Fetching datastream from FROST with url {resp.url}")
 
     # 404 represents that there is no datastream and thus the timerange is null
     # we represent null by setting both the start and end to the beginning of all

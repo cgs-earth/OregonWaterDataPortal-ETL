@@ -256,7 +256,9 @@ def test_our_download_matches_ui(execution_number):
     )
     # 'https://apps.wrd.state.or.us/apps/sw/hydro_near_real_time/hydro_download.aspx?station_nbr=10378500&start_date=1/1/2025&end_date=1/9/2025&dataset=MDF&format=tsv&units='
     parsed = parse_oregon_tsv(res)
-    assert parsed.data[0] == 17.1
+    assert (
+        parsed.data[0] == 17.1
+    ), "The first value did match the expected value; this is a sign that either the tsv url generation function is wrong or the data itself was revised inside the API"
     assert parsed.data[1] == 15.2
     for i in range(8):
         assert f"2025-01-0{i + 1}" in parsed.dates[i]
