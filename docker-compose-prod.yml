@@ -1,6 +1,5 @@
 # All services in this file are run for production but are not essential for local development/cicd
 services:
-
   postgres-exporter:
     container_name: postgres-exporter
     image: prometheuscommunity/postgres-exporter:latest
@@ -11,7 +10,7 @@ services:
       - 9187:9187
     command: ["--collector.stat_statements"]
     profiles:
-        - production
+      - production
 
   node-exporter:
     image: prom/node-exporter
@@ -24,7 +23,7 @@ services:
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)"
     profiles:
-        - production
+      - production
 
   web-proxy:
     container_name: web-proxy
