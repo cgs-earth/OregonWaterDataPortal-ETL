@@ -16,7 +16,7 @@ import requests
 import shelve
 from typing import ClassVar, Optional, Tuple
 
-from userCode.env import RUNNING_IN_TEST_ENVIRONMENT
+from userCode.env import RUNNING_AS_TEST_OR_DEV
 from userCode.util import deterministic_hash
 
 
@@ -40,7 +40,7 @@ class ShelveCache:
 
     def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
         # If we are in prod we want to ignore using the cache and not store anything
-        if not RUNNING_IN_TEST_ENVIRONMENT:
+        if not RUNNING_AS_TEST_OR_DEV():
             response = requests.get(url, headers=HEADERS, timeout=300)
             return response.content, response.status_code
 
