@@ -14,8 +14,6 @@ services:
       - POSTGRES_PASSWORD=ChangeMe
     volumes:
       - postgis_volume:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
     # apply the stat_statements in config here instead of needing to mount it in the container; postgres config path
     # varies between versions / env https://github.com/docker-library/postgres/issues/177
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
