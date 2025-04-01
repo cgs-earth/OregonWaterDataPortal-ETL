@@ -13,7 +13,7 @@ from hypothesis import given, strategies as st
 import pytest
 
 from ..lib import wipe_datastreams, wipe_locations, wipe_things
-from userCode.odwr.lib import (
+from userCode.OregonWaterResourcesDepartment.lib import (
     assert_valid_oregon_date,
     download_oregon_tsv,
     parse_oregon_tsv,

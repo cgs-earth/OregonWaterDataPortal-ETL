@@ -11,7 +11,7 @@
 from typing import Optional
 
 from userCode.ontology import ONTOLOGY_MAPPING
-from userCode.odwr.types import Attributes, StationData
+from userCode.OregonWaterResourcesDepartment.types import Attributes, StationData
 from userCode.types import Datastream, Observation
 
 

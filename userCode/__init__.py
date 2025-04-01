@@ -19,7 +19,7 @@ import dagster_slack
 from userCode.env import RUNNING_AS_TEST_OR_DEV
 from userCode.util import get_env, slack_error_fn
 import userCode.awqms.dag as awqms
-import userCode.odwr.dag as odwr
+import userCode.OregonWaterResourcesDepartment.dag as odwr
 
 assets = load_assets_from_modules([awqms, odwr])
 asset_checks = load_asset_checks_from_modules([awqms, odwr])

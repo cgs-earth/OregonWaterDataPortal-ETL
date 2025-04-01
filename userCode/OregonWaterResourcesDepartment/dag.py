@@ -32,18 +32,18 @@ from userCode.env import (
     RUNNING_AS_TEST_OR_DEV,
 )
 from userCode.helper_classes import BatchHelper, get_datastream_time_range, MockValues
-from userCode.odwr.lib import (
+from userCode.OregonWaterResourcesDepartment.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
     assert_no_observations_with_same_iotid_in_first_page,
 )
-from userCode.odwr.sta_generation import (
+from userCode.OregonWaterResourcesDepartment.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.types import (
+from userCode.OregonWaterResourcesDepartment.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     Attributes,

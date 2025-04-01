@@ -13,12 +13,12 @@ import pytest
 import requests
 
 
-from userCode.odwr.lib import (
+from userCode.OregonWaterResourcesDepartment.lib import (
     download_oregon_tsv,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
 )
-from userCode.odwr.types import START_OF_DATA
+from userCode.OregonWaterResourcesDepartment.types import START_OF_DATA
 from userCode.util import (
     assert_date_in_range,
     now_as_oregon_datetime,
