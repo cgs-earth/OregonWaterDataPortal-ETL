@@ -27,6 +27,7 @@ from userCode.util import (
 )
 
 
+@pytest.mark.upstream
 @pytest.mark.parametrize(
     "end_date",
     ["10/7/2022 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
@@ -42,6 +43,7 @@ def test_no_data_with_no_beginning_date(end_date):
     assert len(result.dates) == len(result.data) == 0
 
 
+@pytest.mark.upstream
 @pytest.mark.parametrize(
     "start_date",
     ["10/7/2023 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
@@ -57,6 +59,7 @@ def test_no_data_with_no_end_date(start_date):
     assert len(result.dates) == len(result.data)
 
 
+@pytest.mark.upstream
 @pytest.mark.parametrize(
     "start_date",
     ["10/7/2023 12:00:00 AM", "10/7/2024 12:00:00 AM", "4/7/2000 11:00:00 AM"],
@@ -88,6 +91,7 @@ def test_requesting_no_end_is_undefined_behavior(start_date):
     assert len(today_result.data) >= len(no_end_result.data)
 
 
+@pytest.mark.upstream
 def test_very_old_date_same_as_no_start_date():
     response: bytes = download_oregon_tsv(
         "mean_daily_flow_available",
@@ -115,6 +119,7 @@ def test_very_old_date_same_as_no_start_date():
     assert len(no_start_result.dates) < len(very_old_result.data)
 
 
+@pytest.mark.upstream
 def test_very_old_dates_are_the_same():
     """Make sure that one date in the past with no data gives the same result as another in the past with no data. i.e. 1800 == 1850"""
     response: bytes = download_oregon_tsv(
@@ -153,6 +158,7 @@ def test_old_data_has_many_null_values():
     assert len(null_values) > 500
 
 
+@pytest.mark.upstream
 def test_how_many_observations_in_full_station():
     begin = START_OF_DATA
     end = now_as_oregon_datetime()
@@ -168,6 +174,7 @@ def test_how_many_observations_in_full_station():
     )  # we can't test an exact number here since the oregon data is consistently updating. But must be at least bigger than this value we got on Oct 28 2024
 
 
+@pytest.mark.upstream
 def test_timezone_behavior():
     end = now_as_oregon_datetime()
     begin = to_oregon_datetime(datetime.now(tz=timezone.utc) - timedelta(days=100))
@@ -192,6 +199,7 @@ def test_timezone_behavior():
         )
 
 
+@pytest.mark.upstream
 @pytest.mark.parametrize(
     "begin,end_time",
     [
@@ -245,6 +253,7 @@ def test_adding_one_minute_prevents_overlap(begin, end_time):
         assert date not in parsedResp2.dates
 
 
+@pytest.mark.upstream
 # run this multiple times to make sure it is consistent
 @pytest.mark.parametrize("execution_number", range(5))
 def test_our_download_matches_ui(execution_number):

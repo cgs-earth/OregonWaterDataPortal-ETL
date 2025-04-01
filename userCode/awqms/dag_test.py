@@ -26,7 +26,7 @@ from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
 
-from ..lib import (
+from test.lib import (
     wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
