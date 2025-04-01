@@ -18,6 +18,6 @@
     ".hypothesis/": true,
     // hide build artifacts / dependency installations
     "**/*.egg-info/": true,
-    ".venv/": true,
+    ".venv/": true
   }
 }
