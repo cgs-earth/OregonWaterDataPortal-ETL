@@ -16,7 +16,7 @@ from userCode.helper_classes import (
     TimeRange,
     get_datastream_time_range,
 )
-from ..lib import (
+from test.lib import (
     wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
