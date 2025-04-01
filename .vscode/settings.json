@@ -9,5 +9,15 @@
   "python.analysis.typeCheckingMode": "standard",
   "python.testing.pytestArgs": ["userCode"],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  "files.exclude": {
+    // hide cache folders in every subdirectory
+    "**/__pycache__/": true,
+    "**/.pytest_cache/": true,
+    ".ruff_cache/": true,
+    ".hypothesis/": true,
+    // hide build artifacts / dependency installations
+    "**/*.egg-info/": true,
+    ".venv/": true
+  }
 }

@@ -71,9 +71,9 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
     equiv_dict = dict()
     for keys, value in __ontology_definition:
         for key in keys:
-            assert (
-                key not in equiv_dict
-            ), f"Tried to add duplicate key {key} when it already exists in {equiv_dict}"
+            assert key not in equiv_dict, (
+                f"Tried to add duplicate key {key} when it already exists in {equiv_dict}"
+            )
             equiv_dict[key] = value
 
     return equiv_dict
