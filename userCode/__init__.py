@@ -16,6 +16,7 @@ from dagster import (
 )
 import dagster_slack
 
+from userCode.env import RUNNING_AS_TEST_OR_DEV
 from userCode.util import get_env, slack_error_fn
 import userCode.awqms.dag as awqms
 import userCode.odwr.dag as odwr
@@ -33,7 +34,9 @@ definitions = Definitions(
             channel="#cgs-iow-bots",
             slack_token=get_env("SLACK_BOT_TOKEN"),
             text_fn=slack_error_fn,
-            default_status=DefaultSensorStatus.RUNNING,
+            default_status=DefaultSensorStatus.STOPPED
+            if RUNNING_AS_TEST_OR_DEV()
+            else DefaultSensorStatus.RUNNING,
             monitor_all_code_locations=True,
         )
     ],
