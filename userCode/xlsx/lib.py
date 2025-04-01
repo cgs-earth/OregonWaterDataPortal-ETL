@@ -25,9 +25,9 @@ def validate_columns(sheet: list, typedDict: type):
     gotCols = list(sheet[0].keys())
     # take the set difference
     missingCols = set(expectedCols) - set(gotCols)
-    assert (
-        len(missingCols) == 0
-    ), f"XLSX Validation failed: Sheet {typedDict.__name__} is missing columns: {missingCols}"
+    assert len(missingCols) == 0, (
+        f"XLSX Validation failed: Sheet {typedDict.__name__} is missing columns: {missingCols}"
+    )
 
 
 def parse_xlsx(input_file: Path) -> OregonXLSX:
