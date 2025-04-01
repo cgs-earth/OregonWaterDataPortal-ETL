@@ -17,7 +17,10 @@ from typing import Literal, NamedTuple, Optional
 
 from userCode.env import API_BACKEND_URL
 from userCode.util import from_oregon_datetime, url_join
-from userCode.OregonWaterResourcesDepartment.types import START_OF_DATA, FrostBatchRequest
+from userCode.OregonWaterResourcesDepartment.types import (
+    START_OF_DATA,
+    FrostBatchRequest,
+)
 from userCode.types import Datastream, Observation
 
 
