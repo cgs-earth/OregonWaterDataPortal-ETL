@@ -3,24 +3,38 @@
 alembic==1.14.0 \
     --hash=sha256:99bd884ca390466db5e27ffccff1d179ec5c05c965cfefc0607e69f9e411cb25 \
     --hash=sha256:b00892b53b3642d0b8dbedba234dbf1924b69be83a9a769d5a624b01094e304b
+    # via dagster
 annotated-types==0.7.0 \
     --hash=sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53 \
     --hash=sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89
+    # via pydantic
 antlr4-python3-runtime==4.13.2 \
     --hash=sha256:909b647e1d2fc2b70180ac586df3933e38919c85f98ccc656a96cd3f25ef3916 \
     --hash=sha256:fe3835eb8d33daece0e799090eda89719dbccee7aa39ef94eed3818cafa5a7e8
+    # via dagster
 anyio==4.7.0 \
     --hash=sha256:2f834749c602966b7d456a7567cafcb309f96482b5081d14ac93ccd457f9dd48 \
     --hash=sha256:ea60c3723ab42ba6fff7e8ccb0488c898ec538ff4df1f1d5e642c3601d07e352
+    # via
+    #   gql
+    #   httpx
+    #   starlette
+    #   watchfiles
 attrs==24.3.0 \
     --hash=sha256:8f5c07333d543103541ba7be0e2ce16eeee8130cb0b3f9238ab904ce1e85baff \
     --hash=sha256:ac96cd038792094f438ad1f6ff80837353805ac950cd2aa0e0625ef19850c308
+    # via hypothesis
 backoff==2.2.1 \
     --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
     --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
+    # via gql
 certifi==2024.8.30 \
     --hash=sha256:922820b53db7a7257ffbda3f597266d435245903d80737e34f8a45ff3e3230d8 \
     --hash=sha256:bec941d2aa8195e248a60b31ff9f0558284cf01a52591ceda73ea9afffd69fd9
+    # via
+    #   httpcore
+    #   httpx
+    #   requests
 charset-normalizer==3.4.0 \
     --hash=sha256:0713f3adb9d03d49d365b70b84775d0a0d18e4ab08d12bc46baa6132ba78aaf6 \
     --hash=sha256:07afec21bbbbf8a5cc3651aa96b980afe2526e7f048fdfb7f1014d84acc8b6d8 \
@@ -54,33 +68,55 @@ charset-normalizer==3.4.0 \
     --hash=sha256:f19c1585933c82098c2a520f8ec1227f20e339e33aca8fa6f956f6691b784e67 \
     --hash=sha256:fe9f97feb71aa9896b81973a7bbada8c49501dc73e58a10fcef6663af95e5079 \
     --hash=sha256:ffc519621dce0c767e96b9c53f09c5d215578e10b02c285809f76509a3931482
+    # via requests
 click==8.1.7 \
     --hash=sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28 \
     --hash=sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de
+    # via
+    #   dagster
+    #   dagster-webserver
+    #   oregonwaterdataportal-etl
+    #   uvicorn
 colorama==0.4.6 ; sys_platform == 'win32' \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
+    # via
+    #   click
+    #   pytest
+    #   tqdm
+    #   uvicorn
 coloredlogs==14.0 \
     --hash=sha256:346f58aad6afd48444c2468618623638dadab76e4e70d5e10822676f2d32226a \
     --hash=sha256:a1fab193d2053aa6c0a97608c4342d031f1f93a3d1218432c59322441d31a505
+    # via dagster
 croniter==3.0.4 \
     --hash=sha256:96e14cdd5dcb479dd48d7db14b53d8434b188dfb9210448bef6f65663524a6f0 \
     --hash=sha256:f9dcd4bdb6c97abedb6f09d6ed3495b13ede4d4544503fa580b6372a56a0c520
+    # via dagster
 dagster==1.9.4 \
     --hash=sha256:85b33e25fb06318fe0cab226f60028d0dea5eaa715e4f7ec7e6f3e30dca96f05 \
     --hash=sha256:9b60f65fc6e90d2f7f428c06c7c6f7e10607eeb30a9e55ad6cc2a657cb23c2a0
+    # via
+    #   dagster-graphql
+    #   dagster-slack
+    #   dagster-webserver
+    #   oregonwaterdataportal-etl
 dagster-graphql==1.9.4 \
     --hash=sha256:3a7ad03f2e428d017e5f179748285a28ecd0970214d95b9de8da431a3a825ea1 \
     --hash=sha256:f1ff96a6b7f9d2c9df31e1c2ff0ce641abdf7a43195d8265c2159b80c247bf54
+    # via dagster-webserver
 dagster-pipes==1.9.4 \
     --hash=sha256:6d0b151d01d45f21bd4ae91743cf766c7e00816b4e856074523d01365362c389 \
     --hash=sha256:7c2e468a803d0ee64726296f74d9acb0bd532e6ebb070676914f2aae3c236afe
+    # via dagster
 dagster-slack==0.25.4 \
     --hash=sha256:23ac4298a7fd7cb71d86254e122702e8496fe38b9ca9bc9b7dd4d225caac4389 \
     --hash=sha256:6fc0514b490adfc528c2d94dfe7fa88f16c2f0fc3665bf51721f087f61277e63
+    # via oregonwaterdataportal-etl
 dagster-webserver==1.9.4 \
     --hash=sha256:a18e208caaf3418137be83657a9329f6a99c0e4e307ecd74bdc790cf9a520111 \
     --hash=sha256:a514f7000604249c54dc38f8e34ffc84c8997bf2f9b3b2e3ba6bbb4cb794d254
+    # via oregonwaterdataportal-etl
 debugpy==1.8.11 \
     --hash=sha256:0e22f846f4211383e6a416d04b4c13ed174d24cc5d43f5fd52e7821d0ebc8920 \
     --hash=sha256:28e45b3f827d3bf2592f3cf7ae63282e859f3259db44ed2b129093ca0ac7940b \
@@ -92,41 +128,59 @@ debugpy==1.8.11 \
     --hash=sha256:bb3b15e25891f38da3ca0740271e63ab9db61f41d4d8541745cfc1824252cb28 \
     --hash=sha256:ce291a5aca4985d82875d6779f61375e959208cdf09fcec40001e65fb0a54768 \
     --hash=sha256:d8768edcbeb34da9e11bcb8b5c2e0958d25218df7a6e56adf415ef262cd7b6d1
+    # via oregonwaterdataportal-etl
 demjson3==3.0.6 \
     --hash=sha256:37c83b0c6eb08d25defc88df0a2a4875d58a7809a9650bd6eee7afd8053cdbac
+    # via frost-sta-client
 docstring-parser==0.16 \
     --hash=sha256:538beabd0af1e2db0146b6bd3caa526c35a34d61af9fd2887f3a8a27a739aa6e \
     --hash=sha256:bf0a1387354d3691d102edef7ec124f219ef639982d096e26e3b60aeffa90637
+    # via dagster
 et-xmlfile==2.0.0 \
     --hash=sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa \
     --hash=sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54
+    # via openpyxl
 filelock==3.16.1 \
     --hash=sha256:2082e5703d51fbf98ea75855d9d5527e33d8ff23099bec374a134febee6946b0 \
     --hash=sha256:c249fbfcd5db47e5e2d6d62198e565475ee65e4831e2561c8e313fa7eb961435
+    # via dagster
 frost-sta-client==1.1.45 \
     --hash=sha256:5b201f6ea13e7a6007fbbfdee71980bc26968f2a9ed854e315b9e16ee3648a29 \
     --hash=sha256:a085ee3d3201b9302861c4280d6844413cb33568cd34d6f6ae21c5498a09aea4
+    # via oregonwaterdataportal-etl
 fsspec==2024.10.0 \
     --hash=sha256:03b9a6785766a4de40368b88906366755e2819e758b83705c88cd7cb5fe81871 \
     --hash=sha256:eda2d8a4116d4f2429db8550f2457da57279247dd930bb12f821b58391359493
+    # via universal-pathlib
 furl==2.1.3 \
     --hash=sha256:5a6188fe2666c484a12159c18be97a1977a71d632ef5bb867ef15f54af39cc4e \
     --hash=sha256:9ab425062c4217f9802508e45feb4a83e54324273ac4b202f1850363309666c0
+    # via frost-sta-client
 geojson==3.1.0 \
     --hash=sha256:58a7fa40727ea058efc28b0e9ff0099eadf6d0965e04690830208d3ef571adac \
     --hash=sha256:68a9771827237adb8c0c71f8527509c8f5bef61733aa434cefc9c9d4f0ebe8f3
+    # via
+    #   frost-sta-client
+    #   oregonwaterdataportal-etl
 gql==3.5.0 \
     --hash=sha256:70dda5694a5b194a8441f077aa5fb70cc94e4ec08016117523f013680901ecb7 \
     --hash=sha256:ccb9c5db543682b28f577069950488218ed65d4ac70bb03b6929aaadaf636de9
+    # via dagster-graphql
 graphene==3.4.3 \
     --hash=sha256:2a3786948ce75fe7e078443d37f609cbe5bb36ad8d6b828740ad3b95ed1a0aaa \
     --hash=sha256:820db6289754c181007a150db1f7fff544b94142b556d12e3ebc777a7bf36c71
+    # via dagster-graphql
 graphql-core==3.2.5 \
     --hash=sha256:2f150d5096448aa4f8ab26268567bbfeef823769893b39c1a2e1409590939c8a \
     --hash=sha256:e671b90ed653c808715645e3998b7ab67d382d55467b7e2978549111bbabf8d5
+    # via
+    #   gql
+    #   graphene
+    #   graphql-relay
 graphql-relay==3.2.0 \
     --hash=sha256:1ff1c51298356e481a0be009ccdff249832ce53f30559c1338f22a0e0d17250c \
     --hash=sha256:c9b22bd28b170ba1fe674c74384a8ff30a76c8e26f88ac3aa1584dd3179953e5
+    # via graphene
 greenlet==3.1.1 ; (python_full_version < '3.13' and platform_machine == 'AMD64') or (python_full_version < '3.13' and platform_machine == 'WIN32') or (python_full_version < '3.13' and platform_machine == 'aarch64') or (python_full_version < '3.13' and platform_machine == 'amd64') or (python_full_version < '3.13' and platform_machine == 'ppc64le') or (python_full_version < '3.13' and platform_machine == 'win32') or (python_full_version < '3.13' and platform_machine == 'x86_64') \
     --hash=sha256:0153404a4bb921f0ff1abeb5ce8a5131da56b953eda6e14b88dc6bbc04d2049e \
     --hash=sha256:04b013dc07c96f83134b1e99888e7a79979f1a247e2a9f59697fa14b5862ed01 \
@@ -154,6 +208,7 @@ greenlet==3.1.1 ; (python_full_version < '3.13' and platform_machine == 'AMD64')
     --hash=sha256:efc0f674aa41b92da8c49e0346318c6075d734994c3c4e4430b1c3f853e498e4 \
     --hash=sha256:f1695e76146579f8c06c1509c7ce4dfe0706f49c6831a817ac04eebb2fd02011 \
     --hash=sha256:f406b22b7c9a9b4f8aa9d2ab13d6ae0ac3e85c9a809bd590ad53fed2bf70dc79
+    # via sqlalchemy
 grpcio==1.68.1 \
     --hash=sha256:04cfd68bf4f38f5bb959ee2361a7546916bd9a50f78617a346b3aeb2b42e2161 \
     --hash=sha256:255b1635b0ed81e9f91da4fcc8d43b7ea5520090b9a9ad9340d147066d1d3613 \
@@ -174,15 +229,23 @@ grpcio==1.68.1 \
     --hash=sha256:c08079b4934b0bf0a8847f42c197b1d12cba6495a3d43febd7e99ecd1cdc8d54 \
     --hash=sha256:c28848761a6520c5c6071d2904a18d339a796ebe6b800adc8b3f474c5ce3c3ad \
     --hash=sha256:e4842e4872ae4ae0f5497bf60a0498fa778c192cc7a9e87877abd2814aca9475
+    # via
+    #   dagster
+    #   grpcio-health-checking
 grpcio-health-checking==1.68.1 \
     --hash=sha256:2457627bf1223c7e57efebdbe50970d8e20ce536adfb8866535b21754b216bf4 \
     --hash=sha256:ea936cfa0c64a24afd8005873ea61b1acc83a941c00b56a6339c9b225c80a1a8
+    # via dagster
 h11==0.14.0 \
     --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
     --hash=sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761
+    # via
+    #   httpcore
+    #   uvicorn
 httpcore==1.0.7 \
     --hash=sha256:8551cb62a169ec7162ac7be8d4817d561f60e08eaa485234898414bb5a8a0b4c \
     --hash=sha256:a3fff8f43dc260d5bd363d9f9cf1830fa3a458b332856f34282de498ed420edd
+    # via httpx
 httptools==0.6.4 \
     --hash=sha256:16e603a3bff50db08cd578d54f07032ca1631450ceb972c2f834c2b860c28ea2 \
     --hash=sha256:28908df1b9bb8187393d5b5db91435ccc9c8e891657f9cbb42a2541b44c82fc8 \
@@ -199,39 +262,55 @@ httptools==0.6.4 \
     --hash=sha256:df017d6c780287d5c80601dafa31f17bddb170232d85c066604d8558683711a2 \
     --hash=sha256:ec4f178901fa1834d4a060320d2f3abc5c9e39766953d038f1458cb885f47e81 \
     --hash=sha256:f9eb89ecf8b290f2e293325c646a211ff1c2493222798bb80a530c5e7502494f
+    # via uvicorn
 httpx==0.28.1 \
     --hash=sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
+    # via oregonwaterdataportal-etl
 humanfriendly==10.0 \
     --hash=sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477 \
     --hash=sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc
+    # via coloredlogs
 hypothesis==6.122.5 \
     --hash=sha256:c50b104d9d5163ebdeb09ccd93626343664942570bcb067c41adf10394a81caf \
     --hash=sha256:e0994f04331251d51e18040f497c839a52b37669b422fe4cfef85a54d41405bf
+    # via oregonwaterdataportal-etl
 idna==3.10 \
     --hash=sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9 \
     --hash=sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3
+    # via
+    #   anyio
+    #   httpx
+    #   requests
+    #   yarl
 iniconfig==2.0.0 \
     --hash=sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3 \
     --hash=sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374
+    # via pytest
 jinja2==3.1.4 \
     --hash=sha256:4a3aee7acbbe7303aede8e9648d13b8bf88a429282aa6122a993f0ac800cb369 \
     --hash=sha256:bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d
+    # via dagster
 jsonpatch==1.33 \
     --hash=sha256:0ae28c0cd062bbd8b8ecc26d7d164fbbea9652a1a3693f3b956c1eae5145dade \
     --hash=sha256:9fcd4009c41e6d12348b4a0ff2563ba56a2923a7dfee731d004e212e1ee5030c
+    # via frost-sta-client
 jsonpickle==4.0.0 \
     --hash=sha256:53730b9e094bc41f540bfdd25eaf6e6cf43811590e9e1477abcec44b866ddcd9 \
     --hash=sha256:fc670852b204d77601b08f8f9333149ac37ab6d3fe4e6ed3b578427291f63736
+    # via frost-sta-client
 jsonpointer==3.0.0 \
     --hash=sha256:13e088adc14fca8b6aa8177c044e12701e6ad4b28ff10e65f2267a90109c9942 \
     --hash=sha256:2b2d729f2091522d61c3b31f82e11870f60b68f43fbc705cb76bf4b832af59ef
+    # via jsonpatch
 mako==1.3.8 \
     --hash=sha256:42f48953c7eb91332040ff567eb7eea69b22e7a4affbc5ba8e845e8f730f6627 \
     --hash=sha256:577b97e414580d3e088d47c2dbbe9594aa7a5146ed2875d4dfa9075af2dd3cc8
+    # via alembic
 markdown-it-py==3.0.0 \
     --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
     --hash=sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb
+    # via rich
 markupsafe==3.0.2 \
     --hash=sha256:0f4ca02bea9a23221c0182836703cbf8930c5e9454bacce27e767509fa286a30 \
     --hash=sha256:131a3c7689c85f5ad20f9f6fb1b866f402c445b220c19fe4308c0b147ccd2ad9 \
@@ -264,9 +343,13 @@ markupsafe==3.0.2 \
     --hash=sha256:ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0 \
     --hash=sha256:f3818cb119498c0678015754eba762e0d61e5b52d34c8b13d770f0719f7b1d79 \
     --hash=sha256:f8b3d067f2e40fe93e1ccdd6b2e1d16c43140e76f02fb1319a05cf2b79d99430
+    # via
+    #   jinja2
+    #   mako
 mdurl==0.1.2 \
     --hash=sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8 \
     --hash=sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba
+    # via markdown-it-py
 multidict==6.1.0 \
     --hash=sha256:052e10d2d37810b99cc170b785945421141bf7bb7d2f8799d431e7db229c385f \
     --hash=sha256:071120490b47aa997cca00666923a83f02c7fbb44f71cf7f136df753f7fa8761 \
@@ -300,6 +383,7 @@ multidict==6.1.0 \
     --hash=sha256:d569388c381b24671589335a3be6e1d45546c2988c2ebe30fdcada8457a31008 \
     --hash=sha256:e9aa71e15d9d9beaad2c6b9319edcdc0a49a43ef5c0a4c8265ca9ee7d6c67774 \
     --hash=sha256:f90c822a402cb865e396a504f9fc8173ef34212a342d92e362ca498cad308e28
+    # via yarl
 numpy==2.2.0 \
     --hash=sha256:0798b138c291d792f8ea40fe3768610f3c7dd2574389e37c3f26573757c8f7ef \
     --hash=sha256:0f0986e917aca18f7a567b812ef7ca9391288e2acb7a4308aa9d265bd724bdae \
@@ -332,15 +416,21 @@ numpy==2.2.0 \
     --hash=sha256:ebe5e59545401fbb1b24da76f006ab19734ae71e703cdb4a8b347e84a0cece67 \
     --hash=sha256:f0dd071b95bbca244f4cb7f70b77d2ff3aaaba7fa16dc41f58d14854a6204e6c \
     --hash=sha256:f8c8b141ef9699ae777c6278b52c706b653bf15d135d302754f6b2e90eb30367
+    # via pandas
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
     --hash=sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050
+    # via oregonwaterdataportal-etl
 orderedmultidict==1.0.1 \
     --hash=sha256:04070bbb5e87291cc9bfa51df413677faf2141c73c61d2a5f7b26bea3cd882ad \
     --hash=sha256:43c839a17ee3cdd62234c47deca1a8508a3f2ca1d0678a3bf791c87cf84adbf3
+    # via furl
 packaging==24.2 \
     --hash=sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759 \
     --hash=sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f
+    # via
+    #   dagster
+    #   pytest
 pandas==2.2.3 \
     --hash=sha256:062309c1b9ea12a50e8ce661145c6aab431b1e99530d3cd60640e255778bd43a \
     --hash=sha256:15c0e1e02e93116177d29ff83e8b1619c93ddc9c49083f237d4312337a61165d \
@@ -363,9 +453,11 @@ pandas==2.2.3 \
     --hash=sha256:f00d1345d84d8c86a63e476bb4955e46458b304b9575dcf71102b5c705320015 \
     --hash=sha256:f3a255b2c19987fbbe62a9dfd6cff7ff2aa9ccab3fc75218fd4b7530f01efa24 \
     --hash=sha256:fffb8ae78d8af97f849404f21411c95062db1496aeb3e56f146f0355c9989319
+    # via oregonwaterdataportal-etl
 pluggy==1.5.0 \
     --hash=sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1 \
     --hash=sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669
+    # via pytest
 propcache==0.2.1 \
     --hash=sha256:049324ee97bb67285b49632132db351b41e77833678432be52bdd0289c0e05e4 \
     --hash=sha256:081a430aa8d5e8876c6909b67bd2d937bfd531b0382d3fdedb82612c618bc41a \
@@ -401,6 +493,7 @@ propcache==0.2.1 \
     --hash=sha256:e73091191e4280403bde6c9a52a6999d69cdfde498f1fdf629105247599b57ec \
     --hash=sha256:e800776a79a5aabdb17dcc2346a7d66d0777e942e4cd251defeb084762ecd17d \
     --hash=sha256:f508b0491767bb1f2b87fdfacaba5f7eddc2f867740ec69ece6d1946d29029a6
+    # via yarl
 protobuf==5.29.1 \
     --hash=sha256:1fc55267f086dd4050d18ef839d7bd69300d0d08c2a53ca7df3920cc271a3c34 \
     --hash=sha256:22c1f539024241ee545cbcb00ee160ad1877975690b16656ff87dde107b5f110 \
@@ -409,13 +502,18 @@ protobuf==5.29.1 \
     --hash=sha256:8ee1461b3af56145aca2800e6a3e2f928108c749ba8feccc6f5dd0062c410c0d \
     --hash=sha256:b5ba1d0e4c8a40ae0496d0e2ecfdbb82e1776928a205106d14ad6985a09ec155 \
     --hash=sha256:d473655e29c0c4bbf8b69e9a8fb54645bc289dead6d753b952e7aa660254ae18
+    # via
+    #   dagster
+    #   grpcio-health-checking
 psutil==6.1.0 ; sys_platform == 'win32' \
     --hash=sha256:1ad45a1f5d0b608253b11508f80940985d1d0c8f6111b5cb637533a0e6ddc13e \
     --hash=sha256:353815f59a7f64cdaca1c0307ee13558a0512f6db064e92fe833784f08539c7a \
     --hash=sha256:a8fb3752b491d246034fa4d279ff076501588ce8cbcdbb62c32fd7a377d996be
+    # via dagster
 pydantic==2.10.3 \
     --hash=sha256:be04d85bbc7b65651c5f8e6b9976ed9c6f41782a55524cef079a34a0bb82144d \
     --hash=sha256:cb5ac360ce894ceacd69c403187900a02c4b20b693a9dd1d643e1effab9eadf9
+    # via dagster
 pydantic-core==2.27.1 \
     --hash=sha256:0325336f348dbee6550d129b1627cb8f5351a9dc91aad141ffb96d4937bd9529 \
     --hash=sha256:062f60e512fc7fff8b8a9d680ff0ddaaef0193dba9fa83e679c0c5f5fbd018bc \
@@ -446,27 +544,47 @@ pydantic-core==2.27.1 \
     --hash=sha256:e1f735dc43da318cad19b4173dd1ffce1d84aafd6c9b782b3abc04a0d5a6f5bb \
     --hash=sha256:f216dbce0e60e4d03e0c4353c7023b202d95cbaeff12e5fd2e82ea0a66905073 \
     --hash=sha256:f4e5658dbffe8843a0f12366a4c2d1c316dbe09bb4dfbdc9d2d9cd6031de8aae
+    # via pydantic
 pygments==2.18.0 \
     --hash=sha256:786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199 \
     --hash=sha256:b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a
+    # via rich
 pyreadline3==3.5.4 ; sys_platform == 'win32' \
     --hash=sha256:8d57d53039a1c75adba8e50dd3d992b28143480816187ea5efbd5c78e6c885b7 \
     --hash=sha256:eaf8e6cc3c49bcccf145fc6067ba8643d1df34d604a1ec0eccbf7a18e6d3fae6
+    # via humanfriendly
 pytest==8.3.4 \
     --hash=sha256:50e16d954148559c9a74109af1eaf0c945ba2d8f30f0a3d3335edde19788b6f6 \
     --hash=sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761
+    # via
+    #   oregonwaterdataportal-etl
+    #   pytest-dotenv
 pytest-dotenv==0.5.2 \
     --hash=sha256:2dc6c3ac6d8764c71c6d2804e902d0ff810fa19692e95fe138aefc9b1aa73732 \
     --hash=sha256:40a2cece120a213898afaa5407673f6bd924b1fa7eafce6bda0e8abffe2f710f
+    # via oregonwaterdataportal-etl
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
     --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+    # via
+    #   croniter
+    #   frost-sta-client
+    #   graphene
+    #   pandas
 python-dotenv==1.0.1 \
     --hash=sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca \
     --hash=sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a
+    # via
+    #   dagster
+    #   pytest-dotenv
+    #   uvicorn
 pytz==2024.2 \
     --hash=sha256:2aa355083c50a0f93fa581709deac0c9ad65cca8a9e9beac660adcbd493c798a \
     --hash=sha256:31c7c1817eb7fae7ca4b8c7ee50c72f93aa2dd863de768e1ef4245d426aa0725
+    # via
+    #   croniter
+    #   dagster
+    #   pandas
 pywin32==308 ; sys_platform == 'win32' \
     --hash=sha256:00b3e11ef09ede56c6a43c71f2d31857cf7c54b0ab6e78ac659497abd2834f47 \
     --hash=sha256:1c44539a37a5b7b21d02ab34e6a4d314e0788f1690d65b48e9b0b89f31abbbed \
@@ -474,6 +592,7 @@ pywin32==308 ; sys_platform == 'win32' \
     --hash=sha256:9b4de86c8d909aed15b7011182c8cab38c8850de36e6afb1f0db22b8959e3091 \
     --hash=sha256:ef313c46d4c18dfb82a2431e3051ac8f112ccee1a34f29c263c583c568db63cd \
     --hash=sha256:fd380990e792eaf6827fcb7e187b2b4b1cede0585e3d0c9e84201ec27b9905e4
+    # via dagster
 pyyaml==6.0.2 \
     --hash=sha256:0833f8694549e586547b576dcfaba4a6b55b9e96098b36cdc7ebefe667dfed48 \
     --hash=sha256:0ffe8360bab4910ef1b9e87fb812d8bc0a308b0d0eef8c8f44e0254ab3b07133 \
@@ -494,30 +613,50 @@ pyyaml==6.0.2 \
     --hash=sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e \
     --hash=sha256:ef6107725bd54b262d6dedcc2af448a266975032bc85ef0172c5f059da6325b4 \
     --hash=sha256:efdca5630322a10774e8e98e1af481aad470dd62c3170801852d752aa7a783ba
+    # via
+    #   dagster
+    #   uvicorn
 requests==2.32.3 \
     --hash=sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760 \
     --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
+    # via
+    #   dagster
+    #   dagster-graphql
+    #   frost-sta-client
+    #   gql
+    #   oregonwaterdataportal-etl
+    #   requests-toolbelt
 requests-toolbelt==1.0.0 \
     --hash=sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6 \
     --hash=sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06
+    # via gql
 rich==13.9.4 \
     --hash=sha256:439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098 \
     --hash=sha256:6049d5e6ec054bf2779ab3358186963bac2ea89175919d699e378b99738c2a90
+    # via dagster
 setuptools==75.6.0 \
     --hash=sha256:8199222558df7c86216af4f84c30e9b34a61d8ba19366cc914424cdbd28252f6 \
     --hash=sha256:ce74b49e8f7110f9bf04883b730f4765b774ef3ef28f722cce7c273d253aaf7d
+    # via dagster
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
+    # via
+    #   furl
+    #   orderedmultidict
+    #   python-dateutil
 slack-sdk==3.33.5 \
     --hash=sha256:a5e74c00c99dc844ad93e501ab764a20d86fa8184bbc9432af217496f632c4ee \
     --hash=sha256:b8cccadfa3d4005a5e6529f52000d25c583f46173fda8e9136fdd2bc58923ff6
+    # via dagster-slack
 sniffio==1.3.1 \
     --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
     --hash=sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc
+    # via anyio
 sortedcontainers==2.4.0 \
     --hash=sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88 \
     --hash=sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0
+    # via hypothesis
 sqlalchemy==2.0.36 \
     --hash=sha256:0572f4bd6f94752167adfd7c1bed84f4b240ee6203a95e05d1e208d488d0d436 \
     --hash=sha256:1bc330d9d29c7f06f003ab10e1eaced295e87940405afe1b110f2eb93a233588 \
@@ -537,15 +676,23 @@ sqlalchemy==2.0.36 \
     --hash=sha256:f7b64e6ec3f02c35647be6b4851008b26cff592a95ecb13b6788a54ef80bbdd4 \
     --hash=sha256:fddbe92b4760c6f5d48162aef14824add991aeda8ddadb3c31d56eb15ca69f8e \
     --hash=sha256:fdf3386a801ea5aba17c6410dd1dc8d39cf454ca2565541b5ac42a84e1e28f53
+    # via
+    #   alembic
+    #   dagster
 starlette==0.41.3 \
     --hash=sha256:0e4ab3d16522a255be6b28260b938eae2482f98ce5cc934cb08dce8dc3ba5835 \
     --hash=sha256:44cedb2b7c77a9de33a8b74b2b90e9f50d11fcf25d8270ea525ad71a25374ff7
+    # via
+    #   dagster-graphql
+    #   dagster-webserver
 structlog==24.4.0 \
     --hash=sha256:597f61e80a91cc0749a9fd2a098ed76715a1c8a01f73e336b746504d1aad7610 \
     --hash=sha256:b27bfecede327a6d2da5fbc96bd859f114ecc398a6389d664f62085ee7ae6fc4
+    # via dagster
 tabulate==0.9.0 \
     --hash=sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c \
     --hash=sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f
+    # via dagster
 tomli==2.2.1 \
     --hash=sha256:02abe224de6ae62c19f090f68da4e27b10af2b93213d36cf44e6e1c5abd19fdd \
     --hash=sha256:286f0ca2ffeeb5b9bd4fcc8d6c330534323ec51b2f52da063b11c502da16f30c \
@@ -569,27 +716,44 @@ tomli==2.2.1 \
     --hash=sha256:db2b95f9de79181805df90bedc5a5ab4c165e6ec3fe99f970d0e302f384ad222 \
     --hash=sha256:e85e99945e688e32d5a35c1ff38ed0b3f41f43fad8df0bdf79f72b2ba7bc5272 \
     --hash=sha256:f4039b9cbc3048b2416cc57ab3bda989a6fcf9b36cf8937f01a6e731b64f80d7
+    # via dagster
 toposort==1.10 \
     --hash=sha256:bfbb479c53d0a696ea7402601f4e693c97b0367837c8898bc6471adfca37a6bd \
     --hash=sha256:cbdbc0d0bee4d2695ab2ceec97fe0679e9c10eab4b2a87a9372b929e70563a87
+    # via dagster
 tqdm==4.67.1 \
     --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2 \
     --hash=sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2
+    # via dagster
 typing-extensions==4.12.2 \
     --hash=sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d \
     --hash=sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8
+    # via
+    #   alembic
+    #   anyio
+    #   dagster
+    #   graphene
+    #   pydantic
+    #   pydantic-core
+    #   sqlalchemy
 tzdata==2024.2 \
     --hash=sha256:7d85cc416e9382e69095b7bdf4afd9e3880418a2413feec7069d533d6b4e31cc \
     --hash=sha256:a48093786cdcde33cad18c2555e8532f34422074448fbc874186f0abd79565cd
+    # via
+    #   dagster
+    #   pandas
 universal-pathlib==0.2.5 \
     --hash=sha256:a634f700eca827b4ad03bfa0267e51161560dd1de83b051cf0fccf39b3e56b32 \
     --hash=sha256:ea5d4fb8178c2ab469cf4fa46d0ceb16ccb378da46dbbc28a8b9c1eebdccc655
+    # via dagster
 urllib3==2.2.3 \
     --hash=sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac \
     --hash=sha256:e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9
+    # via requests
 uvicorn==0.32.1 \
     --hash=sha256:82ad92fd58da0d12af7482ecdb5f2470a04c9c9a53ced65b9bbb4a205377602e \
     --hash=sha256:ee9519c246a72b1c084cea8d3b44ed6026e78a4a309cbedae9c37e4cb9fbb175
+    # via dagster-webserver
 uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32' \
     --hash=sha256:183aef7c8730e54c9a3ee3227464daed66e37ba13040bb3f350bc2ddc040f22f \
     --hash=sha256:359ec2c888397b9e592a889c4d72ba3d6befba8b2bb01743f72fffbde663b59c \
@@ -604,6 +768,7 @@ uvloop==0.21.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'c
     --hash=sha256:bfd55dfcc2a512316e65f16e503e9e450cab148ef11df4e4e679b5e8253a5281 \
     --hash=sha256:f3df876acd7ec037a3d005b3ab85a7e4110422e4d9c1571d4fc89b0fc41b6816 \
     --hash=sha256:f7089d2dc73179ce5ac255bdf37c236a9f914b264825fdaacaded6990a7fb4c2
+    # via uvicorn
 watchdog==5.0.3 \
     --hash=sha256:0f9332243355643d567697c3e3fa07330a1d1abf981611654a1f2bf2175612b7 \
     --hash=sha256:1021223c08ba8d2d38d71ec1704496471ffd7be42cfb26b87cd5059323a389a1 \
@@ -622,6 +787,7 @@ watchdog==5.0.3 \
     --hash=sha256:c66f80ee5b602a9c7ab66e3c9f36026590a0902db3aea414d59a2f55188c1f49 \
     --hash=sha256:dd021efa85970bd4824acacbb922066159d0f9e546389a4743d56919b6758b91 \
     --hash=sha256:f00b4cf737f568be9665563347a910f8bdc76f88c2970121c86243c8cfdf90e9
+    # via dagster
 watchfiles==1.0.3 \
     --hash=sha256:0179252846be03fa97d4d5f8233d1c620ef004855f0717712ae1c558f1974a16 \
     --hash=sha256:0d1ec043f02ca04bf21b1b32cab155ce90c651aaf5540db8eb8ad7f7e645cba8 \
@@ -649,6 +815,7 @@ watchfiles==1.0.3 \
     --hash=sha256:e153a690b7255c5ced17895394b4f109d5dcc2a4f35cb809374da50f0e5c456a \
     --hash=sha256:f3ff7da165c99a5412fe5dd2304dd2dbaaaa5da718aad942dcb3a178eaa70c56 \
     --hash=sha256:f58d3bfafecf3d81c15d99fc0ecf4319e80ac712c77cf0ce2661c8cf8bf84066
+    # via uvicorn
 websockets==14.1 \
     --hash=sha256:00fe5da3f037041da1ee0cf8e308374e236883f9842c7c465aa65098b1c9af59 \
     --hash=sha256:0d4290d559d68288da9f444089fd82490c8d2744309113fc26e2da6e48b65da6 \
@@ -674,6 +841,7 @@ websockets==14.1 \
     --hash=sha256:cf5201a04550136ef870aa60ad3d29d2a59e452a7f96b94193bee6d73b8ad9a9 \
     --hash=sha256:eb6d38971c800ff02e4a6afd791bbe3b923a9a57ca9aeab7314c21c84bf9ff05 \
     --hash=sha256:ed907449fe5e021933e46a3e65d651f641975a768d0649fee59f10c2985529ed
+    # via uvicorn
 yarl==1.18.3 \
     --hash=sha256:00e5a1fea0fd4f5bfa7440a47eff01d9822a65b4488f7cff83155a0f31a2ecba \
     --hash=sha256:1a74a13a4c857a84a845505fd2d68e54826a2cd01935a96efb1e9d86c728e186 \
@@ -709,3 +877,4 @@ yarl==1.18.3 \
     --hash=sha256:f52a265001d830bc425f82ca9eabda94a64a4d753b07d623a9f2863fde532b53 \
     --hash=sha256:f91c4803173928a25e1a55b943c81f55b8872f0018be83e3ad4938adffb77dd2 \
     --hash=sha256:fbd6748e8ab9b41171bb95c6142faf068f5ef1511935a0aa07025438dd9a9bc1
+    # via gql
