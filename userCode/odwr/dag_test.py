@@ -23,7 +23,7 @@ from userCode.odwr.types import StationData
 from userCode.util import to_oregon_datetime
 
 
-from ..lib import (
+from test.lib import (
     assert_no_duplicate_at_given_time,
     assert_observations_and_datastreams_empty,
     dates_are_within_X_days,
@@ -32,7 +32,7 @@ from ..lib import (
     wipe_observed_properties,
     wipe_things,
 )
-from .test_lib import test_iow_hash_is_deterministic
+from .lib_test import test_iow_hash_is_deterministic
 
 
 @pytest.fixture(scope="module")

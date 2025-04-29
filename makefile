@@ -24,6 +24,7 @@ wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
 # run tests on the dagster pipeline. NOTE: this will clear the db and start fresh
+.PHONY: test
 test:
 	pytest -vv -x
 
