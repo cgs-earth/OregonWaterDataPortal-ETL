@@ -340,6 +340,7 @@ odwr_job = define_asset_job(
 
 EVERY_4_HOURS = "0 */4 * * *"
 
+
 @schedule(
     cron_schedule=EVERY_4_HOURS,
     target=AssetSelection.groups("owdp"),
