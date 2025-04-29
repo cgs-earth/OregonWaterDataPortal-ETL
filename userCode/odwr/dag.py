@@ -338,11 +338,10 @@ odwr_job = define_asset_job(
     selection=AssetSelection.groups("owdp"),
 )
 
-DAILY_AT_4AM_EST_1AM_PST = "0 9 * * *"
-
+EVERY_6_HOURS = "0 */6 * * *"
 
 @schedule(
-    cron_schedule=DAILY_AT_4AM_EST_1AM_PST,
+    cron_schedule=EVERY_6_HOURS,
     target=AssetSelection.groups("owdp"),
     default_status=DefaultScheduleStatus.STOPPED
     if RUNNING_AS_TEST_OR_DEV()
