@@ -8,7 +8,7 @@
 #
 # =================================================================
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import pytest
 import requests
 
@@ -20,6 +20,7 @@ from userCode.odwr.lib import (
 )
 from userCode.odwr.types import START_OF_DATA
 from userCode.util import (
+    PACIFIC_TIME,
     assert_date_in_range,
     now_as_oregon_datetime,
     from_oregon_datetime,
@@ -177,7 +178,7 @@ def test_how_many_observations_in_full_station():
 @pytest.mark.upstream
 def test_timezone_behavior():
     end = now_as_oregon_datetime()
-    begin = to_oregon_datetime(datetime.now(tz=timezone.utc) - timedelta(days=100))
+    begin = to_oregon_datetime(datetime.now(tz=PACIFIC_TIME) - timedelta(days=100))
 
     response: bytes = download_oregon_tsv(
         "mean_daily_flow_available", 10371500, start_date=begin, end_date=end
@@ -205,7 +206,7 @@ def test_timezone_behavior():
     [
         (
             "2024-09-20T00:00:00Z",
-            (datetime.now(tz=timezone.utc) - timedelta(hours=1)).strftime(
+            (datetime.now(tz=PACIFIC_TIME) - timedelta(hours=1)).strftime(
                 "%Y-%m-%dT%H:%M:%SZ"
             ),
         ),
@@ -224,8 +225,8 @@ def test_adding_one_minute_prevents_overlap(begin, end_time):
     # it ignores the minute extra. We don't want to add full hours however since we don't
     # want to be ignoring any data.
 
-    begin = datetime.fromisoformat(begin)
-    end_time = datetime.fromisoformat(end_time)
+    begin = datetime.fromisoformat(begin).replace(tzinfo=PACIFIC_TIME)
+    end_time = datetime.fromisoformat(end_time).replace(tzinfo=PACIFIC_TIME)
 
     response1: bytes = download_oregon_tsv(
         "mean_daily_flow_available",
@@ -236,7 +237,7 @@ def test_adding_one_minute_prevents_overlap(begin, end_time):
 
     new_begin = end_time + timedelta(minutes=1)
     assert new_begin > end_time
-    assert new_begin < datetime.now(tz=timezone.utc)
+    assert new_begin < datetime.now(tz=PACIFIC_TIME)
     new_begin_oregon_fmt = to_oregon_datetime(new_begin)
 
     response2: bytes = download_oregon_tsv(

@@ -26,6 +26,7 @@ from userCode.odwr.types import (
     OregonHttpResponse,
     ParsedTSVData,
 )
+from userCode.util import PACIFIC_TIME
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,13 +103,17 @@ def parse_oregon_tsv(
 
 def unix_offset_to_iso(unix_offset: int) -> str:
     """Convert unix offset to iso format"""
-    return datetime.datetime.fromtimestamp(unix_offset / 1000).isoformat()
+    return (
+        datetime.datetime.fromtimestamp(unix_offset / 1000)
+        .replace(tzinfo=PACIFIC_TIME)
+        .isoformat()
+    )
 
 
 def tsv_date_response_to_datetime(date_str: str) -> datetime.datetime:
     """Convert the date string from the tsv response to a datetime object"""
     date_str = date_str.replace("Z", "+00:00")
-    return datetime.datetime.fromisoformat(date_str)
+    return datetime.datetime.fromisoformat(date_str).replace(tzinfo=PACIFIC_TIME)
 
 
 def generate_phenomenon_time(dates: list[str]) -> Optional[str]:

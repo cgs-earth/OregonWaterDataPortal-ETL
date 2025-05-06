@@ -14,6 +14,8 @@ from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
 
+PACIFIC_TIME = datetime.timezone(datetime.timedelta(hours=-8))
+
 
 def get_env(key: str) -> str:
     """Fetch environment variable"""
@@ -46,15 +48,17 @@ def slack_error_fn(context: RunFailureSensorContext) -> str:
 
 
 def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
-    isoDate = datetime.datetime.fromisoformat(date)
-    assert isoDate.tzinfo == datetime.timezone.utc
+    isoDate = datetime.datetime.fromisoformat(date).replace(tzinfo=PACIFIC_TIME)
+    assert isoDate.tzinfo == PACIFIC_TIME
+    assert start.tzinfo == PACIFIC_TIME
+    assert end.tzinfo == PACIFIC_TIME
     assert isoDate >= start
     assert isoDate <= end
 
 
 def now_as_oregon_datetime():
     """Get the current time formatted in a way that the oregon api expects"""
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    now = datetime.datetime.now(tz=PACIFIC_TIME)
     return to_oregon_datetime(now)
 
 
@@ -67,9 +71,7 @@ def from_oregon_datetime(
     date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p"
 ) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, fmt).replace(
-        tzinfo=datetime.timezone.utc
-    )
+    return datetime.datetime.strptime(date_str, fmt).replace(tzinfo=PACIFIC_TIME)
 
 
 def url_join(*parts: str) -> str:

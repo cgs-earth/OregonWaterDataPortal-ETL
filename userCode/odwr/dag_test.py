@@ -18,9 +18,11 @@ from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.env import API_BACKEND_URL
 from userCode.odwr.dag import all_metadata, post_station, sta_station
 from userCode.helper_classes import get_datastream_time_range, MockValues
-from userCode.odwr.lib import assert_no_observations_with_same_iotid_in_first_page
+from userCode.odwr.lib import (
+    assert_no_observations_with_same_iotid_in_first_page,
+)
 from userCode.odwr.types import StationData
-from userCode.util import to_oregon_datetime
+from userCode.util import PACIFIC_TIME, to_oregon_datetime
 
 
 from test.lib import (
@@ -78,7 +80,7 @@ def test_full_pipeline(metadata: list[StationData]):
     # we need to mock to a date in the past that is still
     # relatively recent since some datastreams dont have data
     # before 2020ish
-    mocked_date = datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc)
+    mocked_date = datetime.datetime(2022, 1, 1, tzinfo=PACIFIC_TIME)
 
     crawl_subset_result = harvest_job.execute_in_process(
         instance=instance,
@@ -147,7 +149,7 @@ def test_full_pipeline(metadata: list[StationData]):
         "The start of the datastream should not change as new data is added to the end"
     )
     assert update_crawl_range.end >= range.end
-    today = datetime.datetime.now(tz=datetime.timezone.utc)
+    today = datetime.datetime.now(tz=PACIFIC_TIME)
     assert dates_are_within_X_days(update_crawl_range.end, today, 7), (
         "The most recent observation in a datastream should be close to today unless the upstream Oregon API is behind and has not updated observations yet"
     )
