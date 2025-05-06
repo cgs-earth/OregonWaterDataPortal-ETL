@@ -17,4 +17,6 @@ WORKDIR /opt/dagster/app
 
 EXPOSE 3000
 
+ENV PRODUCTION=true
+
 ENTRYPOINT ["dagster", "dev", "-h", "0.0.0.0"]

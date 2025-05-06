@@ -21,4 +21,15 @@ AWQMS_URL = "https://ordeq.gselements.com/api"
 # we wouldn't necessarily want to do in production
 def RUNNING_AS_TEST_OR_DEV():
     """Check if we are running outside of the docker container"""
-    return "DAGSTER_IS_DEV_CLI" in os.environ or "PYTEST_CURRENT_TEST" in os.environ
+    return (
+        # If we are running from the command line
+        "DAGSTER_IS_DEV_CLI" in os.environ
+        # If we are running inside of pytest
+        or "PYTEST_CURRENT_TEST" in os.environ
+        # Make sure that we are not inside the container
+        # with the PRODUCTION variable st
+        # We have to have this case since in this repo
+        # we are running the dagster dev command in production
+        # and that sets DAGSTER_IS_DEV_CLI
+        and "PRODUCTION" not in os.environ
+    )
