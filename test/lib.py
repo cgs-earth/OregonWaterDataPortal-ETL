@@ -13,7 +13,7 @@ import datetime
 import requests
 
 from userCode.env import API_BACKEND_URL
-from userCode.util import to_oregon_datetime
+from userCode.util import PACIFIC_TIME, to_oregon_datetime
 
 
 @contextmanager
@@ -77,15 +77,14 @@ def wipe_datastreams():
 
 
 def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
-    isoDate = datetime.datetime.fromisoformat(date)
-    assert isoDate.tzinfo == datetime.timezone.utc
-    assert isoDate >= start
-    assert isoDate <= end
+    isoDate = datetime.datetime.fromisoformat(date).replace(tzinfo=PACIFIC_TIME)
+    assert start.tzinfo == PACIFIC_TIME and end.tzinfo == PACIFIC_TIME
+    assert isoDate >= start and isoDate <= end
 
 
 def now_as_oregon_datetime():
     """Get the current time formatted in a way that the oregon api expects"""
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    now = datetime.datetime.now(tz=PACIFIC_TIME)
     return to_oregon_datetime(now)
 
 

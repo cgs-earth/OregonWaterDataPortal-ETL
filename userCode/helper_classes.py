@@ -16,7 +16,7 @@ import requests
 from typing import Literal, NamedTuple, Optional
 
 from userCode.env import API_BACKEND_URL
-from userCode.util import from_oregon_datetime, url_join
+from userCode.util import PACIFIC_TIME, from_oregon_datetime, url_join
 from userCode.odwr.types import START_OF_DATA, FrostBatchRequest
 from userCode.types import Datastream, Observation
 
@@ -146,8 +146,8 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
         f"phenomenonTime was not found in the datastream. This is a sign that the datastream was created in a previous call but never populated correctly. Full json: {json}"
     )
     range = json["phenomenonTime"].split("/")
-    start = datetime.datetime.fromisoformat(range[0])
-    end = datetime.datetime.fromisoformat(range[1])
+    start = datetime.datetime.fromisoformat(range[0]).replace(tzinfo=PACIFIC_TIME)
+    end = datetime.datetime.fromisoformat(range[1]).replace(tzinfo=PACIFIC_TIME)
 
     assert len(range) == 2
 

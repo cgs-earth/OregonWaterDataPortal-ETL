@@ -18,7 +18,7 @@ from userCode.odwr.lib import (
     download_oregon_tsv,
     parse_oregon_tsv,
 )
-from userCode.util import from_oregon_datetime, deterministic_hash
+from userCode.util import PACIFIC_TIME, from_oregon_datetime, deterministic_hash
 
 
 def test_download():
@@ -48,10 +48,10 @@ def test_parse_tsv():
     # make sure the dates are in the specified range; we need to remove the timezone information from the dates to compare
     assert from_oregon_datetime(start) <= datetime.datetime.fromisoformat(
         dates[0]
-    ).replace(tzinfo=datetime.timezone.utc)
+    ).replace(tzinfo=PACIFIC_TIME)
     assert from_oregon_datetime(end) >= datetime.datetime.fromisoformat(
         dates[-1]
-    ).replace(tzinfo=datetime.timezone.utc)
+    ).replace(tzinfo=PACIFIC_TIME)
 
 
 def test_oregon_dates():
