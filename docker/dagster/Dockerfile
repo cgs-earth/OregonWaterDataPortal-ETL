@@ -19,4 +19,5 @@ EXPOSE 3000
 
 ENV PRODUCTION=true
 
-ENTRYPOINT ["dagster", "dev", "-h", "0.0.0.0"]
+# use sh so that env vars are available
+ENTRYPOINT ["sh", "-c", "dagster dev -h 0.0.0.0"]
