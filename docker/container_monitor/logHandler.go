@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
@@ -16,45 +16,46 @@ type LogWatcherConfig struct {
 	Patterns []string // Patterns to watch in the logs
 }
 
-// Watch a container's logs for specific patterns and send a Slack message when a pattern is matched
 func watchAndHandleLogs(docker *client.Client, slackAPI SlackClient, containerName string, logWatcherConfig LogWatcherConfig) {
-	logger.Printf("Listening for logs for container %s...\n", containerName)
+	log.Infof("Starting log watcher for container %s with patterns %v", containerName, logWatcherConfig.Patterns)
 
-	ctx := context.Background()
+	for {
+		nowTime := time.Now()
 
-	nowTime := time.Now()
+		logs, err := docker.ContainerLogs(context.Background(), containerName, container.LogsOptions{
+			ShowStdout: true,
+			ShowStderr: true,
+			Follow:     true,
+			Timestamps: true,
+			Since:      nowTime.Format(time.RFC3339),
+		})
+		if err != nil {
+			log.Errorf("Failed to retrieve logs for container %s: %v", containerName, err)
+			time.Sleep(5 * time.Second) // wait before retrying
+			continue
+		}
 
-	// Retrieve container logs as a stream
-	logs, err := docker.ContainerLogs(ctx, containerName, container.LogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-		Follow:     true,
-		Timestamps: true,
-		Since:      nowTime.Format(time.RFC3339),
-	})
-	if err != nil {
-		log.Fatalf("Failed to retrieve logs for container %s: %v\n", containerName, err)
-	}
-	defer logs.Close()
+		scanner := bufio.NewScanner(logs)
+		for scanner.Scan() {
+			logLine := scanner.Text()
+			for _, pattern := range logWatcherConfig.Patterns {
+				if strings.Contains(logLine, pattern) {
+					message := fmt.Sprintf("Container `%s`: matched watch pattern `%s` with log line: \n`%s`", containerName, pattern, logLine)
+					log.Infof("Sending Slack notification to channel %s with message: %s", slackAPI.Config.SlackChannelName, message)
 
-	// Use a scanner to read the logs line by line
-	scanner := bufio.NewScanner(logs)
-	for scanner.Scan() {
-		logLine := scanner.Text()
-		for _, pattern := range logWatcherConfig.Patterns {
-			if strings.Contains(logLine, pattern) {
-				message := fmt.Sprintf("Container `%s`: matched watch pattern `%s` with log line: \n`%s`", containerName, pattern, logLine)
-				log.Printf("Sending Slack notification to channel %s with message: %s", slackAPI.Config.SlackChannelName, message)
-
-				_, err := slackAPI.SendMessage(message)
-				if err != nil {
-					log.Fatalf("Failed to send Slack message: %v\n", err)
+					if _, err := slackAPI.SendMessage(message); err != nil {
+						log.Errorf("Failed to send Slack message: %v", err)
+					}
 				}
 			}
 		}
-	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatalf("Error reading container logs: %v\n", err)
+		if err := scanner.Err(); err != nil {
+			log.Errorf("Error reading container logs: %v", err)
+		}
+
+		logs.Close()
+		log.Warnf("Log stream for container %s ended, reconnecting...", containerName)
+		time.Sleep(2 * time.Second) // brief pause before retrying
 	}
 }

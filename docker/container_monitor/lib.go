@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/slack-go/slack"
@@ -42,7 +42,7 @@ func NewSlackClient() *SlackClient {
 // Send a message to a channel on slack and return the thread in question
 // All text is sent as markdown
 func (s *SlackClient) SendMessage(message string, opts ...slack.MsgOption) (string, error) {
-	logger.Printf("Sending message to channel %s: %s", s.Config.SlackChannelName, message)
+	log.Infof("Sending message to channel %s: %s", s.Config.SlackChannelName, message)
 	postParams := slack.PostMessageParameters{
 		Username: s.Config.SlackBotName,
 		IconURL:  s.Config.SlackBotAvatar,
@@ -85,8 +85,7 @@ func strictEnv(envVarName string) string {
 
 // Get the logs for a container as a newline separated string
 func getContainerLogs(cli *client.Client, containerID string) (string, error) {
-	ctx := context.Background()
-	reader, err := cli.ContainerLogs(ctx, containerID, container.LogsOptions{
+	reader, err := cli.ContainerLogs(context.Background(), containerID, container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Tail:       fmt.Sprintf("%d", tailLength),
