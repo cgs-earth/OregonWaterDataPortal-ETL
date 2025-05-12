@@ -84,9 +84,12 @@ services:
     build:
       context: ./docker/container_monitor
     container_name: owdp-container-monitor
+    env_file:
+      - .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      # test scopes for the token with https://api.slack.com/methods/chat.postMessage/test
       - SLACK_BOT_TOKEN
       # NOTE, no # needed here for the channel name
       - SLACK_CHANNEL_NAME=cgs-iow-bots
