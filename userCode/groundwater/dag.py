@@ -21,17 +21,19 @@ from dagster import (
 from userCode.env import (
     RUNNING_AS_TEST_OR_DEV,
 )
+from userCode.groundwater.wells import fetch_wells, flatten_paginated_well_response
 from userCode.helper_classes import BatchHelper
-from userCode.odwr.types import (
-    ALL_RELEVANT_STATIONS,
-)
 from userCode.types import Observation
 from userCode.util import (
     now_as_oregon_datetime,
 )
 
+ALL_RELEVANT_IDS = [
+    feature for feature in flatten_paginated_well_response(fetch_wells()).features
+]
 
-station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
+
+station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_IDS])
 
 
 @asset(partitions_def=station_partition, deps=[], group_name="owdp")
