@@ -1,3 +1,8 @@
+// This script converts a GeoJSON file to an ESRI JSON file
+// this is needed sine the esri API only accepts ESRI JSON
+// this is in js and not python since we don't need to call this
+// at runtime; we just need to get the static file since it is just county borders
+
 const { geojsonToArcGIS } = require("@terraformer/arcgis")
 const fs = require("fs")
 
