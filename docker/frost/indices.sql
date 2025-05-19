@@ -1,3 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS "system_stats";
+
+
 --------- By default FROST does not index in some of the ways we would expect so we 
 --------- Need to add additional indices 
 

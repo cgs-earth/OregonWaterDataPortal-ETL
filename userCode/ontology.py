@@ -63,6 +63,10 @@ __ontology_definition = (
         ),
         get_ontology(f"{BASE_URL}/variablename/temperatureSensor"),
     ),
+    (
+        ("groundwater_level", "groundwater depth", "groundwater"),
+        get_ontology(f"{BASE_URL}/variablename/groundwaterDepth"),
+    ),
 )
 
 
