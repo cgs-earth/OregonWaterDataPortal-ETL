@@ -9,10 +9,10 @@ server:
   languages:
     - "en-US"
   pretty_print: false
-  limits:  
-        default_items: 1000
-        max_items: 100000
-        on_exceed: error
+  limits:
+    default_items: 1000
+    max_items: 100000
+    on_exceed: error
   map:
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     attribution: '<a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
