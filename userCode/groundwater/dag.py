@@ -63,11 +63,11 @@ def stations(get_wells: list[WellFeature]) -> None:
     """Convert a list of wells to a list of StationData objects"""
     foundCount = 0
     for i, well in enumerate(get_wells):
-        if i % 100 == 0:
+        if i % 1000 == 0:
             get_dagster_logger().info(f"Creating station {i} of {len(get_wells)}")
         resp = requests.post(
             f"{API_BACKEND_URL}/Things",
-            json=well.to_sta_location(),
+            json=well.to_sta_thing(),
         )
         if resp.status_code == 500 and "Failed to store data" in resp.text:
             foundCount += 1
@@ -92,7 +92,7 @@ def datastreams(get_wells: list[WellFeature]) -> None:
     )
     foundCount = 0
     for i, datastream in enumerate(datastreams_to_create):
-        if i % 100 == 0:
+        if i % 1000 == 0:
             get_dagster_logger().info(
                 f"Creating datastream {i} of {len(datastreams_to_create)}"
             )

@@ -147,15 +147,15 @@ class WellFeature(BaseModel):
             observations.append(observation)
         return observations
 
-    def to_sta_location(self):
+    def to_sta_thing(self):
         return {
             "@iot.id": self._get_unique_wl_id(),
-            "name": self._get_datastream_name(),
+            "name": f"Groundwater Well {self._get_unique_wl_id()}",
             "description": self._get_datastream_description(),
             "Locations": [
                 {
                     "@iot.id": self._get_unique_wl_id(),
-                    "name": self._get_datastream_name(),
+                    "name": f"Groundwater Well {self._get_unique_wl_id()}",
                     "description": self._get_datastream_description(),
                     "encodingType": "application/vnd.geo+json",
                     "location": {
