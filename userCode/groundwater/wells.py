@@ -87,7 +87,8 @@ class WellFeature(BaseModel):
         timeseries_id = self._get_unique_wl_id()
         url = f"https://apps.wrd.state.or.us/apps/gw/gw_data_rws/api/{timeseries_id}/gw_measured_water_level/?start_date=1/1/1905&end_date=12/30/2050&public_viewable="
 
-        cache = ShelveCache()
+        # Never cache timeseries data, since it will bloat the cache
+        cache = ShelveCache(skip_caching_in_prod=True)
         resp, status = cache.get_or_fetch(url, force_fetch=False)
         assert status == 200
         data = json.loads(resp)
@@ -252,7 +253,10 @@ def fetch_wells():
         }
         encoded_params = urlencode(params)
         logging.debug(f"Fetching {base_url}&{encoded_params}")
-        cache = ShelveCache()
+        # We want to cache the results of this API call since it is expensive
+        isSunday = datetime.datetime.now().weekday() == 6
+        # skip caching and always fetch once a week, otherwise cache it so it doesn't take forever
+        cache = ShelveCache(skip_caching_in_prod=True if isSunday else False)
         response, status = cache.get_or_fetch(
             f"{base_url}&{encoded_params}", force_fetch=False
         )

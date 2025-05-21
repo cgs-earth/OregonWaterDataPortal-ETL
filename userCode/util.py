@@ -78,6 +78,7 @@ def from_oregon_datetime(
     date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p"
 ) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
+    ## TODO: NOTE: check if this should always have .replace with pacific time on it but this currently works as is
     return datetime.datetime.strptime(date_str, fmt)
 
 

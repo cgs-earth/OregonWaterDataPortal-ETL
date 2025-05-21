@@ -30,6 +30,11 @@ class ShelveCache:
     """
 
     db: ClassVar[str] = "oregondb"
+    # skip caching in prod and always fetch
+    skip_caching_in_prod: bool = False
+
+    def __init__(self, skip_caching_in_prod):
+        self.skip_caching_in_prod = skip_caching_in_prod
 
     def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
         try:
@@ -38,9 +43,14 @@ class ShelveCache:
         except Exception:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
-    def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
+    def get_or_fetch(
+        self,
+        url: str,
+        force_fetch: bool,
+    ) -> Tuple[bytes, int]:
         # If we are in prod we want to ignore using the cache and not store anything
-        if not RUNNING_AS_TEST_OR_DEV():
+        runningInProd = not RUNNING_AS_TEST_OR_DEV
+        if (self.skip_caching_in_prod and runningInProd) or RUNNING_AS_TEST_OR_DEV:
             response = requests.get(url, headers=HEADERS, timeout=300)
             return response.content, response.status_code
 

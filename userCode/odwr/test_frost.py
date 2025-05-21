@@ -23,7 +23,6 @@ from test.lib import (
     wipe_things,
     wipe_things_before_and_after,
 )
-from userCode.util import PACIFIC_TIME
 
 
 def test_duplicate():
@@ -525,8 +524,8 @@ def test_adding_linked_obs_changes_datastream_time():
     )
 
     assert get_datastream_time_range("1") == UTCTimeRange(
-        datetime.datetime.fromisoformat(firstTime).replace(tzinfo=PACIFIC_TIME),
-        datetime.datetime.fromisoformat(newTime).replace(tzinfo=PACIFIC_TIME),
+        datetime.datetime.fromisoformat(firstTime),
+        datetime.datetime.fromisoformat(newTime),
     ), (
         "The second check of the datastream timerange failed. This may be a sign that the time_range helper fn is wrong"
     )

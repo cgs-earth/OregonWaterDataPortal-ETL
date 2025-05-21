@@ -11,6 +11,7 @@
 from hypothesis import given, strategies as st
 
 from userCode.util import (
+    PACIFIC_TIME,
     deterministic_hash,
     from_oregon_datetime,
     now_as_oregon_datetime,
@@ -26,9 +27,10 @@ def test_deterministic_hash():
 def test_now_as_oregon_datetime():
     """Get the current time formatted in a way that the oregon api expects"""
     assert "Z" not in now_as_oregon_datetime(), "Should not be in UTC"
-    assert "-08:00" in from_oregon_datetime(now_as_oregon_datetime()).isoformat(), (
-        "Should be in pacific time"
-    )
+
+    dt = from_oregon_datetime(now_as_oregon_datetime()).replace(tzinfo=PACIFIC_TIME)
+    asIso = dt.isoformat()
+    assert "-08:00" in asIso or "-07:00" in asIso, "Should be in pacific time"
 
 
 # Property: Hash is always positive

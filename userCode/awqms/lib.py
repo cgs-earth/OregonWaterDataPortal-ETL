@@ -56,7 +56,7 @@ def fetch_station(station_id: str) -> bytes:
     encoded_params = urlencode(params)
     xml_url = url_join(AWQMS_URL, f"MonitoringLocationsVer1?{encoded_params}")
 
-    cache = ShelveCache()
+    cache = ShelveCache(skip_caching_in_prod=True)
     response, status_code = cache.get_or_fetch(xml_url, force_fetch=False)
 
     if status_code != 200:
@@ -74,7 +74,7 @@ def fetch_observations(observed_prop: str, station_id: str) -> list[dict]:
     encoded_params = urlencode(params)
     results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
-    cache = ShelveCache()
+    cache = ShelveCache(skip_caching_in_prod=True)
     response, status_code = cache.get_or_fetch(results_url, force_fetch=False)
 
     if status_code != 200:

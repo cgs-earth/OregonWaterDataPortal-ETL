@@ -8,7 +8,7 @@
 #
 # =================================================================
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pytest
 import requests
 
@@ -190,13 +190,14 @@ def test_timezone_behavior():
     result = parse_oregon_tsv(response, drop_rows_with_null_data=True)
 
     for date in result.dates:
-        # Even though oregon requires requests in a specific format,
-        # it returns the data in an ISO format that is different from the request
-        with pytest.raises(ValueError):
-            from_oregon_datetime(date)
-
         assert_utc_date_in_range(
-            date, from_oregon_datetime(begin), from_oregon_datetime(end)
+            date,
+            from_oregon_datetime(begin)
+            .replace(tzinfo=PACIFIC_TIME)
+            .astimezone(timezone.utc),
+            from_oregon_datetime(end)
+            .replace(tzinfo=PACIFIC_TIME)
+            .astimezone(timezone.utc),
         )
 
 

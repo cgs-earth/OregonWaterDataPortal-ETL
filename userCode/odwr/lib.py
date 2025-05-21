@@ -176,7 +176,9 @@ def download_oregon_tsv(
     """Get the tsv data for a specific dataset for a specific station in a given date range"""
     tsv_url = generate_oregon_tsv_url(dataset, station_nbr, start_date, end_date)
 
-    cache = ShelveCache()
+    # we don't want to cache all tsv responses if we are in prod
+    # otherwise we will have a huge cache duplicating all the data
+    cache = ShelveCache(skip_caching_in_prod=True)
     response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
 
     if status_code != 200 or "An Error Has Occured" in response.decode("utf-8"):
