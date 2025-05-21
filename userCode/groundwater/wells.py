@@ -6,12 +6,12 @@ from urllib.parse import urlencode
 
 from dagster import get_dagster_logger
 from pydantic import BaseModel, ConfigDict
-import requests
 
 from userCode import ontology
 from userCode.cache import ShelveCache
 from userCode.types import Datastream, Observation
-from userCode.util import deterministic_hash
+from userCode.util import PACIFIC_TIME, deterministic_hash
+import datetime
 
 
 class WellField(BaseModel):
@@ -38,9 +38,9 @@ class WellAttributes(BaseModel):
 
 class TimeseriesProperties(BaseModel):
     gw_logid: str
-    land_surface_elevation: float
+    land_surface_elevation: Optional[float] = None
     waterlevel_ft_above_mean_sea_level: Optional[float] = None
-    waterlevel_ft_below_land_surface: float
+    waterlevel_ft_below_land_surface: Optional[float] = None
     method_of_water_level_measurement: str
     reviewed_status_desc: str
     measured_date: str
@@ -86,16 +86,18 @@ class WellFeature(BaseModel):
         """Using the id in the mapserver and the well number, fetch the associated timeseries data from the other API"""
         timeseries_id = self._get_unique_wl_id()
         url = f"https://apps.wrd.state.or.us/apps/gw/gw_data_rws/api/{timeseries_id}/gw_measured_water_level/?start_date=1/1/1905&end_date=12/30/2050&public_viewable="
-        resp = requests.get(url)
-        resp.raise_for_status()
-        data = resp.json()
+
+        cache = ShelveCache()
+        resp, status = cache.get_or_fetch(url, force_fetch=False)
+        assert status == 200
+        data = json.loads(resp)
         assert data
         results: list[TimeseriesProperties] = []
         for item in data["feature_list"]:
             serialized_item = TimeseriesProperties.model_validate(item)
             if not serialized_item.waterlevel_ft_below_land_surface:
                 get_dagster_logger().warning(
-                    f"Missing waterlevel_ft_below_land_surface for {item['measured_datetime']}"
+                    f"Missing waterlevel_ft_below_land_surface for gw log id {serialized_item.gw_logid}, measured at {serialized_item.measured_datetime}"
                 )
             results.append(serialized_item)
 
@@ -104,16 +106,24 @@ class WellFeature(BaseModel):
     def to_sta_observations(self) -> list[Observation]:
         """Convert the timeseries data to a list of observations"""
         timeseries_data = self._get_timeseries_data()
+
         observations: list[Observation] = []
         for item in timeseries_data:
+            # read in the timezone naive datetime, assume it is pacific time, then convert to UTC for storage in frost
+            asPacific = (
+                datetime.datetime.fromisoformat(item.measured_datetime)
+                .replace(tzinfo=PACIFIC_TIME)
+                .astimezone(datetime.timezone.utc)
+            )
+
             observation = Observation(
                 **{
                     "@iot.id": deterministic_hash(
                         f"{item.measured_time}{self._get_unique_wl_id()}{item.waterlevel_ft_below_land_surface}",
                         18,
                     ),
-                    "phenomenonTime": item.measured_datetime,
-                    "resultTime": item.measured_datetime,
+                    "phenomenonTime": asPacific.isoformat(),
+                    "resultTime": asPacific.isoformat(),
                     "result": item.waterlevel_ft_below_land_surface,
                     "Datastream": {"@iot.id": self._get_unique_wl_id()},
                     "FeatureOfInterest": {
@@ -128,11 +138,34 @@ class WellFeature(BaseModel):
                                 self.geometry.y,
                             ],
                         },
+                        "properties": {
+                            "land_surface_elevation": item.land_surface_elevation,
+                        },
                     },
                 }
             )
             observations.append(observation)
         return observations
+
+    def to_sta_location(self):
+        return {
+            "@iot.id": self._get_unique_wl_id(),
+            "name": self._get_datastream_name(),
+            "description": self._get_datastream_description(),
+            "Locations": [
+                {
+                    "@iot.id": self._get_unique_wl_id(),
+                    "name": self._get_datastream_name(),
+                    "description": self._get_datastream_description(),
+                    "encodingType": "application/vnd.geo+json",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [self.geometry.x, self.geometry.y],
+                    },
+                }
+            ],
+            "properties": self.attributes.model_dump(),
+        }
 
     def to_sta_datastream(self):
         ontology_mapped_property = ontology.ONTOLOGY_MAPPING["groundwater_level"]

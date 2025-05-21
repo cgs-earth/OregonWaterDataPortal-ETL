@@ -27,13 +27,15 @@ def to_sensorthings_observation(
         raise RuntimeError("Missing datapoint")
 
     # generate a unique id by concatenating the datastream id and the resultTime
-    # we assume that the resultTime is in the format YYYY-MM-DDTHH:MM:SSZ and
+    # we assume that the resultTime is in a pacific time zone and is in the format YYYY-MM-DDTHH:MM:SS-08:00 and
     # that when it is concat with the datastream id it will be unique and less than 18 characters in total
-    strippedResultTime = resultTime.removesuffix("Z")
-    assert strippedResultTime.endswith("00:00:00"), (
-        "resultTime does not end with 00:00:00 so we would lose information if we removed it"
+    assert not resultTime.endswith("Z"), "resultTime should not end with Z"
+
+    pacificTimeMarker = "00:00:00-08:00"
+    assert resultTime.endswith(pacificTimeMarker), (
+        f"resultTime is {resultTime} and does not end with 00:00:00 so we would lose information if we removed it to generate the hash"
     )
-    strippedResultTime = strippedResultTime.removesuffix("00:00:00")
+    strippedResultTime = resultTime.removesuffix(pacificTimeMarker)
     uniqueId = f"{associatedDatastream.iotid}{strippedResultTime}"
     uniqueIdJustNumerical = "".join(filter(str.isdigit, uniqueId))
     MAX_LENGTH_IOTID_FOR_FROST = 18

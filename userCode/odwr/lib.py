@@ -92,7 +92,7 @@ def parse_oregon_tsv(
             else:
                 data.append(float(row[2]))
 
-            parsed_date = parse_date(str(DATE_COLUMN))
+            parsed_date = parse_date_as_pacific_time(str(DATE_COLUMN))
             assert parsed_date not in unique_dates, (
                 f"Date '{parsed_date}' appeared twice in the data"
             )
@@ -127,11 +127,11 @@ def generate_phenomenon_time(dates: list[str]) -> Optional[str]:
     return f"{earliest.isoformat()}/{oldest.isoformat()}"
 
 
-def parse_date(date_str: str) -> str:
+def parse_date_as_pacific_time(date_str: str) -> str:
     formats = ["%m-%d-%Y %H:%M", "%m-%d-%Y"]
     for fmt in formats:
         try:
-            return f"{datetime.datetime.strptime(date_str, fmt).isoformat()}Z"
+            return f"{datetime.datetime.strptime(date_str, fmt).replace(tzinfo=PACIFIC_TIME).isoformat()}"
         except ValueError:
             continue
     raise ValueError(f"Date {date_str} does not match any known formats")

@@ -10,12 +10,24 @@
 
 from hypothesis import given, strategies as st
 
-from userCode.util import deterministic_hash
+from userCode.util import (
+    deterministic_hash,
+    from_oregon_datetime,
+    now_as_oregon_datetime,
+)
 
 
 def test_deterministic_hash():
     assert deterministic_hash("test", 5) == 28374, (
         "Hashes should be deterministic across runs"
+    )
+
+
+def test_now_as_oregon_datetime():
+    """Get the current time formatted in a way that the oregon api expects"""
+    assert "Z" not in now_as_oregon_datetime(), "Should not be in UTC"
+    assert "-08:00" in from_oregon_datetime(now_as_oregon_datetime()).isoformat(), (
+        "Should be in pacific time"
     )
 
 
