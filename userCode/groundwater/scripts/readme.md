@@ -2,7 +2,7 @@ This directory represents all code needed to generate the geometry data for the 
 
 We have to convert the geojson files to esrijson so that they can be used as a polygon filter in the esri api. The esri api does not support geojson polygon filters.
 
-To generate the esrijson files, run 
+To generate the esrijson files, run
 
 `npm i; node geojsonToEsrijson.js`
 
