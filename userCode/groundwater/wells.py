@@ -197,9 +197,10 @@ class WellFeature(BaseModel):
                     "metadata": "Unknown",
                 },
                 "Thing": {
+                    # make sure only the id is specified,
+                    # if you specify the name and description, it will create a new thing
+                    # an error instead of linking the existing one
                     "@iot.id": self._get_unique_wl_id(),
-                    "name": f"Well {self._get_unique_wl_id()}",
-                    "description": f"Well {self._get_unique_wl_id()}",
                 },
             }
         )

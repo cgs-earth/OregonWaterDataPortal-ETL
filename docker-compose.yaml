@@ -36,6 +36,7 @@ services:
       - API_URL=${OWDP_URL}/oapi
       - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
+    restart: always
 
   owdp-ui:
     image: internetofwater/hub2box-ui:owdp-limited

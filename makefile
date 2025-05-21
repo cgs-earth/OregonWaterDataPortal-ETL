@@ -41,6 +41,9 @@ build:
 	uv sync 
 	source .venv/bin/activate
 
+addIndices:
+	docker exec -i owdp-database psql -U sensorthings -d sensorthings < docker/frost/indices.sql
+
 # Check which indices are present on the observations table
 indexCheck:
 	docker exec -t owdp-database psql -U sensorthings -d sensorthings -c "SELECT indexname FROM pg_indexes WHERE tablename = 'OBSERVATIONS'"
