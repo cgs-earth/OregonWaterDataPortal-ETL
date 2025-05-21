@@ -22,7 +22,7 @@ from userCode.odwr.lib import (
     assert_no_observations_with_same_iotid_in_first_page,
 )
 from userCode.odwr.types import StationData
-from userCode.util import PACIFIC_TIME, to_oregon_datetime
+from userCode.util import PACIFIC_TIME
 
 
 from test.lib import (
@@ -89,7 +89,7 @@ def test_full_pipeline(metadata: list[StationData]):
             {
                 # random date in the past
                 "sta_all_observations": MockValues(
-                    mocked_date_to_update_until=to_oregon_datetime(mocked_date)
+                    mocked_date_to_update_until=mocked_date.isoformat()
                 )
             }
         ),

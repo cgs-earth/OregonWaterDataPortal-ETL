@@ -13,8 +13,9 @@ import datetime
 from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
+from zoneinfo import ZoneInfo
 
-PACIFIC_TIME = datetime.timezone(datetime.timedelta(hours=-8))
+PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
 
 
 def get_env(key: str) -> str:
@@ -39,7 +40,8 @@ def deterministic_hash(name: str, desiredLength: int) -> int:
 def slack_error_fn(context: RunFailureSensorContext) -> str:
     get_dagster_logger().info("Sending notification to Slack")
     # The make_slack_on_run_failure_sensor automatically sends the job
-    # id and name so you can just send the error. We don't need other data in the string
+    # id and name so you can just send the error. We don't nee
+    # d other data in the string
     source_being_crawled = context.partition_key
     if source_being_crawled:
         return f"Error for partition: {source_being_crawled}: {context.failure_event.message}"
@@ -47,13 +49,18 @@ def slack_error_fn(context: RunFailureSensorContext) -> str:
         return f"Error: {context.failure_event.message}"
 
 
-def assert_date_in_range(date: str, start: datetime.datetime, end: datetime.datetime):
-    isoDate = datetime.datetime.fromisoformat(date).replace(tzinfo=PACIFIC_TIME)
-    assert isoDate.tzinfo == PACIFIC_TIME
-    assert start.tzinfo == PACIFIC_TIME
-    assert end.tzinfo == PACIFIC_TIME
-    assert isoDate >= start
-    assert isoDate <= end
+def assert_utc_date_in_range(
+    date: str, start: datetime.datetime, end: datetime.datetime
+):
+    isoDate = datetime.datetime.fromisoformat(date)
+    assert (
+        isoDate.tzinfo == datetime.timezone.utc
+        and start.tzinfo == datetime.timezone.utc
+        and end.tzinfo == datetime.timezone.utc
+    ), "Dates should be in UTC"
+    assert isoDate >= start and isoDate <= end, (
+        f"{isoDate} is not in range {start} - {end}"
+    )
 
 
 def now_as_oregon_datetime():
@@ -71,7 +78,7 @@ def from_oregon_datetime(
     date_str: str, fmt: str = "%m/%d/%Y %I:%M:%S %p"
 ) -> datetime.datetime:
     """Convert a datetime string into a datetime object"""
-    return datetime.datetime.strptime(date_str, fmt).replace(tzinfo=PACIFIC_TIME)
+    return datetime.datetime.strptime(date_str, fmt)
 
 
 def url_join(*parts: str) -> str:

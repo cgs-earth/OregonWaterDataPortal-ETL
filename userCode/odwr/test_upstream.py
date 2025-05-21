@@ -21,7 +21,7 @@ from userCode.odwr.lib import (
 from userCode.odwr.types import START_OF_DATA
 from userCode.util import (
     PACIFIC_TIME,
-    assert_date_in_range,
+    assert_utc_date_in_range,
     now_as_oregon_datetime,
     from_oregon_datetime,
     to_oregon_datetime,
@@ -195,7 +195,7 @@ def test_timezone_behavior():
         with pytest.raises(ValueError):
             from_oregon_datetime(date)
 
-        assert_date_in_range(
+        assert_utc_date_in_range(
             date, from_oregon_datetime(begin), from_oregon_datetime(end)
         )
 

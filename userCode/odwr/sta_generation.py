@@ -27,20 +27,22 @@ def to_sensorthings_observation(
         raise RuntimeError("Missing datapoint")
 
     # generate a unique id by concatenating the datastream id and the resultTime
-    # we assume that the resultTime is in a pacific time zone and is in the format YYYY-MM-DDTHH:MM:SS-08:00 and
+    # we assume that the resultTime is in a pacific time zone and is in the format YYYY-MM-DDTHH:MM:SS-
     # that when it is concat with the datastream id it will be unique and less than 18 characters in total
-    assert not resultTime.endswith("Z"), "resultTime should not end with Z"
-
-    pacificTimeMarker = "00:00:00-08:00"
-    assert resultTime.endswith(pacificTimeMarker), (
-        f"resultTime is {resultTime} and does not end with 00:00:00 so we would lose information if we removed it to generate the hash"
+    utcMarker = ":00:00Z"
+    assert resultTime.endswith(utcMarker), (
+        f"resultTime {resultTime} does not end with {utcMarker}. This is required to generate a unique id for the observation. Associated datastream was {associatedDatastream}"
     )
-    strippedResultTime = resultTime.removesuffix(pacificTimeMarker)
+
+    strippedResultTime = resultTime.removesuffix(utcMarker)
     uniqueId = f"{associatedDatastream.iotid}{strippedResultTime}"
     uniqueIdJustNumerical = "".join(filter(str.isdigit, uniqueId))
     MAX_LENGTH_IOTID_FOR_FROST = 18
+    uniqueIdJustNumerical = uniqueIdJustNumerical[
+        :MAX_LENGTH_IOTID_FOR_FROST
+    ]  # Limit to 18 characters
     assert len(uniqueIdJustNumerical) <= MAX_LENGTH_IOTID_FOR_FROST, (
-        f"@iot.id {uniqueIdJustNumerical} is too long to insert into FROST when constructed with {associatedDatastream.iotid} and {strippedResultTime}"
+        f"@iot.id {uniqueIdJustNumerical} is too long to insert into FROST when constructed with id {associatedDatastream.iotid} and time {strippedResultTime}"
     )
 
     return Observation(

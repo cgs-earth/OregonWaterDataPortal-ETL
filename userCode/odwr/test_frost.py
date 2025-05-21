@@ -13,7 +13,7 @@ import requests
 
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import (
-    TimeRange,
+    UTCTimeRange,
     get_datastream_time_range,
 )
 from test.lib import (
@@ -524,7 +524,7 @@ def test_adding_linked_obs_changes_datastream_time():
         == updatedDatastream["resultTime"]
     )
 
-    assert get_datastream_time_range("1") == TimeRange(
+    assert get_datastream_time_range("1") == UTCTimeRange(
         datetime.datetime.fromisoformat(firstTime).replace(tzinfo=PACIFIC_TIME),
         datetime.datetime.fromisoformat(newTime).replace(tzinfo=PACIFIC_TIME),
     ), (
