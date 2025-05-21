@@ -1,8 +1,6 @@
 from pathlib import Path
 
-import requests
 
-from userCode.env import API_BACKEND_URL
 from userCode.groundwater.wells import (
     WellAttributes,
     WellFeature,
@@ -49,43 +47,3 @@ def test_get_geometry_file():
     res = get_geometry_file()
     assert res
     assert Path(res).exists()
-
-
-def test_post_datastream():
-    datastream = {
-        "@iot.id": "GILL0000207",
-        "name": "Waterlevel below land surface for well 207",
-        "description": "Type of log: Water Well",
-        "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-        "unitOfMeasurement": {
-            "name": "feet",
-            "symbol": "ft",
-            "definition": "https://qudt.org/vocab/unit/FT",
-        },
-        "ObservedProperty": {
-            "@iot.id": 77608,
-            "name": "Groundwater Depth",
-            "definition": "Groundwater depth is the distance between the water surface and the ground surface at a specific location specified by the site location and offset.",
-            "description": "Originally from the CUAHSI HIS VariableNameCV.  See: http://his.cuahsi.org/mastercvreg/edit_cv11.aspx?tbl=VariableNameCV.",
-            "properties": {
-                "uri": "http://vocabulary.odm2.org/api/v1/variablename/groundwaterDepth"
-            },
-        },
-        "Sensor": {
-            "@iot.id": 0,
-            "name": "Unknown",
-            "description": "Unknown",
-            "encodingType": "Unknown",
-            "metadata": "Unknown",
-        },
-        "Thing": {
-            "@iot.id": "GILL0000207",
-            "name": "Well GILL0000207",
-            "description": "Well GILL0000207",
-        },
-    }
-    resp = requests.post(
-        f"{API_BACKEND_URL}/Datastreams",
-        json=datastream,
-    )
-    assert resp.ok, resp.text

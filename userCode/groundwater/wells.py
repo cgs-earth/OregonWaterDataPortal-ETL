@@ -219,9 +219,10 @@ class WellResponse(BaseModel):
 
 
 def get_geometry_file():
-    """Get the path to the relevant locations file."""
+    """Get the path to the relevant locations file"""
+    # this file represents the esri geometry of 3 locations in Oregon
     geometry_file = os.path.join(
-        os.path.dirname(__file__), "scripts", "relevant_locations_simple.json"
+        os.path.dirname(__file__), "scripts", "relevant_locations_simple.esri.json"
     )
     return geometry_file
 

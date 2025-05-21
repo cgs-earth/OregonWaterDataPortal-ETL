@@ -18,6 +18,6 @@ const esrijson = geojsonToArcGIS(geojson);
 
 // Write to output file
 fs.writeFileSync(
-  "relevant_locations_simple.esrijson",
+  "relevant_locations_simple.esri.json",
   JSON.stringify(esrijson, null, 2),
 );
