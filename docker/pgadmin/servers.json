@@ -1,13 +1,13 @@
 {
-    "Servers": {
-        "1": {
-            "Name": "OWDP Database",
-            "Group": "Servers",
-            "Host": "owdp-database",
-            "Port": 5432,
-            "MaintenanceDB": "sensorthings",
-            "Username": "sensorthings",
-            "SSLMode": "prefer"
-        }
+  "Servers": {
+    "1": {
+      "Name": "OWDP Database",
+      "Group": "Servers",
+      "Host": "owdp-database",
+      "Port": 5432,
+      "MaintenanceDB": "sensorthings",
+      "Username": "sensorthings",
+      "SSLMode": "prefer"
     }
+  }
 }

@@ -3,15 +3,21 @@
 // this is in js and not python since we don't need to call this
 // at runtime; we just need to get the static file since it is just county borders
 
-const { geojsonToArcGIS } = require("@terraformer/arcgis")
-const fs = require("fs")
+const { geojsonToArcGIS } = require("@terraformer/arcgis");
+const fs = require("fs");
 
 // Read the GeoJSON file as a string and parse it
-const geojsonData = fs.readFileSync("./relevant_locations_simple.geojson", "utf8")
-const geojson = JSON.parse(geojsonData)
+const geojsonData = fs.readFileSync(
+  "./relevant_locations_simple.geojson",
+  "utf8",
+);
+const geojson = JSON.parse(geojsonData);
 
 // Convert to ESRI JSON
-const esrijson = geojsonToArcGIS(geojson)
+const esrijson = geojsonToArcGIS(geojson);
 
 // Write to output file
-fs.writeFileSync("relevant_locations_simple.esrijson", JSON.stringify(esrijson, null, 2))
+fs.writeFileSync(
+  "relevant_locations_simple.esrijson",
+  JSON.stringify(esrijson, null, 2),
+);
