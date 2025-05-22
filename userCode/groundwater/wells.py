@@ -87,7 +87,7 @@ class WellFeature(BaseModel):
         timeseries_id = self._get_unique_wl_id()
         url = f"https://apps.wrd.state.or.us/apps/gw/gw_data_rws/api/{timeseries_id}/gw_measured_water_level/?start_date=1/1/1905&end_date=12/30/2050&public_viewable="
 
-        # Never cache timeseries data, since it will bloat the cache
+        # Don't cache in prod since it would bloat the cache, and don't cache in prod either
         cache = ShelveCache()
         resp, status = cache.get_or_fetch(url, force_fetch=False)
         assert status == 200
@@ -170,6 +170,7 @@ class WellFeature(BaseModel):
 
     def to_sta_datastream(self):
         ontology_mapped_property = ontology.ONTOLOGY_MAPPING["groundwater_level"]
+        assert ontology_mapped_property, "groundwater_level not found in the ontology"
 
         return Datastream(
             **{

@@ -9,6 +9,7 @@
 # =================================================================
 
 import concurrent.futures
+from typing import Set
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -46,12 +47,12 @@ def get_wells() -> list[WellFeature]:
 
 def get_existing_datastream_ids() -> set[str]:
     url = f"{API_BACKEND_URL}/Datastreams?$select=@iot.id"
-    existing_ids = set()
+    existing_ids: Set[str] = set()
     with httpx.Client(timeout=10.0) as client:
         while url:
             response = client.get(url)
             response.raise_for_status()
-            data = response.json()
+            data: dict = response.json()
             existing_ids.update(str(ds["@iot.id"]) for ds in data.get("value", []))
             # Handle pagination
             url = data.get("@iot.nextLink")
