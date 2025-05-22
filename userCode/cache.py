@@ -38,9 +38,16 @@ class ShelveCache:
         except Exception:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
-    def get_or_fetch(self, url: str, force_fetch: bool = False) -> Tuple[bytes, int]:
-        # If we are in prod we want to ignore using the cache and not store anything
-        if not RUNNING_AS_TEST_OR_DEV():
+    def get_or_fetch(
+        self,
+        url: str,
+        # force fetch and skip sourcing items from the cache
+        force_fetch: bool,
+        # cache results in test/dev mode for faster testing, otherwise default
+        #  to skipping caching in prod so we don't fill up a huge db
+        cache_result: bool = RUNNING_AS_TEST_OR_DEV(),
+    ) -> Tuple[bytes, int]:
+        if not cache_result:
             response = requests.get(url, headers=HEADERS, timeout=300)
             return response.content, response.status_code
 

@@ -36,6 +36,7 @@ services:
       - API_URL=${OWDP_URL}/oapi
       - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
+    restart: always
 
   owdp-ui:
     image: internetofwater/hub2box-ui:owdp-limited
@@ -101,5 +102,24 @@ services:
     profiles: [production]
     restart: always
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - 5050:80
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+      - ./docker/pgadmin/setup.sh:/docker-entrypoint-initdb.d/setup.sh
+    depends_on:
+      - owdp-database
+    profiles:
+      - debug
+
 volumes:
   postgis_volume:
+  pgadmin_data:

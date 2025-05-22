@@ -16,7 +16,7 @@ import requests
 from typing import Literal, NamedTuple, Optional
 
 from userCode.env import API_BACKEND_URL
-from userCode.util import PACIFIC_TIME, from_oregon_datetime, url_join
+from userCode.util import from_oregon_datetime, url_join
 from userCode.odwr.types import START_OF_DATA, FrostBatchRequest
 from userCode.types import Datastream, Observation
 
@@ -110,8 +110,11 @@ class BatchHelper:
             self._send_payload(serialized_observations)
 
 
-class TimeRange(NamedTuple):
-    """Helper class for representing a time range of a STA datastream"""
+class UTCTimeRange(NamedTuple):
+    """
+    Helper class for representing a time range of a STA datastream
+    Timezone is in UTC
+    """
 
     start: datetime.datetime
     end: datetime.datetime
@@ -125,7 +128,7 @@ class MockValues(Config):
     mocked_date_to_update_until: Optional[str]
 
 
-def get_datastream_time_range(iotid: str | int) -> TimeRange:
+def get_datastream_time_range(iotid: str | int) -> UTCTimeRange:
     """Get the range of the observation times within a given STA datastream. This can be
     accomplished by fetching the datastream ID since it is auto-updated by FROST"""
 
@@ -136,9 +139,9 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
     # we represent null by setting both the start and end to the beginning of all
     # possible data
     if resp.status_code == 404:
-        start_dummy = from_oregon_datetime(START_OF_DATA)
+        start_dummy = from_oregon_datetime(START_OF_DATA).astimezone(datetime.UTC)
         get_dagster_logger().warning(f"Did not find datastream: '{iotid}' inside FROST")
-        return TimeRange(start_dummy, start_dummy)
+        return UTCTimeRange(start_dummy, start_dummy)
     if not resp.ok:
         raise RuntimeError(resp.text)
     json = resp.json()
@@ -146,9 +149,14 @@ def get_datastream_time_range(iotid: str | int) -> TimeRange:
         f"phenomenonTime was not found in the datastream. This is a sign that the datastream was created in a previous call but never populated correctly. Full json: {json}"
     )
     range = json["phenomenonTime"].split("/")
-    start = datetime.datetime.fromisoformat(range[0]).replace(tzinfo=PACIFIC_TIME)
-    end = datetime.datetime.fromisoformat(range[1]).replace(tzinfo=PACIFIC_TIME)
+    # dates from the db should be in UTC
+    start = datetime.datetime.fromisoformat(range[0])
+    end = datetime.datetime.fromisoformat(range[1])
 
     assert len(range) == 2
 
-    return TimeRange(start, end)
+    assert start.tzinfo == datetime.UTC and end.tzinfo == datetime.UTC, (
+        f"Timezones were not UTC, {start.tzinfo}, {end.tzinfo}"
+    )
+
+    return UTCTimeRange(start, end)

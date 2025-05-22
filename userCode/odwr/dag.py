@@ -31,7 +31,12 @@ from userCode.env import (
     API_BACKEND_URL,
     RUNNING_AS_TEST_OR_DEV,
 )
-from userCode.helper_classes import BatchHelper, get_datastream_time_range, MockValues
+from userCode.helper_classes import (
+    BatchHelper,
+    UTCTimeRange,
+    get_datastream_time_range,
+    MockValues,
+)
 from userCode.odwr.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
@@ -53,9 +58,9 @@ from userCode.odwr.types import (
 )
 from userCode.types import Datastream, Observation
 from userCode.util import (
-    assert_date_in_range,
+    PACIFIC_TIME,
+    assert_utc_date_in_range,
     now_as_oregon_datetime,
-    from_oregon_datetime,
     to_oregon_datetime,
 )
 
@@ -163,24 +168,32 @@ def sta_all_observations(
     async def fetch_obs(datastream: Datastream) -> List[Observation]:
         """Fetch observations for a single datastream and return them."""
         local_observations = []  # the observations array local to this function.
-        range = get_datastream_time_range(datastream.iotid)
+        range: UTCTimeRange = get_datastream_time_range(datastream.iotid)
 
-        new_end = (
-            config.mocked_date_to_update_until
+        assert (
+            range.start.tzinfo == datetime.UTC and range.end.tzinfo == datetime.UTC
+        ), f"{range.start.tzinfo} and {range.end.tzinfo} should be in UTC"
+
+        new_end_in_pacific_time: datetime.datetime = (
+            datetime.datetime.fromisoformat(
+                config.mocked_date_to_update_until
+            ).astimezone(PACIFIC_TIME)
             if config and config.mocked_date_to_update_until
-            else now_as_oregon_datetime()
+            else datetime.datetime.now(tz=PACIFIC_TIME)
         )
 
         get_dagster_logger().info(
-            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.end} to {new_end}"
+            f"Found existing observations in range {range.start} to {range.end}. Pulling data from {range.end} to {new_end_in_pacific_time}"
         )
 
         tsv_url = generate_oregon_tsv_url(
             datastream.description + "_available",
             int(attr.station_nbr),
             # Offset the end of the range by 1 minute to avoid duplicate observations
-            to_oregon_datetime(range.end + datetime.timedelta(minutes=1)),
-            new_end,
+            to_oregon_datetime(
+                range.end.astimezone(PACIFIC_TIME) + datetime.timedelta(minutes=1)
+            ),
+            to_oregon_datetime(new_end_in_pacific_time),
         )
 
         response = await session.get(tsv_url)
@@ -192,7 +205,15 @@ def sta_all_observations(
         tsvParse: ParsedTSVData = parse_oregon_tsv(response.content)
 
         for i, (obs, date) in enumerate(zip(tsvParse.data, tsvParse.dates)):
-            assert_date_in_range(date, range.start, from_oregon_datetime(new_end))
+            assert date.endswith("Z"), (
+                f"The date  {date}, parsed from the tsv file is not in UTC"
+            )
+
+            assert_utc_date_in_range(
+                date,
+                range.start,
+                new_end_in_pacific_time.astimezone(datetime.UTC),
+            )
 
             # If we are running this as a test, we want to keep track of which observations we have seen so we can detect duplicates
             # We don't want to cache every single observation unless we are running as a test since the db will catch duplicates as well
@@ -200,7 +221,7 @@ def sta_all_observations(
             if RUNNING_AS_TEST_OR_DEV():
                 key = (datastream.iotid, date)
                 assert key not in seen_obs, (
-                    f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end}"
+                    f"Found duplicate observation {key} after {i} iterations for station {attr.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url} for date range {range.start} to {new_end_in_pacific_time}"
                 )
                 seen_obs.add(key)
 
@@ -214,7 +235,7 @@ def sta_all_observations(
             # log it as a runtime error so it has high visibility. There are cases in the upstream API where
             # there will be lots of missing data for an unknown reason
             get_dagster_logger().error(
-                f"No observations found in range {range.end} to {new_end} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
+                f"No observations found in range {range.end} to {new_end_in_pacific_time} for station {station_metadata.attributes.station_nbr} and datastream '{datastream.description}' after fetching url: {tsv_url}"
             )
 
         return local_observations
