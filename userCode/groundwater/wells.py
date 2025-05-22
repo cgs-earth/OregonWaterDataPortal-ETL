@@ -87,6 +87,7 @@ class WellFeature(BaseModel):
         timeseries_id = self._get_unique_wl_id()
         url = f"https://apps.wrd.state.or.us/apps/gw/gw_data_rws/api/{timeseries_id}/gw_measured_water_level/?start_date=1/1/1905&end_date=12/30/2050&public_viewable="
 
+        # Never cache timeseries data, since it will bloat the cache
         cache = ShelveCache()
         resp, status = cache.get_or_fetch(url, force_fetch=False)
         assert status == 200
@@ -252,9 +253,15 @@ def fetch_wells():
         }
         encoded_params = urlencode(params)
         logging.debug(f"Fetching {base_url}&{encoded_params}")
+        # We want to cache the results of this API call since it is expensive
+        getNewResultsOnceAWeek = datetime.datetime.now().weekday() == 6
+        # skip caching and fetch directly once a week, otherwise cache it so it doesn't take forever
+        # this is different behavior from other cache calls in the codebase
         cache = ShelveCache()
         response, status = cache.get_or_fetch(
-            f"{base_url}&{encoded_params}", force_fetch=False
+            f"{base_url}&{encoded_params}",
+            cache_result=True,
+            force_fetch=getNewResultsOnceAWeek,
         )
         assert status == 200
         count = json.loads(response)["count"]
@@ -271,7 +278,9 @@ def fetch_wells():
             encoded_params = urlencode(params)
 
             response, status = cache.get_or_fetch(
-                f"{base_url}&{encoded_params}", force_fetch=False
+                f"{base_url}&{encoded_params}",
+                force_fetch=getNewResultsOnceAWeek,
+                cache_result=True,
             )
             assert status == 200
             results.append(WellResponse.model_validate_json(response))

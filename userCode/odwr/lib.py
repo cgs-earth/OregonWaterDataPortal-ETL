@@ -92,10 +92,11 @@ def parse_oregon_tsv(
             else:
                 data.append(float(row[2]))
 
-            parsed_date = parse_date_as_pacific_time(str(DATE_COLUMN))
+            parsed_date = parse_pacific_time_date_and_return_utc(str(DATE_COLUMN))
             assert parsed_date not in unique_dates, (
                 f"Date '{parsed_date}' appeared twice in the data"
             )
+            assert parsed_date.endswith("Z"), f"{parsed_date} should end with Z"
             unique_dates[parsed_date] = None
 
     return ParsedTSVData(data, units, list(unique_dates))
@@ -127,11 +128,22 @@ def generate_phenomenon_time(dates: list[str]) -> Optional[str]:
     return f"{earliest.isoformat()}/{oldest.isoformat()}"
 
 
-def parse_date_as_pacific_time(date_str: str) -> str:
+def parse_pacific_time_date_and_return_utc(date_str: str) -> str:
     formats = ["%m-%d-%Y %H:%M", "%m-%d-%Y"]
     for fmt in formats:
         try:
-            return f"{datetime.datetime.strptime(date_str, fmt).replace(tzinfo=PACIFIC_TIME).isoformat()}"
+            # Parse
+            return (
+                datetime.datetime.strptime(date_str, fmt)
+                # replace asserts that the time we are getting is in pacific time
+                .replace(tzinfo=PACIFIC_TIME)
+                # we then convert it to UTC
+                .astimezone(datetime.timezone.utc)
+                .isoformat()
+                # and finally convert it to the standard utc iso format
+                # for some reason python doesnt do this automatically
+                .replace("+00:00", "Z")
+            )
         except ValueError:
             continue
     raise ValueError(f"Date {date_str} does not match any known formats")
@@ -164,6 +176,8 @@ def download_oregon_tsv(
     """Get the tsv data for a specific dataset for a specific station in a given date range"""
     tsv_url = generate_oregon_tsv_url(dataset, station_nbr, start_date, end_date)
 
+    # we don't want to cache all tsv responses if we are in prod
+    # otherwise we will have a huge cache duplicating all the data
     cache = ShelveCache()
     response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
 

@@ -42,16 +42,24 @@ def test_parse_tsv():
     assert result.units == "cfs"
     assert len(result.dates) == len(result.data)
 
-    # convert to standardized iso format for comparison
-    dates = [date.replace("Z", "+00:00") for date in result.dates]
+    dates = result.dates
 
-    # make sure the dates are in the specified range; we need to remove the timezone information from the dates to compare
-    assert from_oregon_datetime(start) <= datetime.datetime.fromisoformat(
-        dates[0]
-    ).replace(tzinfo=PACIFIC_TIME)
-    assert from_oregon_datetime(end) >= datetime.datetime.fromisoformat(
-        dates[-1]
-    ).replace(tzinfo=PACIFIC_TIME)
+    # make sure the dates are in the specified range;
+    start_dt_utc = (
+        from_oregon_datetime(start)
+        .replace(tzinfo=PACIFIC_TIME)
+        .astimezone(datetime.timezone.utc)
+    )
+    end_dt_utc = (
+        from_oregon_datetime(end)
+        .replace(tzinfo=PACIFIC_TIME)
+        .astimezone(datetime.timezone.utc)
+    )
+    first_date = datetime.datetime.fromisoformat(dates[0].replace("Z", "+00:00"))
+    last_date = datetime.datetime.fromisoformat(dates[-1].replace("Z", "+00:00"))
+
+    assert start_dt_utc <= first_date
+    assert end_dt_utc >= last_date
 
 
 def test_oregon_dates():

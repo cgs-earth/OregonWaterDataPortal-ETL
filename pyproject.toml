@@ -32,3 +32,6 @@ code_location_name = "userCode"
 env_files = [
     ".env"
 ]
+markers = [
+    "upstream: tests that validate the understream of the upstream API, not any ETL"
+]
