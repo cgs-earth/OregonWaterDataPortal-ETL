@@ -26,7 +26,11 @@ wipedb:
 # run tests on the dagster pipeline. NOTE: this will clear the db and start fresh
 .PHONY: test
 test:
-	pytest -vv -x
+	pytest -vv -x -m "not upstream"
+
+.PHONY: testUpstream
+testUpstream:
+	pytest -vv -x -m "upstream"
 
 # install uv for python package management
 uv:
