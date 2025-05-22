@@ -133,7 +133,7 @@ def parse_pacific_time_date_and_return_utc(date_str: str) -> str:
     for fmt in formats:
         try:
             # Parse
-            return f"{
+            return (
                 datetime.datetime.strptime(date_str, fmt)
                 # replace asserts that the time we are getting is in pacific time
                 .replace(tzinfo=PACIFIC_TIME)
@@ -142,8 +142,8 @@ def parse_pacific_time_date_and_return_utc(date_str: str) -> str:
                 .isoformat()
                 # and finally convert it to the standard utc iso format
                 # for some reason python doesnt do this automatically
-                .replace('+00:00', 'Z')
-            }"
+                .replace("+00:00", "Z")
+            )
         except ValueError:
             continue
     raise ValueError(f"Date {date_str} does not match any known formats")
@@ -178,7 +178,7 @@ def download_oregon_tsv(
 
     # we don't want to cache all tsv responses if we are in prod
     # otherwise we will have a huge cache duplicating all the data
-    cache = ShelveCache(skip_caching_in_prod=True)
+    cache = ShelveCache()
     response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
 
     if status_code != 200 or "An Error Has Occured" in response.decode("utf-8"):

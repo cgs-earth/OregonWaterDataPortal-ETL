@@ -30,11 +30,6 @@ class ShelveCache:
     """
 
     db: ClassVar[str] = "oregondb"
-    # skip caching in prod and always fetch
-    skip_caching_in_prod: bool = False
-
-    def __init__(self, skip_caching_in_prod):
-        self.skip_caching_in_prod = skip_caching_in_prod
 
     def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
         try:
@@ -46,11 +41,13 @@ class ShelveCache:
     def get_or_fetch(
         self,
         url: str,
+        # force fetch and skip sourcing items from the cache
         force_fetch: bool,
+        # cache results in test/dev mode for faster testing, otherwise default
+        #  to skipping caching in prod so we don't fill up a huge db
+        cache_result: bool = RUNNING_AS_TEST_OR_DEV(),
     ) -> Tuple[bytes, int]:
-        # If we are in prod we want to ignore using the cache and not store anything
-        runningInProd = not RUNNING_AS_TEST_OR_DEV
-        if (self.skip_caching_in_prod and runningInProd) or RUNNING_AS_TEST_OR_DEV:
+        if not cache_result:
             response = requests.get(url, headers=HEADERS, timeout=300)
             return response.content, response.status_code
 
