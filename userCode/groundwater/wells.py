@@ -34,6 +34,9 @@ class WellAttributes(BaseModel):
     wl_county_code: str
     wl_nbr: int
     wl_version: int
+    # this value is in feet; if a value from the Oregon
+    # water system is not specific, it is likely to be
+    # feet, not meters according to email correspondence
     est_horizontal_error: Optional[float] = None
 
 
