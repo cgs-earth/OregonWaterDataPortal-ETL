@@ -26,7 +26,11 @@ wipedb:
 # run tests on the dagster pipeline. NOTE: this will clear the db and start fresh
 .PHONY: test
 test:
-	pytest -vv -x
+	pytest -vv -x -m "not upstream"
+
+.PHONY: testUpstream
+testUpstream:
+	pytest -vv -x -m "upstream"
 
 # install uv for python package management
 uv:
@@ -40,6 +44,9 @@ build:
 	uv python install 3.12
 	uv sync 
 	source .venv/bin/activate
+
+addIndices:
+	docker exec -i owdp-database psql -U sensorthings -d sensorthings < docker/frost/indices.sql
 
 # Check which indices are present on the observations table
 indexCheck:
