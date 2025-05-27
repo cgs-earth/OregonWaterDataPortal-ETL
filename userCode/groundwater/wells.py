@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 
 from userCode import ontology
 from userCode.cache import ShelveCache
+from userCode.groundwater.lib import generate_circle_polygon
 from userCode.types import Datastream, Observation
 from userCode.util import PACIFIC_TIME, deterministic_hash
 import datetime
@@ -36,6 +37,8 @@ class WellAttributes(BaseModel):
     est_horizontal_error: Optional[float] = None
 
 
+# All the properties contained on the API response which returns
+# the relevant measurement data for a well
 class TimeseriesProperties(BaseModel):
     gw_logid: str
     land_surface_elevation: Optional[float] = None
@@ -117,6 +120,11 @@ class WellFeature(BaseModel):
                 .astimezone(datetime.timezone.utc)
             )
 
+            if not self.attributes.est_horizontal_error:
+                get_dagster_logger().warning(
+                    f"Well {self._get_unique_wl_id()} does not have an est_horizontal_error property, so setting it to 0.0"
+                )
+
             observation = Observation(
                 **{
                     "@iot.id": deterministic_hash(
@@ -133,11 +141,12 @@ class WellFeature(BaseModel):
                         "description": self._get_datastream_description(),
                         "encodingType": "application/vnd.geo+json",
                         "feature": {
-                            "type": "Point",
-                            "coordinates": [
-                                self.geometry.x,
+                            "type": "Polygon",
+                            "coordinates": generate_circle_polygon(
                                 self.geometry.y,
-                            ],
+                                self.geometry.x,
+                                self.attributes.est_horizontal_error or 0.0,
+                            ),
                         },
                         "properties": {
                             "land_surface_elevation": item.land_surface_elevation,
@@ -160,8 +169,17 @@ class WellFeature(BaseModel):
                     "description": self._get_datastream_description(),
                     "encodingType": "application/vnd.geo+json",
                     "location": {
-                        "type": "Point",
-                        "coordinates": [self.geometry.x, self.geometry.y],
+                        "type": "Polygon",
+                        "coordinates": generate_circle_polygon(
+                            self.geometry.y,
+                            self.geometry.x,
+                            # if a well has no horizontal error property
+                            # we cannot make the circular polygon and thus have to set the radius to 0
+                            # it is unclear if a lack of horizontal error means the long/lat is exact
+                            # or if this info is just missing; either way does not affect the algorithm,
+                            # just the end user's interpretation thereof
+                            self.attributes.est_horizontal_error or 0.0,
+                        ),
                     },
                 }
             ],

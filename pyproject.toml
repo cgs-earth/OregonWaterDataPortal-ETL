@@ -19,6 +19,7 @@ dependencies = [
     "dagster-slack>=0.25.4",
     "pytest-dotenv>=0.5.2",
     "hypothesis>=6.122.5",
+    "geopy>=2.4.1",
 ]
 
 [tool.setuptools]
