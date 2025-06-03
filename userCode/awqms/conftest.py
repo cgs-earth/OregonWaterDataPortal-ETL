@@ -29,7 +29,11 @@ def sample_station_data():
         Geometry=GmlPoint(longitude=-118.8239942, latitude=45.65429575),
         Datastreams=[
             ResultSummary(
-                activity_type="Field Msr/Obs", observed_property="Temperature, water"
+                activity_type="Field Msr/Obs",
+                observed_property="Temperature, water",
+                result_count=1,
+                min_date="2022-01-01",
+                max_date="2022-01-01",
             )
         ],
     )

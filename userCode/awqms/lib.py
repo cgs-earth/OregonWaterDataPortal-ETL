@@ -41,7 +41,10 @@ def fetch_station(station_id: str) -> bytes:
     return response
 
 
-def fetch_observations(observed_prop: str, station_id: str) -> list[dict]:
+def fetch_observations(
+    observed_prop: str,
+    station_id: str,
+) -> list[dict]:
     params = {
         "Characteristic": observed_prop,
         "MonitoringLocationIdentifiersCsv": station_id,
@@ -50,21 +53,36 @@ def fetch_observations(observed_prop: str, station_id: str) -> list[dict]:
     encoded_params = urlencode(params)
     results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
-    cache = ShelveCache()
-    response, status_code = cache.get_or_fetch(results_url, force_fetch=False)
+    # don't cache this since observations would take up too much space
+    response = requests.get(results_url)
 
-    if status_code != 200:
-        raise RuntimeError(f"Request to {results_url} failed with status {status_code}")
+    if (
+        "No records were found which match your search criteria"
+        in response.content.decode("utf-8")
+    ):
+        # we have to check the response since sometimes awqms returns 200 for this and sometimes
+        # it returns 404; so the status code isnt reliable
+        LOGGER.warning(
+            f"No records were found which match your search criteria for {observed_prop} at {station_id}"
+        )
+        return []
+
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Request to {results_url} failed with status {response.status_code}"
+        )
 
     try:
-        serialized = json.loads(response)
+        serialized = json.loads(response.content)
     except json.decoder.JSONDecodeError:
-        raise RuntimeError(f"Request to {results_url} failed with status {status_code}")
+        raise RuntimeError(
+            f"Request to {results_url} failed with status {response.status_code}"
+        )
 
     return [result for item in serialized for result in item["ContinuousResults"]]
 
 
-def fetch_observation_ids(datastream_id: str) -> set[int]:
+def fetch_observation_ids_in_db(datastream_id: str) -> set[int]:
     """
     Fetch all existing Observations' @iot.id for a given Datastream's @iot.id.
 

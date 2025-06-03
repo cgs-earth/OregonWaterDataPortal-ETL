@@ -18,6 +18,7 @@ from userCode.awqms.sta_generation import (
 )
 from userCode.awqms.types import GmlPoint
 from userCode.ontology import ONTOLOGY_MAPPING
+from userCode.util import deterministic_hash
 
 
 def test_to_sensorthings_station(sample_station_data):
@@ -77,9 +78,15 @@ def test_to_sensorthings_datastream(sample_station_data):
         units="celsius",
         property=property_name,
         associatedThingId="TEST123",
+        minDate="2024-01-17 02:30:00 PM",
+        maxDate="2024-01-17 02:30:00 PM",
+        activity_type="test_activity",
     )
 
-    assert result.iotid == f"TEST123-{ONTOLOGY_MAPPING[property_name].id}"
+    assert (
+        result.iotid
+        == f"TEST123-{ONTOLOGY_MAPPING[property_name].id}-{deterministic_hash('test_activity', 4)}"
+    )
     assert property_name in result.name
     assert result.unitOfMeasurement.name == "celsius"
 
@@ -91,4 +98,7 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
             units="celsius",
             property="unknown_property",
             associatedThingId="TEST123",
+            activity_type="test_activity",
+            maxDate="2024-01-17 02:30:00 PM",
+            minDate="2024-01-17 02:30:00 PM",
         )

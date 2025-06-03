@@ -16,7 +16,7 @@ from unittest.mock import patch, Mock
 from userCode.awqms.lib import (
     fetch_station,
     fetch_observations,
-    fetch_observation_ids,
+    fetch_observation_ids_in_db,
 )
 from userCode.awqms.stations import read_csv
 
@@ -113,7 +113,7 @@ def test_fetch_observation_ids():
             Mock(status_code=200, json=Mock(return_value=mock_response_2)),
         ]
 
-        result = fetch_observation_ids(datastream_id)
+        result = fetch_observation_ids_in_db(datastream_id)
 
         assert result == {1, 2, 3, 4}
         assert mock_get.call_count == 2

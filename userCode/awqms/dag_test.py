@@ -21,7 +21,9 @@ from userCode.awqms.dag import (
     awqms_datastreams,
     awqms_schedule,
 )
-from userCode.awqms.stations import _STATIONS_IN_INITIAL_REQUEST
+from userCode.awqms.lib import fetch_station
+from userCode.awqms.stations import _STATIONS_IN_INITIAL_REQUEST, ALL_RELEVANT_STATIONS
+from userCode.awqms.types import POTENTIAL_DATASTREAMS, parse_monitoring_locations
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
@@ -34,6 +36,25 @@ from test.lib import (
     assert_observations_and_datastreams_empty,
     assert_no_duplicate_at_given_time,
 )
+
+
+@pytest.mark.upstream
+def test_all_datastreams_are_defined():
+    propertiesToMaxAssociatedResults: dict[str, int] = {}
+    for i, station in enumerate(ALL_RELEVANT_STATIONS):
+        stationData = parse_monitoring_locations(fetch_station(station))
+        for datastream in stationData.Datastreams:
+            previousVal = propertiesToMaxAssociatedResults.get(
+                datastream.observed_property, 0
+            )
+
+            propertiesToMaxAssociatedResults[datastream.observed_property] = max(
+                previousVal, datastream.result_count
+            )
+
+    assert len(propertiesToMaxAssociatedResults) == len(
+        set(POTENTIAL_DATASTREAMS.keys())
+    )
 
 
 def test_awqms_preflight_checks():
