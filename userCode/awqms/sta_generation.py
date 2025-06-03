@@ -109,8 +109,6 @@ def to_sensorthings_datastream(
 
     datastream: Datastream = Datastream(
         **{
-            # since a thing can have the same property with different activity types, we need to add the activity type
-            # to construct a unique id
             "@iot.id": f"{associatedThingId}-{ontology_mapped_property.id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,

@@ -78,9 +78,6 @@ def test_to_sensorthings_datastream(sample_station_data):
         units="celsius",
         property=property_name,
         associatedThingId="TEST123",
-        minDate="2024-01-17 02:30:00 PM",
-        maxDate="2024-01-17 02:30:00 PM",
-        activity_type="test_activity",
     )
 
     assert (
@@ -98,7 +95,4 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
             units="celsius",
             property="unknown_property",
             associatedThingId="TEST123",
-            activity_type="test_activity",
-            maxDate="2024-01-17 02:30:00 PM",
-            minDate="2024-01-17 02:30:00 PM",
         )
