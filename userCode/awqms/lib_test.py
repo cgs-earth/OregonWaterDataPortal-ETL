@@ -14,11 +14,11 @@ import tempfile
 from unittest.mock import patch, Mock
 
 from userCode.awqms.lib import (
-    read_csv,
     fetch_station,
     fetch_observations,
     fetch_observation_ids,
 )
+from userCode.awqms.stations import read_csv
 
 
 @pytest.fixture
@@ -35,8 +35,8 @@ def test_read_csv_success(sample_csv_path):
 
 
 def test_read_csv_file_not_found():
-    result = read_csv(Path("nonexistent.csv"))
-    assert result == []
+    with pytest.raises(FileNotFoundError):
+        read_csv(Path("nonexistent.csv"))
 
 
 @patch("userCode.cache.ShelveCache", autospec=True)

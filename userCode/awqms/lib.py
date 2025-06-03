@@ -8,12 +8,9 @@
 #
 # =================================================================
 
-import csv
 import json
 import logging
-from pathlib import Path
 import requests
-from typing import List
 from urllib.parse import urlencode
 
 from userCode.cache import ShelveCache
@@ -21,27 +18,6 @@ from userCode.env import API_BACKEND_URL, AWQMS_URL
 from userCode.util import url_join
 
 LOGGER = logging.getLogger(__name__)
-
-
-def read_csv(filepath: Path) -> List[str]:
-    result_list = []
-
-    try:
-        with open(filepath, "r", newline="", encoding="utf-8") as csvfile:
-            reader = csv.reader(csvfile)
-
-            # Skip the header row
-            next(reader, None)
-
-            for row in reader:
-                if row:  # Ensure the row is not empty
-                    result_list.append(row[0])
-    except FileNotFoundError:
-        print(f"Error: The file '{filepath}' does not exist.")
-    except Exception as e:
-        print(f"An error occurred while reading the CSV: {e}")
-
-    return result_list
 
 
 def fetch_station(station_id: str) -> bytes:

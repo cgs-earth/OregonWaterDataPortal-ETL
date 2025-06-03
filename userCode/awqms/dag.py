@@ -28,8 +28,8 @@ from userCode.awqms.sta_generation import (
     to_sensorthings_observation,
     to_sensorthings_station,
 )
+from userCode.awqms.stations import ALL_RELEVANT_STATIONS
 from userCode.awqms.types import (
-    ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     StationData,
     parse_monitoring_locations,

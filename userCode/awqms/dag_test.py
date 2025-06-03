@@ -21,7 +21,7 @@ from userCode.awqms.dag import (
     awqms_datastreams,
     awqms_schedule,
 )
-from userCode.awqms.types import ALL_RELEVANT_STATIONS
+from userCode.awqms.stations import _STATIONS_IN_INITIAL_REQUEST
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
@@ -193,7 +193,7 @@ def test_full_pipeline():
     harvest_job = definitions.get_job_def("harvest_awqms")
 
     instance = DagsterInstance.ephemeral()
-    first_station = str(ALL_RELEVANT_STATIONS[0])
+    first_station = str(_STATIONS_IN_INITIAL_REQUEST[0])
 
     initial_run = harvest_job.execute_in_process(
         instance=instance,
