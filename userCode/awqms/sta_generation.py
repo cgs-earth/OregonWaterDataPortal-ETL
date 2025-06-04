@@ -11,7 +11,7 @@
 from userCode.awqms.types import StationData, GmlPoint
 from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.types import Datastream, Observation
-from userCode.util import deterministic_hash, from_oregon_datetime
+from userCode.util import from_oregon_datetime
 
 
 def to_sensorthings_station(station: StationData) -> dict:
@@ -126,12 +126,8 @@ def to_sensorthings_datastream(
                 "properties": {"uri": ontology_mapped_property.uri},
             },
             "Sensor": {
-                "@iot.id": deterministic_hash(
-                    f"{attr.MonitoringLocationId}{property}",
-                    desiredLength=12,
-                ),
-                # i.e. 11561-ORDEQ Temperature, waterField Msr/Obs
-                "name": f"{attr.MonitoringLocationId} {property}",
+                "@iot.id": 0,
+                "name": "Unknown",
                 "description": "Unknown",
                 "encodingType": "Unknown",
                 "metadata": "Unknown",
