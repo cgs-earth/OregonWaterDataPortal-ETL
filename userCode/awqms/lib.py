@@ -37,7 +37,6 @@ def get_datastream_unit(observed_prop: str, station_id: str) -> str:
 
     cache = ShelveCache()
 
-    # don't cache this since observations would take up too much space
     response, status = cache.get_or_fetch(
         results_url, force_fetch=False, cache_result=True
     )
