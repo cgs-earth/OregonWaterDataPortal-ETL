@@ -987,5 +987,5 @@ ResourceURI = Literal[
     "zirconium",
     "zirconium_95",
     "zirconiumDissolved",
-    "zooplankton"
+    "zooplankton",
 ]
