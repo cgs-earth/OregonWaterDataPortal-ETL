@@ -41,6 +41,11 @@ def get_datastream_unit(observed_prop: str, station_id: str) -> str:
         results_url, force_fetch=False, cache_result=True
     )
 
+    # if there are no results, we can't get the units for the datastream
+    # and thus have to declare the units are unknown
+    if status == 404:
+        return "Unknown"
+
     assert status == 200, (
         f"Request to get units from {results_url} failed with status {status}"
     )

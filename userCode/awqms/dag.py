@@ -157,10 +157,14 @@ async def awqms_observations(
     async def fetch_and_process(datastream: Datastream):
         observations_ids = fetch_observation_ids_in_db(datastream.iotid)
         LOGGER.info(f"Fetching observations for {datastream.iotid}")
-        for result in fetch_observations(
+        results = fetch_observations(
             observed_prop=datastream.description,
             station_id=associatedThing,
-        ):
+        )
+        get_dagster_logger().info(
+            f"Found {len(results)} observations for datastream {datastream.iotid}"
+        )
+        for result in results:
             if not result["ResultValue"]:
                 continue
 

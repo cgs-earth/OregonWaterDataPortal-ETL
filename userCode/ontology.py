@@ -39,7 +39,13 @@ def get_ontology(uri: str) -> Ontology:
     get_dagster_logger().info(f"Constructing ontology object from {uriAsJson}")
     resp = requests.get(uriAsJson)
     assert resp.ok, f"Failed to get {uriAsJson}: {resp.text}"
-    json = resp.json()
+    try:
+        json = resp.json()
+    except Exception:
+        # raise a more informative error if something is wrong in the json parse
+        # usually indicates a quirk of ODM2 itself
+        raise RuntimeError(f"Failed to get {uriAsJson}: {resp.text}")
+
     return Ontology(
         definition=json["definition"],
         description=json["provenance"],
@@ -315,9 +321,23 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
     """Construct a dictionary from the association list in which we defined in the ontology mapping"""
     equiv_dict = dict()
     for keys, value in __ontology_definition.items():
+        if type(keys) != tuple:
+            keys = (keys,)
+
+        if not value:
+            continue
+
+        # special case that has to be skipped
+        # since there is no standard uri
+        # by skipping this it doesn't mean it won't show
+        # up at all, rather it means we use the direct name and
+        # not the mapped vocabulary term since to do would be ambiguous
+        if "pheophytin" in value:
+            continue
+
         for key in keys:
             assert key not in equiv_dict, (
-                f"Tried to add duplicate key {key} when it already exists in {equiv_dict}"
+                f"Tried to add duplicate key {key} when it already exists in {equiv_dict[key]}"
             )
             equiv_dict[key] = get_ontology(
                 f"http://vocabulary.odm2.org/api/v1/variablename/{value}/"
