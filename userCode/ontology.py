@@ -321,7 +321,7 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
     """Construct a dictionary from the association list in which we defined in the ontology mapping"""
     equiv_dict = dict()
     for keys, value in __ontology_definition.items():
-        if type(keys) != tuple:
+        if type(keys) is not tuple:
             keys = (keys,)
 
         if not value:
