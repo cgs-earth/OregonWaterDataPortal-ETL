@@ -61,7 +61,9 @@ def fetch_station(station_id: str) -> bytes:
     xml_url = url_join(AWQMS_URL, f"MonitoringLocationsVer1?{encoded_params}")
 
     cache = ShelveCache()
-    response, status_code = cache.get_or_fetch(xml_url, force_fetch=False)
+    response, status_code = cache.get_or_fetch(
+        xml_url, force_fetch=False, cache_result=True
+    )
 
     if status_code != 200:
         raise RuntimeError(f"Request to {xml_url} failed with status {status_code}")

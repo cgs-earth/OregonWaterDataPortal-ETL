@@ -8,6 +8,7 @@
 #
 # =================================================================
 
+import json
 from dagster import DagsterInstance
 import pytest
 import requests
@@ -27,6 +28,7 @@ from userCode.awqms.types import POTENTIAL_DATASTREAMS, parse_monitoring_locatio
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
+from concurrent.futures import ThreadPoolExecutor
 
 from test.lib import (
     wipe_datastreams,
@@ -38,19 +40,33 @@ from test.lib import (
 )
 
 
+import threading
+
+
 @pytest.mark.upstream
 def test_all_datastreams_are_defined():
     propertiesToMaxAssociatedResults: dict[str, int] = {}
-    for i, station in enumerate(ALL_RELEVANT_STATIONS):
+    lock = threading.Lock()
+
+    def process_station(station):
         stationData = parse_monitoring_locations(fetch_station(station))
         for datastream in stationData.Datastreams:
-            previousVal = propertiesToMaxAssociatedResults.get(
-                datastream.observed_property, 0
-            )
+            with lock:
+                previousVal = propertiesToMaxAssociatedResults.get(
+                    datastream.observed_property, 0
+                )
+                propertiesToMaxAssociatedResults[datastream.observed_property] = max(
+                    previousVal, datastream.result_count
+                )
 
-            propertiesToMaxAssociatedResults[datastream.observed_property] = max(
-                previousVal, datastream.result_count
-            )
+    with ThreadPoolExecutor() as executor:
+        executor.map(process_station, ALL_RELEVANT_STATIONS)
+
+    with open("params.json", "w") as f:
+        paramNames = {
+            "terms": [param for param in propertiesToMaxAssociatedResults.keys()]
+        }
+        f.write(json.dumps(paramNames))
 
     assert len(propertiesToMaxAssociatedResults) == len(
         set(POTENTIAL_DATASTREAMS.keys())
