@@ -56,3 +56,10 @@ indexCheck:
 # this should trigger the slow query log and is mainly just for testing
 mimicSlowLog:
 	docker exec owdp-frost sh -c "echo 'Slow Query 200000000000' > /proc/1/fd/1"
+
+
+clean:
+# clean up artifacts produced by dagster dev
+	rm -rf schedules/
+	rm -rf tmp*/
+	rm -rf history/
