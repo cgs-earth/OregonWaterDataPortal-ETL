@@ -18,7 +18,6 @@ from userCode.awqms.sta_generation import (
 )
 from userCode.awqms.types import GmlPoint
 from userCode.ontology import ONTOLOGY_MAPPING
-from userCode.util import deterministic_hash
 
 
 def test_to_sensorthings_station(sample_station_data):
@@ -80,10 +79,7 @@ def test_to_sensorthings_datastream(sample_station_data):
         associatedThingId="TEST123",
     )
 
-    assert (
-        result.iotid
-        == f"TEST123-{ONTOLOGY_MAPPING[property_name].id}-{deterministic_hash('test_activity', 4)}"
-    )
+    assert result.iotid == f"TEST123-{ONTOLOGY_MAPPING[property_name].id}"
     assert property_name in result.name
     assert result.unitOfMeasurement.name == "celsius"
 
