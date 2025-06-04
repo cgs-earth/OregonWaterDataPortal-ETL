@@ -26,6 +26,7 @@ from userCode.awqms.lib import (
     fetch_station,
     fetch_observations,
     fetch_observation_ids_in_db,
+    get_datastream_unit,
 )
 from userCode.awqms.sta_generation import (
     to_sensorthings_datastream,
@@ -99,10 +100,12 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
 
     datastreams: list[Datastream] = []
     for datastream in awqms_metadata.Datastreams:
+        unit = get_datastream_unit(datastream.observed_property, thingid)
+
         datastreams.append(
             to_sensorthings_datastream(
                 attr=awqms_metadata,
-                units="Undefined",
+                units=unit,
                 property=datastream.observed_property,
                 associatedThingId=thingid,
             )

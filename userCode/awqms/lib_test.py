@@ -17,6 +17,7 @@ from userCode.awqms.lib import (
     fetch_station,
     fetch_observations,
     fetch_observation_ids_in_db,
+    get_datastream_unit,
 )
 from userCode.awqms.stations import read_csv
 
@@ -37,6 +38,10 @@ def test_read_csv_success(sample_csv_path):
 def test_read_csv_file_not_found():
     with pytest.raises(FileNotFoundError):
         read_csv(Path("nonexistent.csv"))
+
+
+def test_get_datastream_unit():
+    assert get_datastream_unit("Temperature, water", "11973-ORDEQ") == "deg C"
 
 
 @patch("userCode.cache.ShelveCache", autospec=True)

@@ -20,6 +20,35 @@ from userCode.util import url_join
 LOGGER = logging.getLogger(__name__)
 
 
+def get_datastream_unit(observed_prop: str, station_id: str) -> str:
+    """
+    Retrieve the units for a given datastream by fetching the first result
+    This is necessary since IncludeResultSummary does not include units
+    """
+    params = {
+        "Characteristic": observed_prop,
+        "PageSize": 1,
+        "PageNumber": 1,
+        "MonitoringLocationIdentifiersCsv": station_id,
+        "ContentType": "json",
+    }
+    encoded_params = urlencode(params)
+    results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
+
+    cache = ShelveCache()
+
+    # don't cache this since observations would take up too much space
+    response, status = cache.get_or_fetch(
+        results_url, force_fetch=False, cache_result=True
+    )
+
+    assert status == 200, (
+        f"Request to get units from {results_url} failed with status {status}"
+    )
+
+    return json.loads(response)[0]["ContinuousResults"][0]["ResultUnit"]
+
+
 def fetch_station(station_id: str) -> bytes:
     """Get the xml data for a specific dataset for a specific
     station in a given date range"""
