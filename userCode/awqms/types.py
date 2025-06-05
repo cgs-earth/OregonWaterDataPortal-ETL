@@ -9,21 +9,31 @@
 # =================================================================
 
 import json
-from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import Optional
-
-from userCode.awqms.lib import read_csv
 
 
 POTENTIAL_DATASTREAMS: dict[str, str] = {
     "Temperature, water": "°C",
+    # "Conductivity": "uS/cm",
+    # "Alkalinity": "mg/L",
+    # "Dissolved oxygen (DO)": "mg/L",
+    # "Nitrate + Nitrite": "mg/L",
+    # "Dissolved oxygen saturation": "%",
+    # "Escherichia coli": "CFU/100 mL",
+    # "Alkalinity, total": "mg/L",
+    # "Depth, bottom": "m",
     # "pH": "None",
-    # "Disolved Oxygen (DO)": "mg/L",
+    # "1,1,1,2-Tetrachloroethane": "mg/L",
+    # "Turbidity Field": "NTU",
+    # "Pressure": "mmHg",
+    # "Sulfate": "mg/L",
+    # "Field Msr/Obs": "None",
+    # "Turbidity": "NTU",
+    # "(-)-cis-Permethrin": "mg/L",
+    # "1,1,1-Trichloroethane": "mg/L",
+    # "Ammonia": "mg/L",
 }
-
-THISDIR = Path(__file__).parent.resolve()
-ALL_RELEVANT_STATIONS = read_csv(THISDIR / "testdata" / "valid_stations.csv")
 
 
 class GmlPoint(BaseModel):
@@ -32,8 +42,8 @@ class GmlPoint(BaseModel):
 
 
 class ResultSummary(BaseModel):
-    activity_type: str
     observed_property: str
+    result_count: int
 
 
 class StationData(BaseModel):
@@ -52,42 +62,46 @@ class StationData(BaseModel):
 
 
 def parse_monitoring_locations(features: bytes) -> StationData:
+    # we use 0 here since it is returned as a json list with
+    # only one element
     feature = json.loads(features)[0]
 
-    location_data = {
-        "Datastreams": [],
-        "CountyName": feature["CountyName"],
-        "MonitoringLocationId": feature["MonitoringLocationIdentifier"],
-        "MonitoringLocationName": feature["MonitoringLocationName"],
-        "OrganizationIdentifier": feature["OrganizationIdentifier"],
-        "StateCode": feature["StateCode"],
-        "MonitoringLocationType": feature["MonitoringLocationType"],
-        "WaterbodyName": feature["WaterbodyName"],
-        "WatershedManagementUnit": feature["WatershedManagementUnit"],
-    }
-
-    if feature.get("Huc8"):
-        location_data["Huc8"] = feature["Huc8"]
-
-    if feature.get("Huc12"):
-        location_data["Huc12"] = feature["Huc12"]
-
-    location_data["Geometry"] = GmlPoint(
-        latitude=feature["Latitude"], longitude=feature["Longitude"]
-    )
-
-    datastreams = set()
+    foundProperties: set[str] = set()
+    datastreamList: list[ResultSummary] = []
     for ds in feature["ResultSummaries"]:
-        activity_type = ds["ActivityType"]
-        characteristic = ds["CharacteristicName"]
-
-        if characteristic in datastreams:
+        # if a datastream has less than 24 results, skip it
+        # 24 is a reasonable approximation of having one obs
+        # per month for the past 2 years
+        if int(ds["ResultCount"]) < 24:
             continue
-        else:
-            datastreams.add(characteristic)
 
-        location_data["Datastreams"].append(
-            ResultSummary(activity_type=activity_type, observed_property=characteristic)
+        observed_property = ds["CharacteristicName"]
+        if (
+            observed_property in foundProperties
+            or observed_property not in POTENTIAL_DATASTREAMS
+        ):
+            continue
+
+        foundProperties.add(observed_property)
+
+        datastreamList.append(
+            ResultSummary(
+                observed_property=ds["CharacteristicName"],
+                result_count=ds["ResultCount"],
+            )
         )
 
-    return StationData(**location_data)
+    return StationData(
+        Datastreams=datastreamList,
+        CountyName=feature["CountyName"],
+        MonitoringLocationId=feature["MonitoringLocationIdentifier"],
+        MonitoringLocationName=feature["MonitoringLocationName"],
+        OrganizationIdentifier=feature["OrganizationIdentifier"],
+        StateCode=feature["StateCode"],
+        MonitoringLocationType=feature["MonitoringLocationType"],
+        WaterbodyName=feature["WaterbodyName"],
+        WatershedManagementUnit=feature["WatershedManagementUnit"],
+        Geometry=GmlPoint(latitude=feature["Latitude"], longitude=feature["Longitude"]),
+        Huc8=feature["Huc8"],
+        Huc12=feature["Huc12"],
+    )

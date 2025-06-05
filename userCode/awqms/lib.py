@@ -8,12 +8,9 @@
 #
 # =================================================================
 
-import csv
 import json
 import logging
-from pathlib import Path
 import requests
-from typing import List
 from urllib.parse import urlencode
 
 from userCode.cache import ShelveCache
@@ -23,25 +20,37 @@ from userCode.util import url_join
 LOGGER = logging.getLogger(__name__)
 
 
-def read_csv(filepath: Path) -> List[str]:
-    result_list = []
+def get_datastream_unit(observed_prop: str, station_id: str) -> str:
+    """
+    Retrieve the units for a given datastream by fetching the first result
+    This is necessary since IncludeResultSummary does not include units
+    """
+    params = {
+        "Characteristic": observed_prop,
+        "PageSize": 1,
+        "PageNumber": 1,
+        "MonitoringLocationIdentifiersCsv": station_id,
+        "ContentType": "json",
+    }
+    encoded_params = urlencode(params)
+    results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
-    try:
-        with open(filepath, "r", newline="", encoding="utf-8") as csvfile:
-            reader = csv.reader(csvfile)
+    cache = ShelveCache()
 
-            # Skip the header row
-            next(reader, None)
+    response, status = cache.get_or_fetch(
+        results_url, force_fetch=False, cache_result=True
+    )
 
-            for row in reader:
-                if row:  # Ensure the row is not empty
-                    result_list.append(row[0])
-    except FileNotFoundError:
-        print(f"Error: The file '{filepath}' does not exist.")
-    except Exception as e:
-        print(f"An error occurred while reading the CSV: {e}")
+    # if there are no results, we can't get the units for the datastream
+    # and thus have to declare the units are unknown
+    if status == 404:
+        return "Unknown"
 
-    return result_list
+    assert status == 200, (
+        f"Request to get units from {results_url} failed with status {status}"
+    )
+
+    return json.loads(response)[0]["ContinuousResults"][0]["ResultUnit"]
 
 
 def fetch_station(station_id: str) -> bytes:
@@ -57,7 +66,9 @@ def fetch_station(station_id: str) -> bytes:
     xml_url = url_join(AWQMS_URL, f"MonitoringLocationsVer1?{encoded_params}")
 
     cache = ShelveCache()
-    response, status_code = cache.get_or_fetch(xml_url, force_fetch=False)
+    response, status_code = cache.get_or_fetch(
+        xml_url, force_fetch=False, cache_result=True
+    )
 
     if status_code != 200:
         raise RuntimeError(f"Request to {xml_url} failed with status {status_code}")
@@ -65,7 +76,10 @@ def fetch_station(station_id: str) -> bytes:
     return response
 
 
-def fetch_observations(observed_prop: str, station_id: str) -> list[dict]:
+def fetch_observations(
+    observed_prop: str,
+    station_id: str,
+) -> list[dict]:
     params = {
         "Characteristic": observed_prop,
         "MonitoringLocationIdentifiersCsv": station_id,
@@ -74,21 +88,36 @@ def fetch_observations(observed_prop: str, station_id: str) -> list[dict]:
     encoded_params = urlencode(params)
     results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
-    cache = ShelveCache()
-    response, status_code = cache.get_or_fetch(results_url, force_fetch=False)
+    # don't cache this since observations would take up too much space
+    response = requests.get(results_url)
 
-    if status_code != 200:
-        raise RuntimeError(f"Request to {results_url} failed with status {status_code}")
+    if (
+        "No records were found which match your search criteria"
+        in response.content.decode("utf-8")
+    ):
+        # we have to check the response since sometimes awqms returns 200 for this and sometimes
+        # it returns 404; so the status code isnt reliable
+        LOGGER.warning(
+            f"No records were found which match your search criteria for {observed_prop} at {station_id}"
+        )
+        return []
+
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Request to {results_url} failed with status {response.status_code}"
+        )
 
     try:
-        serialized = json.loads(response)
+        serialized = json.loads(response.content)
     except json.decoder.JSONDecodeError:
-        raise RuntimeError(f"Request to {results_url} failed with status {status_code}")
+        raise RuntimeError(
+            f"Request to {results_url} failed with status {response.status_code}"
+        )
 
     return [result for item in serialized for result in item["ContinuousResults"]]
 
 
-def fetch_observation_ids(datastream_id: str) -> set[int]:
+def fetch_observation_ids_in_db(datastream_id: str) -> set[int]:
     """
     Fetch all existing Observations' @iot.id for a given Datastream's @iot.id.
 

@@ -22,15 +22,19 @@ from dagster import (
 )
 import requests
 
-from userCode.awqms.lib import fetch_station, fetch_observations, fetch_observation_ids
+from userCode.awqms.lib import (
+    fetch_station,
+    fetch_observations,
+    fetch_observation_ids_in_db,
+    get_datastream_unit,
+)
 from userCode.awqms.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
+from userCode.awqms.stations import ALL_RELEVANT_STATIONS
 from userCode.awqms.types import (
-    ALL_RELEVANT_STATIONS,
-    POTENTIAL_DATASTREAMS,
     StationData,
     parse_monitoring_locations,
 )
@@ -96,19 +100,18 @@ def awqms_datastreams(awqms_metadata: StationData) -> list[Datastream]:
 
     datastreams: list[Datastream] = []
     for datastream in awqms_metadata.Datastreams:
-        if datastream.observed_property not in POTENTIAL_DATASTREAMS:
-            continue
+        unit = get_datastream_unit(datastream.observed_property, thingid)
 
         datastreams.append(
             to_sensorthings_datastream(
-                awqms_metadata,
-                POTENTIAL_DATASTREAMS[datastream.observed_property],
-                datastream.observed_property,
-                thingid,
+                attr=awqms_metadata,
+                units=unit,
+                property=datastream.observed_property,
+                associatedThingId=thingid,
             )
         )
 
-    assert len(datastreams) > 0, f"No datastreams found for {thingid}"
+    get_dagster_logger().info(f"Found {len(datastreams)} datastreams")
 
     return datastreams
 
@@ -152,9 +155,16 @@ async def awqms_observations(
     observations: dict[int, Observation] = {}
 
     async def fetch_and_process(datastream: Datastream):
-        observations_ids = fetch_observation_ids(datastream.iotid)
+        observations_ids = fetch_observation_ids_in_db(datastream.iotid)
         LOGGER.info(f"Fetching observations for {datastream.iotid}")
-        for result in fetch_observations(datastream.description, associatedThing):
+        results = fetch_observations(
+            observed_prop=datastream.description,
+            station_id=associatedThing,
+        )
+        get_dagster_logger().info(
+            f"Found {len(results)} observations for datastream {datastream.iotid}"
+        )
+        for result in results:
             if not result["ResultValue"]:
                 continue
 

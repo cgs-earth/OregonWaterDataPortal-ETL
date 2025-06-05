@@ -14,11 +14,12 @@ import tempfile
 from unittest.mock import patch, Mock
 
 from userCode.awqms.lib import (
-    read_csv,
     fetch_station,
     fetch_observations,
-    fetch_observation_ids,
+    fetch_observation_ids_in_db,
+    get_datastream_unit,
 )
+from userCode.awqms.stations import read_csv
 
 
 @pytest.fixture
@@ -35,8 +36,12 @@ def test_read_csv_success(sample_csv_path):
 
 
 def test_read_csv_file_not_found():
-    result = read_csv(Path("nonexistent.csv"))
-    assert result == []
+    with pytest.raises(FileNotFoundError):
+        read_csv(Path("nonexistent.csv"))
+
+
+def test_get_datastream_unit():
+    assert get_datastream_unit("Temperature, water", "11973-ORDEQ") == "deg C"
 
 
 @patch("userCode.cache.ShelveCache", autospec=True)
@@ -80,20 +85,17 @@ def test_fetch_observations(mock_shelve_cache_cls):
         assert len(result) == 3354
 
 
-@patch("userCode.cache.ShelveCache", autospec=True)
-def test_fetch_observations_invalid_json(mock_shelve_cache_cls):
-    with tempfile.NamedTemporaryFile() as temp_db:
-        # Configure the mocked ShelveCache class to use a temporary database
-        mock_shelve_cache_cls.db = temp_db.name + ".db"
+@patch("requests.get", autospec=True)
+def test_fetch_observations_invalid_json(mock_get):
+    # Mock a response with status_code 404
+    mock_response = Mock()
+    mock_response.status_code = 404
+    mock_response.content = b"Not Found"
+    mock_get.return_value = mock_response
 
-        # Mock an invalid JSON response
-        mock_cache_instance = Mock()
-        mock_cache_instance.get_or_fetch.return_value = (b"invalid json", 200)
-        mock_shelve_cache_cls.return_value = mock_cache_instance
-
-        # Test that a RuntimeError is raised for invalid JSON data
-        with pytest.raises(RuntimeError, match="Request to.*failed with status 404"):
-            fetch_observations("Temperature", "12005-ORDEQ")
+    # Test that a RuntimeError is raised for a failed fetch
+    with pytest.raises(RuntimeError, match="Request to.*failed with status 404"):
+        fetch_observations("Temperature", "12005-ORDEQ")
 
 
 def test_fetch_observation_ids():
@@ -113,7 +115,7 @@ def test_fetch_observation_ids():
             Mock(status_code=200, json=Mock(return_value=mock_response_2)),
         ]
 
-        result = fetch_observation_ids(datastream_id)
+        result = fetch_observation_ids_in_db(datastream_id)
 
         assert result == {1, 2, 3, 4}
         assert mock_get.call_count == 2

@@ -28,6 +28,9 @@ def RUNNING_AS_TEST_OR_DEV():
             "DAGSTER_IS_DEV_CLI" in os.environ
             # If we are running inside of pytest
             or "PYTEST_CURRENT_TEST" in os.environ
+            # we need the following if we are running pytest
+            # but are not inside a test function
+            or "PYTEST_VERSION" in os.environ
         )
         # Make sure that we are not inside the container
         # with the PRODUCTION variable st
