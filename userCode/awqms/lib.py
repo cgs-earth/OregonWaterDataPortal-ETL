@@ -43,14 +43,21 @@ def get_datastream_unit(observed_prop: str, station_id: str) -> str:
 
     # if there are no results, we can't get the units for the datastream
     # and thus have to declare the units are unknown
-    if status == 404:
+    if (
+        status == 404
+        # we have to match on the text since sometimes awqms returns 200 for this and sometimes 404
+        or "No records were found which match your search criteria"
+        in response.decode("utf-8")
+    ):        
         return "Unknown"
 
     assert status == 200, (
         f"Request to get units from {results_url} failed with status {status}"
     )
 
-    return json.loads(response)[0]["ContinuousResults"][0]["ResultUnit"]
+    asJson = json.loads(response)
+    unit = asJson[0]["ContinuousResults"][0]["ResultUnit"]
+    return unit
 
 
 def fetch_station(station_id: str) -> bytes:

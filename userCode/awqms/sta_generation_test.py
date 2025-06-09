@@ -92,3 +92,13 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
             property="unknown_property",
             associatedThingId="TEST123",
         )
+
+    assert "MCPA" in ONTOLOGY_MAPPING
+    assert not ONTOLOGY_MAPPING["MCPA"]
+
+    assert to_sensorthings_datastream(
+        attr=sample_station_data,
+        units="N/A",
+        property="MCPA",
+        associatedThingId="TEST123",
+    )

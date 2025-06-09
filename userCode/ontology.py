@@ -8,12 +8,13 @@
 #
 # =================================================================
 
+import json
 from typing import Optional, Sequence
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
-import requests
 
-from userCode.schema import ResourceURI
+from userCode.cache import ShelveCache
+from userCode.awqms._generated.schema import ResourceURI
 from userCode.util import deterministic_hash
 
 
@@ -37,19 +38,17 @@ def get_ontology(uri: str) -> Ontology:
     """Parse an odm2 vocabulary into a pydantic model"""
     uriAsJson = f"{uri}?format=json"
     get_dagster_logger().info(f"Constructing ontology object from {uriAsJson}")
-    resp = requests.get(uriAsJson)
-    assert resp.ok, f"Failed to get {uriAsJson}: {resp.text}"
-    try:
-        json = resp.json()
-    except Exception:
-        # raise a more informative error if something is wrong in the json parse
-        # usually indicates a quirk of ODM2 itself
-        raise RuntimeError(f"Failed to get {uriAsJson}: {resp.text}")
-
+    cache = ShelveCache()
+    # always cache the ontology
+    resp, status = cache.get_or_fetch(uriAsJson, force_fetch=False, cache_result=True)
+    assert status == 200, (
+        f"Request to {uriAsJson} failed with status {status} and body {resp}"
+    )
+    asJson = json.loads(resp)
     return Ontology(
-        definition=json["definition"],
-        description=json["provenance"],
-        name=json["name"],
+        definition=asJson["definition"],
+        description=asJson["provenance"],
+        name=asJson["name"],
         uri=uri,
     )
 
@@ -73,15 +72,15 @@ __ontology_definition: dict[Sequence, Optional[ResourceURI]] = {
         "groundwater depth",
         "groundwater",
     ): "groundwaterDepth",
-    ("Alkalinity, total"): "n_AlkaneTotal",
-    # mark
+    ("Alkalinity, total"): "alkalinityTotal",
+    # this is electrical and not hydr
     ("Conductivity"): "electricalConductivity",
     ("Dissolved oxygen (DO)"): "oxygenDissolved",
     ("Dissolved oxygen saturation"): "oxygenDissolvedPercentOfSaturation",
     ("pH"): "pH",
     ("Turbidity", "Turbidity Field"): "turbidity",
     ("Aluminum"): "aluminum",
-    ("Ammonia"): None,
+    ("Ammonia"): "nitrogen_NH3",
     ("Arsenic"): "arsenic",
     ("Biochemical oxygen demand, non-standard conditions"): None,
     ("Cadmium"): "cadmium",
@@ -155,7 +154,7 @@ __ontology_definition: dict[Sequence, Optional[ResourceURI]] = {
     ("Total Coliform"): "coliformTotal",
     ("Antimony"): "antimony",
     ("Halogenated organics"): None,
-    ("True color"): None,
+    ("True color"): "color",
     ("Dicamba"): None,
     ("Enterococcus"): "enterococci",
     # NOTE" unsure on this if gauge or something else
@@ -301,8 +300,7 @@ __ontology_definition: dict[Sequence, Optional[ResourceURI]] = {
     ("Tris(1,3-dichloro-2-propyl)phosphate"): None,
     ("Tris(2-chloroethyl) phosphate"): None,
     ("Nitrogen"): "nitrogen",
-    # NOTE: don't think there is anything that really matches this
-    ("Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)"): None,
+    ("Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)"): "nitrogen",
     ("(RS)-AMPA (Aminomethyl phosphonic acid)"): None,
     ("Coumaphos"): None,
     ("Demeton-S"): None,
@@ -324,18 +322,19 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
         if type(keys) is not tuple:
             keys = (keys,)
 
-        if not value:
-            continue
-
         # special case that has to be skipped
         # since there is no standard uri
         # by skipping this it doesn't mean it won't show
         # up at all, rather it means we use the direct name and
         # not the mapped vocabulary term since to do would be ambiguous
-        if "pheophytin" in value:
+        if value and "pheophytin" in value:
             continue
 
         for key in keys:
+            if not value:
+                equiv_dict[key] = None
+                continue
+
             assert key not in equiv_dict, (
                 f"Tried to add duplicate key {key} when it already exists in {equiv_dict[key]}"
             )

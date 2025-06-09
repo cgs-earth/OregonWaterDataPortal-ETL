@@ -1,0 +1,930 @@
+{
+  "Temperature, water": [
+    "Temperature, sensor",
+    "deg C"
+  ],
+  "Depth, Secchi disk depth": [
+    "Secchi depth",
+    "Unknown"
+  ],
+  "Dissolved oxygen (DO)": [
+    "Oxygen, dissolved",
+    "mg/L"
+  ],
+  "Dissolved oxygen saturation": [
+    "Oxygen, dissolved percent of saturation",
+    "%"
+  ],
+  "pH": [
+    "pH",
+    "None"
+  ],
+  "Specific conductance": [
+    "Specific conductance",
+    "Unknown"
+  ],
+  "Turbidity": [
+    "Turbidity",
+    "Unknown"
+  ],
+  "Conductivity": [
+    "Electrical conductivity",
+    "umho/cm"
+  ],
+  "Depth": [
+    "Depth",
+    "Unknown"
+  ],
+  "Turbidity Field": [
+    "Turbidity",
+    "Unknown"
+  ],
+  "Ammonia": [
+    null,
+    "Unknown"
+  ],
+  "Chlorophyll a": [
+    "Chlorophyll a",
+    "Unknown"
+  ],
+  "Nitrate": [
+    "Nitrogen, total nitrite",
+    "Unknown"
+  ],
+  "Nitrite": [
+    "Nitrogen, total nitrite",
+    "Unknown"
+  ],
+  "Nitrogen": [
+    "Nitrogen",
+    "Unknown"
+  ],
+  "Orthophosphate": [
+    "Phosphorus, orthophosphate",
+    "Unknown"
+  ],
+  "Silica": [
+    "Silica",
+    "Unknown"
+  ],
+  "Total Phosphorus, mixed forms": [
+    "Phosphorus, total",
+    "Unknown"
+  ],
+  "Nitrogen, mixed forms (NH3), (NH4), organic, (NO2) and (NO3)": [
+    null,
+    "Unknown"
+  ],
+  "Chlorophyll a (probe relative fluorescence)": [
+    "Chlorophyll a",
+    "RFU"
+  ],
+  "Phycocyanin (probe relative fluorescence)": [
+    "Blue-green algae (cyanobacteria), phycocyanin",
+    "RFU"
+  ],
+  "Pressure": [
+    "Pressure, gauge",
+    "Unknown"
+  ],
+  "Aluminum": [
+    "Aluminum",
+    "Unknown"
+  ],
+  "Boron": [
+    "Boron, total",
+    "Unknown"
+  ],
+  "Calcium": [
+    "Calcium, total",
+    "Unknown"
+  ],
+  "Chloride": [
+    "Chloride",
+    "Unknown"
+  ],
+  "Hardness, Ca, Mg": [
+    "Hardness, Calcium",
+    "Unknown"
+  ],
+  "Iron": [
+    "Iron",
+    "Unknown"
+  ],
+  "Lithium": [
+    "Lithium, total",
+    "Unknown"
+  ],
+  "Magnesium": [
+    "Magnesium",
+    "Unknown"
+  ],
+  "Manganese": [
+    "Manganese",
+    "Unknown"
+  ],
+  "Nitrate + Nitrite": [
+    "Nitrogen, nitrite (NO2) + nitrate (NO3)",
+    "Unknown"
+  ],
+  "Organic carbon": [
+    "Carbon, organic extractable",
+    "Unknown"
+  ],
+  "Pheophytin a": [
+    null,
+    "Unknown"
+  ],
+  "Potassium": [
+    "Potassium",
+    "Unknown"
+  ],
+  "Sodium": [
+    "Sodium",
+    "Unknown"
+  ],
+  "Total dissolved solids": [
+    "Solids, total dissolved",
+    "Unknown"
+  ],
+  "Total Kjeldahl nitrogen": [
+    "Nitrogen, total kjeldahl",
+    "Unknown"
+  ],
+  "Total suspended solids": [
+    "Solids, total suspended",
+    "Unknown"
+  ],
+  "Alkalinity, total": [
+    "n-alkane, total",
+    "Unknown"
+  ],
+  "Arsenic": [
+    "Arsenic",
+    "Unknown"
+  ],
+  "Biochemical oxygen demand, non-standard conditions": [
+    null,
+    "Unknown"
+  ],
+  "Cadmium": [
+    "Cadmium",
+    "Unknown"
+  ],
+  "Chemical oxygen demand": [
+    null,
+    "Unknown"
+  ],
+  "Chromium": [
+    "Chromium",
+    "Unknown"
+  ],
+  "Copper": [
+    "Copper",
+    "Unknown"
+  ],
+  "Escherichia coli": [
+    "E-coli",
+    "Unknown"
+  ],
+  "Fecal Coliform": [
+    "Coliform, fecal",
+    "Unknown"
+  ],
+  "Lead": [
+    "Lead",
+    "Unknown"
+  ],
+  "Nickel": [
+    "Nickel",
+    "Unknown"
+  ],
+  "Selenium": [
+    "Selenium, total",
+    "Unknown"
+  ],
+  "Silver": [
+    "Silver",
+    "Unknown"
+  ],
+  "Total solids": [
+    "Solids, total",
+    "Unknown"
+  ],
+  "Zinc": [
+    "Zinc",
+    "Unknown"
+  ],
+  "Stream stage": [
+    null,
+    "Unknown"
+  ],
+  "Enterococcus": [
+    "Enterococci",
+    "Unknown"
+  ],
+  "Flow": [
+    "Well flow rate",
+    "Unknown"
+  ],
+  "Sulfate": [
+    "Sulfate",
+    "Unknown"
+  ],
+  "Total Coliform": [
+    "Coliform, total",
+    "Unknown"
+  ],
+  "True color": [
+    null,
+    "Unknown"
+  ],
+  "Depth, bottom": [
+    "Depth",
+    "Unknown"
+  ],
+  "Depth, from ground surface to well water level": [
+    "Groundwater Depth",
+    "Unknown"
+  ],
+  "Chlorthal-dimethyl": [
+    null,
+    "Unknown"
+  ],
+  "Dacthal Acid Metabolites": [
+    null,
+    "Unknown"
+  ],
+  "Barium": [
+    "Barium",
+    "Unknown"
+  ],
+  "Beryllium": [
+    "Beryllium",
+    "Unknown"
+  ],
+  "Bromide": [
+    "Bromide",
+    "Unknown"
+  ],
+  "Cobalt": [
+    "Cobalt",
+    "Unknown"
+  ],
+  "Lanthanum": [
+    "Lanthanum",
+    "Unknown"
+  ],
+  "Molybdenum": [
+    "Molybdenum, total",
+    "Unknown"
+  ],
+  "Perchlorate": [
+    null,
+    "Unknown"
+  ],
+  "Vanadium": [
+    "Vanadium, total",
+    "Unknown"
+  ],
+  "Count": [
+    null,
+    "Unknown"
+  ],
+  "Density": [
+    "Density",
+    "Unknown"
+  ],
+  "Water level (probe)": [
+    "Water level",
+    "Unknown"
+  ],
+  "Carbonaceous biochemical oxygen demand, non-standard conditions": [
+    "BOD2, carbonaceous",
+    "Unknown"
+  ],
+  "Thallium": [
+    "Thallium",
+    "Unknown"
+  ],
+  "Halogenated organics": [
+    null,
+    "Unknown"
+  ],
+  "Salinity": [
+    "Salinity",
+    "Unknown"
+  ],
+  "Antimony": [
+    "Antimony",
+    "Unknown"
+  ],
+  "Atrazine": [
+    null,
+    "Unknown"
+  ],
+  "Azinphos-methyl": [
+    null,
+    "Unknown"
+  ],
+  "Chlorpyrifos": [
+    null,
+    "Unknown"
+  ],
+  "Diazinon": [
+    null,
+    "Unknown"
+  ],
+  "Dimethoate": [
+    null,
+    "Unknown"
+  ],
+  "Disulfoton": [
+    "Disulfoton",
+    "Unknown"
+  ],
+  "Ethoprop": [
+    null,
+    "Unknown"
+  ],
+  "Malathion": [
+    "Malathion",
+    "Unknown"
+  ],
+  "Methyl parathion": [
+    null,
+    "Unknown"
+  ],
+  "Phorate": [
+    "Phorate",
+    "Unknown"
+  ],
+  "Phosmet": [
+    null,
+    "Unknown"
+  ],
+  "Simazine": [
+    null,
+    "Unknown"
+  ],
+  "Silicon": [
+    "Silicon",
+    "Unknown"
+  ],
+  ".alpha.-Endosulfan": [
+    "Endosulfan I (alpha)",
+    "Unknown"
+  ],
+  ".alpha.-Hexachlorocyclohexane": [
+    null,
+    "Unknown"
+  ],
+  ".beta.-Endosulfan": [
+    "Endosulfan II (beta)",
+    "Unknown"
+  ],
+  ".beta.-Hexachlorocyclohexane": [
+    null,
+    "Unknown"
+  ],
+  ".delta.-Hexachlorocyclohexane": [
+    null,
+    "Unknown"
+  ],
+  "2,4,5-T": [
+    null,
+    "Unknown"
+  ],
+  "2,4-D": [
+    null,
+    "Unknown"
+  ],
+  "2,4-DB": [
+    null,
+    "Unknown"
+  ],
+  "2,6-Dichlorobenzamide": [
+    "2,6-Dichlorophenol",
+    "Unknown"
+  ],
+  "2-Chloro-4-isopropylamino-6-amino-s-triazine": [
+    null,
+    "Unknown"
+  ],
+  "3,5-Dichlorobenzoic acid": [
+    null,
+    "Unknown"
+  ],
+  "Acephate": [
+    "Acetate",
+    "Unknown"
+  ],
+  "Acetamiprid": [
+    null,
+    "Unknown"
+  ],
+  "Acetochlor": [
+    null,
+    "Unknown"
+  ],
+  "Acifluorfen": [
+    null,
+    "Unknown"
+  ],
+  "Alachlor": [
+    null,
+    "Unknown"
+  ],
+  "Aldrin": [
+    "Aldrin",
+    "Unknown"
+  ],
+  "Ametryn": [
+    null,
+    "Unknown"
+  ],
+  "Aminocarb": [
+    null,
+    "Unknown"
+  ],
+  "Azinphos-methyl oxygen analog": [
+    null,
+    "Unknown"
+  ],
+  "Azoxystrobin": [
+    null,
+    "Unknown"
+  ],
+  "Bifenthrin": [
+    "Bifenthrin",
+    "Unknown"
+  ],
+  "Bromacil": [
+    null,
+    "Unknown"
+  ],
+  "Butachlor": [
+    null,
+    "Unknown"
+  ],
+  "Butylate": [
+    null,
+    "Unknown"
+  ],
+  "Carbaryl": [
+    null,
+    "Unknown"
+  ],
+  "Carbofuran": [
+    null,
+    "Unknown"
+  ],
+  "Carboxin": [
+    null,
+    "Unknown"
+  ],
+  "Chlorobenzilate": [
+    "Chlorobenzilate",
+    "Unknown"
+  ],
+  "Chloroneb": [
+    null,
+    "Unknown"
+  ],
+  "Chlorothalonil": [
+    null,
+    "Unknown"
+  ],
+  "Chlorpropham": [
+    null,
+    "Unknown"
+  ],
+  "Chlorpyrifos O.A.": [
+    null,
+    "Unknown"
+  ],
+  "Chlorthal monoacid and diacid degradates": [
+    null,
+    "Unknown"
+  ],
+  "cis-Chlordane": [
+    null,
+    "Unknown"
+  ],
+  "Cyanazine": [
+    null,
+    "Unknown"
+  ],
+  "Cycloate": [
+    null,
+    "Unknown"
+  ],
+  "Deisopropylatrazine": [
+    null,
+    "Unknown"
+  ],
+  "Dicamba": [
+    null,
+    "Unknown"
+  ],
+  "Dichlobenil": [
+    null,
+    "Unknown"
+  ],
+  "Dichlorprop": [
+    "1,2-Dichloropropane",
+    "Unknown"
+  ],
+  "Dichlorvos": [
+    null,
+    "Unknown"
+  ],
+  "Dieldrin": [
+    "Dieldrin",
+    "Unknown"
+  ],
+  "Dimethenamid": [
+    null,
+    "Unknown"
+  ],
+  "Dinoseb": [
+    "Dinoseb",
+    "Unknown"
+  ],
+  "Diphenamid": [
+    null,
+    "Unknown"
+  ],
+  "Diuron": [
+    null,
+    "Unknown"
+  ],
+  "Endosulfan sulfate": [
+    "Endosulfan Sulfate",
+    "Unknown"
+  ],
+  "Endrin": [
+    "Endrin",
+    "Unknown"
+  ],
+  "Endrin aldehyde": [
+    "Endrin aldehyde",
+    "Unknown"
+  ],
+  "Etridiazole": [
+    null,
+    "Unknown"
+  ],
+  "Fenamiphos": [
+    null,
+    "Unknown"
+  ],
+  "Fenarimol": [
+    null,
+    "Unknown"
+  ],
+  "Fenvalerate + Esfenvalerate": [
+    null,
+    "Unknown"
+  ],
+  "Fluometuron": [
+    null,
+    "Unknown"
+  ],
+  "Fluridone": [
+    null,
+    "Unknown"
+  ],
+  "Heptachlor": [
+    "Heptachlor",
+    "Unknown"
+  ],
+  "Heptachlor epoxide": [
+    "Heptachlor epoxide",
+    "Unknown"
+  ],
+  "Hexazinone": [
+    null,
+    "Unknown"
+  ],
+  "Imazapyr": [
+    null,
+    "Unknown"
+  ],
+  "Imidacloprid": [
+    null,
+    "Unknown"
+  ],
+  "Lindane": [
+    null,
+    "Unknown"
+  ],
+  "Linuron": [
+    null,
+    "Unknown"
+  ],
+  "Malaoxon": [
+    null,
+    "Unknown"
+  ],
+  "MCPA": [
+    null,
+    "Unknown"
+  ],
+  "Mecoprop-p (mcpp-p)": [
+    null,
+    "Unknown"
+  ],
+  "Methiocarb": [
+    null,
+    "Unknown"
+  ],
+  "Methomyl": [
+    null,
+    "Unknown"
+  ],
+  "Methoxychlor": [
+    "Methoxychlor",
+    "Unknown"
+  ],
+  "Methyl paraoxon": [
+    null,
+    "Unknown"
+  ],
+  "Metolachlor": [
+    null,
+    "Unknown"
+  ],
+  "Metribuzin": [
+    null,
+    "Unknown"
+  ],
+  "Metsulfuron-methyl": [
+    null,
+    "Unknown"
+  ],
+  "Mevinphos": [
+    "Mevinphos",
+    "Unknown"
+  ],
+  "Mexacarbate": [
+    null,
+    "Unknown"
+  ],
+  "Mirex": [
+    null,
+    "Unknown"
+  ],
+  "Molinate": [
+    null,
+    "Unknown"
+  ],
+  "N,N-Diethyl-m-toluamide": [
+    null,
+    "Unknown"
+  ],
+  "N-2-Ethylhexylbicycloheptenedicarboximide": [
+    null,
+    "Unknown"
+  ],
+  "Napropamide": [
+    null,
+    "Unknown"
+  ],
+  "Neburon": [
+    null,
+    "Unknown"
+  ],
+  "Norflurazon": [
+    null,
+    "Unknown"
+  ],
+  "Oxamyl": [
+    null,
+    "Unknown"
+  ],
+  "Oxyfluorfen": [
+    null,
+    "Unknown"
+  ],
+  "p,p'-DDD": [
+    "4,4-DDD",
+    "Unknown"
+  ],
+  "p,p'-DDE": [
+    "4,4-DDE",
+    "Unknown"
+  ],
+  "p,p'-DDT": [
+    "4,4-DDT",
+    "Unknown"
+  ],
+  "Parathion": [
+    null,
+    "Unknown"
+  ],
+  "Pebulate": [
+    null,
+    "Unknown"
+  ],
+  "Pendimethalin": [
+    null,
+    "Unknown"
+  ],
+  "Pentachlorophenol": [
+    "Pentachlorophenol",
+    "Unknown"
+  ],
+  "Permethrin": [
+    "Permethrin",
+    "Unknown"
+  ],
+  "Phosmetoxon": [
+    null,
+    "Unknown"
+  ],
+  "Picloram": [
+    null,
+    "Unknown"
+  ],
+  "Prometon": [
+    null,
+    "Unknown"
+  ],
+  "Prometryn": [
+    null,
+    "Unknown"
+  ],
+  "Pronamide": [
+    "Pronamide",
+    "Unknown"
+  ],
+  "Propachlor": [
+    null,
+    "Unknown"
+  ],
+  "Propazine": [
+    null,
+    "Unknown"
+  ],
+  "Propiconazole": [
+    null,
+    "Unknown"
+  ],
+  "Propoxur": [
+    null,
+    "Unknown"
+  ],
+  "Pyraclostrobin": [
+    null,
+    "Unknown"
+  ],
+  "Pyraflufen-ethyl": [
+    null,
+    "Unknown"
+  ],
+  "Pyriproxyfen": [
+    null,
+    "Unknown"
+  ],
+  "S-Ethyl dipropylthiocarbamate": [
+    null,
+    "Unknown"
+  ],
+  "Siduron": [
+    null,
+    "Unknown"
+  ],
+  "Silvex": [
+    null,
+    "Unknown"
+  ],
+  "Simetryn": [
+    null,
+    "Unknown"
+  ],
+  "Sulfometuron methyl": [
+    null,
+    "Unknown"
+  ],
+  "Tebuthiuron": [
+    null,
+    "Unknown"
+  ],
+  "Terbacil": [
+    null,
+    "Unknown"
+  ],
+  "Terbufos": [
+    "Terbufos",
+    "Unknown"
+  ],
+  "Terbuthylazine": [
+    null,
+    "Unknown"
+  ],
+  "Terbutryn": [
+    null,
+    "Unknown"
+  ],
+  "Tetrachlorvinphos": [
+    null,
+    "Unknown"
+  ],
+  "trans-Chlordane": [
+    null,
+    "Unknown"
+  ],
+  "trans-Nonachlor": [
+    null,
+    "Unknown"
+  ],
+  "Triadimefon": [
+    null,
+    "Unknown"
+  ],
+  "Triclopyr": [
+    null,
+    "Unknown"
+  ],
+  "Tricyclazole": [
+    null,
+    "Unknown"
+  ],
+  "Trifloxystrobin": [
+    null,
+    "Unknown"
+  ],
+  "Trifluralin": [
+    "Trifluralin",
+    "Unknown"
+  ],
+  "Tris(1,3-dichloro-2-propyl)phosphate": [
+    null,
+    "Unknown"
+  ],
+  "Tris(2-chloroethyl) phosphate": [
+    null,
+    "Unknown"
+  ],
+  "Vernolate": [
+    null,
+    "Unknown"
+  ],
+  "Depth, data-logger (ported)": [
+    "Depth",
+    "m"
+  ],
+  "Chlorophyll a (probe)": [
+    "Chlorophyll a",
+    "RFU"
+  ],
+  "Phycocyanin": [
+    "Blue-green algae (cyanobacteria), phycocyanin",
+    "RFU"
+  ],
+  "(RS)-AMPA (Aminomethyl phosphonic acid)": [
+    null,
+    "Unknown"
+  ],
+  "Coumaphos": [
+    null,
+    "Unknown"
+  ],
+  "Demeton-S": [
+    null,
+    "Unknown"
+  ],
+  "Fensulfothion": [
+    null,
+    "Unknown"
+  ],
+  "Fenthion": [
+    null,
+    "Unknown"
+  ],
+  "Glyphosate": [
+    null,
+    "Unknown"
+  ],
+  "O-Ethyl O-(p-nitrophenyl) phenylphosphonothioate": [
+    null,
+    "Unknown"
+  ],
+  "Prothiofos": [
+    null,
+    "Unknown"
+  ],
+  "Ronnel": [
+    null,
+    "Unknown"
+  ],
+  "Sulprofos": [
+    null,
+    "Unknown"
+  ],
+  "Trichloronate": [
+    null,
+    "Unknown"
+  ]
+}
