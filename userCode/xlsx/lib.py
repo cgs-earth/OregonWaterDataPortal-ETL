@@ -32,7 +32,7 @@ def validate_columns(sheet: list, typedDict: type):
 
 def parse_xlsx(input_file: Path) -> OregonXLSX:
     workbook = pd.read_excel(input_file, sheet_name=None)
-    assert len(workbook) == 3  # make sure there are 3 sheets
+    assert len(workbook) == 3, "There must be 3 sheets in the xlsx file"
 
     site_data: list[SiteData] = read_sheet(workbook["Site Data"])
     # make sure that site_data has the same column names as the SiteData typedict

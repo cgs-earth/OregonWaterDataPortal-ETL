@@ -10,7 +10,7 @@
 
 import click
 import debugpy
-from lib import parse_xlsx
+from userCode.xlsx.lib import parse_xlsx
 import os
 import pytest
 from pathlib import Path
@@ -20,7 +20,7 @@ from pathlib import Path
 @click.pass_context
 @click.argument("file", type=click.Path(exists=True))
 def load(ctx, file):
-    """Load and process an xlsx file, parsing and sending to Frost."""
+    """Load, process and upload a xlsx file to the SensorThings database"""
     path = Path(file)
     parsed = parse_xlsx(path)
     sta = parsed.to_sta()
@@ -34,8 +34,7 @@ def load(ctx, file):
 def test(ctx, pytest_args):
     """Run all pytest tests associated with this module. Pass in additional arguments to pytest if needed."""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    test_dir = os.path.join(dir_path, "tests")
-    pytest.main([test_dir, "-vvvx", *pytest_args])
+    pytest.main([dir_path, "-vvvx", *pytest_args])
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))
