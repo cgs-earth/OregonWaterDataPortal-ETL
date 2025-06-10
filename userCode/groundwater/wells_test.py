@@ -12,8 +12,8 @@ from userCode.groundwater.wells import (
 import pytest
 
 
-@pytest.fixture
-def fetch_wells_res():
+@pytest.mark.upstream
+def test_fetch_wells():
     res = fetch_wells()
     assert len(res) > 0
     for well in res:
@@ -23,7 +23,10 @@ def fetch_wells_res():
     # index will correspond to the same memory before and after merge
     assert len(flattened.features) > len(res[1].features)
     assert len(flattened.fields) > len(res[1].fields)
-    return res
+
+    # make sure that pydantic adds all attributes
+    # from the upstream on to the feature
+    assert flattened.features[0].attributes.bonded_name_company  # type: ignore
 
 
 def test_fetch_timeseries_data():
