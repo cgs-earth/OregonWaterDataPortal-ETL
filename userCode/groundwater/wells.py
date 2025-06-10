@@ -27,6 +27,8 @@ class WellGeometry(BaseModel):
 
 
 class WellAttributes(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     OBJECTID: int
     wl_id: int
     type_of_log: str
@@ -153,6 +155,19 @@ class WellFeature(BaseModel):
                         },
                         "properties": {
                             "land_surface_elevation": item.land_surface_elevation,
+                            "organization": item.measurement_source_organization,
+                            "measurement_source_organization": item.measurement_source_organization,
+                            "measurement_source_owrd": item.measurement_source_owrd,
+                            "measurement_method": item.measurement_method,
+                            "measurement_status_desc": item.measurement_status_desc,
+                            "airline_length": item.airline_length,
+                            "gage_pressure": item.gage_pressure,
+                            "tape_hold": item.tape_hold,
+                            "tape_missing": item.tape_missing,
+                            "tape_cut": item.tape_cut,
+                            "tape_stretch_correction": item.tape_stretch_correction,
+                            "measuring_point_height": item.measuring_point_height,
+                            "waterlevel_accuracy": item.waterlevel_accuracy,
                         },
                     },
                 }
