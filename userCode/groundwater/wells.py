@@ -27,6 +27,8 @@ class WellGeometry(BaseModel):
 
 
 class WellAttributes(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     OBJECTID: int
     wl_id: int
     type_of_log: str
