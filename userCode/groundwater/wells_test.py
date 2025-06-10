@@ -46,6 +46,25 @@ def test_fetch_timeseries_data():
     assert data
 
 
+def test_to_sta_observations():
+    feat = WellFeature(
+        attributes=WellAttributes(
+            OBJECTID=0,
+            wl_id=0,
+            type_of_log="",
+            wl_county_code="MORR",
+            wl_nbr=635,
+            wl_version=0,
+            est_horizontal_error=0,
+        ),
+        geometry=WellGeometry(x=0, y=0),
+    )
+    sta_obs = feat.to_sta_observations()
+    assert sta_obs
+    # make sure that the pydantic model adds all attributes
+    assert sta_obs[0].FeatureOfInterest["properties"]["organization"]
+
+
 def test_get_geometry_file():
     res = get_geometry_file()
     assert res
