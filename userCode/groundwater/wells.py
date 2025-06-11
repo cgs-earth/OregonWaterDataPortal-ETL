@@ -201,7 +201,10 @@ class WellFeature(BaseModel):
                     },
                 }
             ],
-            "properties": self.attributes.model_dump(),
+            "properties": {
+                **self.attributes.model_dump(),
+                "organization": "OWRD",
+            },
         }
 
     def to_sta_datastream(self):

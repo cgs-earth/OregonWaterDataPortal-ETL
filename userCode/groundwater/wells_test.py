@@ -46,7 +46,7 @@ def test_fetch_timeseries_data():
     assert data
 
 
-def test_to_sta_observations():
+def test_to_sta():
     feat = WellFeature(
         attributes=WellAttributes(
             OBJECTID=0,
@@ -59,10 +59,17 @@ def test_to_sta_observations():
         ),
         geometry=WellGeometry(x=0, y=0),
     )
+    asStaThing = feat.to_sta_thing()
+    assert asStaThing["properties"]["organization"] == "OWRD", (
+        "Groundwater wells should be labeled as OWRD"
+    )
+
     sta_obs = feat.to_sta_observations()
     assert sta_obs
     # make sure that the pydantic model adds all attributes
-    assert sta_obs[0].FeatureOfInterest["properties"]["organization"]
+    assert sta_obs[0].FeatureOfInterest["properties"]["organization"] != "OWRD", (
+        "The observations for each groundwater welll should not necessarily be OWRD but could be another organization"
+    )
 
 
 def test_get_geometry_file():
