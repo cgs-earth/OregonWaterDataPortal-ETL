@@ -10,7 +10,7 @@
 
 import click
 import debugpy
-from userCode.xlsx.lib import parse_xlsx
+from userCode.xlsx.lib import parse_xlsx_from_path
 import os
 import pytest
 from pathlib import Path
@@ -22,7 +22,7 @@ from pathlib import Path
 def load(ctx, file):
     """Load, process and upload a xlsx file to the SensorThings database"""
     path = Path(file)
-    parsed = parse_xlsx(path)
+    parsed = parse_xlsx_from_path(path)
     sta = parsed.to_sta()
     parsed.send_to_frost(sta)
     click.echo(f"Finished uploading {path} to FROST")

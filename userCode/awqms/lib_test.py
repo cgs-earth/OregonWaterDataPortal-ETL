@@ -22,6 +22,12 @@ from userCode.awqms.lib import (
 from userCode.awqms.stations import read_csv
 
 
+# def test_fish_and_wildlife():
+#     id = "21449829"
+#     result = fetch_station(id)
+#     assert result
+
+
 @pytest.fixture
 def sample_csv_path(tmp_path):
     csv_content = "station_id\nTEST123\nTEST456\nTEST789"

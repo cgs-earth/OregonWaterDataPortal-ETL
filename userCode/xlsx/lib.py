@@ -30,8 +30,7 @@ def validate_columns(sheet: list, typedDict: type):
     )
 
 
-def parse_xlsx(input_file: Path) -> OregonXLSX:
-    workbook = pd.read_excel(input_file, sheet_name=None)
+def validated_xlsx(workbook: dict[str, pd.DataFrame]) -> OregonXLSX:
     assert len(workbook) == 3, "There must be 3 sheets in the xlsx file"
 
     site_data: list[SiteData] = read_sheet(workbook["Site Data"])
@@ -45,3 +44,13 @@ def parse_xlsx(input_file: Path) -> OregonXLSX:
     validate_columns(data, Data)
 
     return OregonXLSX(site_data, metadata, data)
+
+
+def parse_xlsx_from_bytes(input_file: bytes) -> OregonXLSX:
+    workbook = pd.read_excel(input_file, sheet_name=None)
+    return validated_xlsx(workbook)
+
+
+def parse_xlsx_from_path(input_file: Path) -> OregonXLSX:
+    workbook = pd.read_excel(input_file, sheet_name=None)
+    return validated_xlsx(workbook)
