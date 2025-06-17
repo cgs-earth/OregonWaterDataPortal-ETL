@@ -138,7 +138,7 @@ class WellFeature(BaseModel):
                     ),
                     "phenomenonTime": asPacific.isoformat(),
                     "resultTime": asPacific.isoformat(),
-                    "result": item.waterlevel_ft_below_land_surface,
+                    "result": item.waterlevel_ft_above_mean_sea_level,
                     "Datastream": {"@iot.id": self._get_unique_wl_id()},
                     "FeatureOfInterest": {
                         "@iot.id": self._get_unique_wl_id(),
@@ -154,6 +154,8 @@ class WellFeature(BaseModel):
                             ),
                         },
                         "properties": {
+                            "gw_logid": item.gw_logid,
+                            "waterlevel_ft_below_land_surface": item.waterlevel_ft_below_land_surface,
                             "land_surface_elevation": item.land_surface_elevation,
                             "organization": item.measurement_source_organization,
                             "measurement_source_organization": item.measurement_source_organization,
