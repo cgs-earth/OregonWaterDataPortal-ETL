@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 
 from userCode.cache import ShelveCache
 from userCode.env import API_BACKEND_URL
-from userCode.odwr.types import (
+from userCode.wrd.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
     OregonHttpResponse,

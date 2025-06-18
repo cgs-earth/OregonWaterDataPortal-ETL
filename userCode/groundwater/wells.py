@@ -87,6 +87,15 @@ class WellFeature(BaseModel):
     def _get_datastream_name(self) -> str:
         return f"Waterlevel below land surface for well {self.attributes.wl_nbr}"
 
+    def _get_well_log_url(self) -> str:
+        return f"https://apps.wrd.state.or.us/apps/gw/well_log/wl_details.aspx?wl_id={self.attributes.wl_id}"
+
+    def _get_well_report_pdf_url(self) -> str:
+        return f"https://apps.wrd.state.or.us/apps/misc/vault/vault.aspx?wl_county_code={self.attributes.wl_county_code}&wl_nbr={self.attributes.wl_nbr}"
+
+    def _get_well_hydrograph_url(self) -> str:
+        return f"https://apps.wrd.state.or.us/apps/gw/gw_info/gw_hydrograph/Hydrograph.aspx?gw_logid={self._get_unique_wl_id()}"
+
     def _get_datastream_description(self) -> str:
         return f"Type of log: {self.attributes.type_of_log}"
 
@@ -154,6 +163,12 @@ class WellFeature(BaseModel):
                             ),
                         },
                         "properties": {
+                            "well_log_url": self._get_well_log_url(),
+                            "well_report_pdf_url": self._get_well_report_pdf_url(),
+                            "well_hydrograph_url": self._get_well_hydrograph_url(),
+                            "gw_logid": item.gw_logid,
+                            "waterlevel_ft_above_mean_sea_level": item.waterlevel_ft_above_mean_sea_level,
+                            "waterlevel_ft_below_land_surface": item.waterlevel_ft_below_land_surface,
                             "land_surface_elevation": item.land_surface_elevation,
                             "organization": item.measurement_source_organization,
                             "measurement_source_organization": item.measurement_source_organization,
@@ -201,7 +216,10 @@ class WellFeature(BaseModel):
                     },
                 }
             ],
-            "properties": self.attributes.model_dump(),
+            "properties": {
+                **self.attributes.model_dump(),
+                "organization": "OWRD",
+            },
         }
 
     def to_sta_datastream(self):

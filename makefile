@@ -28,7 +28,7 @@ wipedb:
 # run all tests that test our ETL 
 .PHONY: test
 test:
-	pytest -vv -x -m "not upstream"
+	pyright && pytest -vv -x -m "not upstream"
 
 # Run tests that are relevant to checking our understanding
 # of the upstream APIs, not the associated ETL

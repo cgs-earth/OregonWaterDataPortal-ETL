@@ -28,6 +28,9 @@ from test.lib import (
 def test_duplicate():
     """Make sure that duplicate things are not allowed"""
     wipe_things()
+    wipe_datastreams()
+    wipe_observed_properties()
+    wipe_locations()
     resp = requests.get(API_BACKEND_URL)
     assert resp.ok
     # use a 10 digit number since that is what our hash is

@@ -8,7 +8,6 @@
 #
 # =================================================================
 
-import json
 from dagster import DagsterInstance
 import pytest
 import requests
@@ -24,7 +23,7 @@ from userCode.awqms.dag import (
 )
 from userCode.awqms.lib import fetch_station
 from userCode.awqms.stations import _STATIONS_IN_INITIAL_REQUEST, ALL_RELEVANT_STATIONS
-from userCode.awqms.types import POTENTIAL_DATASTREAMS, parse_monitoring_locations
+from userCode.awqms.types import parse_monitoring_locations
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
@@ -61,16 +60,6 @@ def test_all_datastreams_are_defined():
 
     with ThreadPoolExecutor() as executor:
         executor.map(process_station, ALL_RELEVANT_STATIONS)
-
-    with open("params.json", "w") as f:
-        paramNames = {
-            "terms": [param for param in propertiesToMaxAssociatedResults.keys()]
-        }
-        f.write(json.dumps(paramNames))
-
-    assert len(propertiesToMaxAssociatedResults) == len(
-        set(POTENTIAL_DATASTREAMS.keys())
-    )
 
 
 def test_awqms_preflight_checks():

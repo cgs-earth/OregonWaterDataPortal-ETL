@@ -37,18 +37,18 @@ from userCode.helper_classes import (
     get_datastream_time_range,
     MockValues,
 )
-from userCode.odwr.lib import (
+from userCode.wrd.lib import (
     fetch_station_metadata,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
     assert_no_observations_with_same_iotid_in_first_page,
 )
-from userCode.odwr.sta_generation import (
+from userCode.wrd.sta_generation import (
     to_sensorthings_datastream,
     to_sensorthings_observation,
     to_sensorthings_station,
 )
-from userCode.odwr.types import (
+from userCode.wrd.types import (
     ALL_RELEVANT_STATIONS,
     POTENTIAL_DATASTREAMS,
     Attributes,
@@ -69,14 +69,14 @@ station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STA
 seen_obs: set[Tuple[str, str]] = set()
 
 
-@asset(group_name="owdp")
+@asset(group_name="wrd")
 def preflight_checks():
     """Baseline sanity checks to make sure that the crawl won't immediately fail"""
     sta_ping = requests.get(f"{API_BACKEND_URL}")
     assert sta_ping.ok, f"FROST server is not running at {API_BACKEND_URL}"
 
 
-@asset(deps=[preflight_checks], group_name="owdp")
+@asset(deps=[preflight_checks], group_name="wrd")
 def all_metadata() -> list[StationData]:
     """Get the metadata for all stations that describes what properties they have in the other timeseries API"""
 
@@ -103,7 +103,7 @@ def all_metadata() -> list[StationData]:
     return stations
 
 
-@asset(partitions_def=station_partition, group_name="owdp")
+@asset(partitions_def=station_partition, group_name="wrd")
 def station_metadata(
     context: AssetExecutionContext, all_metadata: list[StationData]
 ) -> StationData:
@@ -120,7 +120,7 @@ def station_metadata(
     return relevant_metadata
 
 
-@asset(partitions_def=station_partition, group_name="owdp")
+@asset(partitions_def=station_partition, group_name="wrd")
 def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     """The sensorthings representation of all datastreams for a given station"""
     attr = station_metadata.attributes
@@ -149,14 +149,14 @@ def sta_datastreams(station_metadata: StationData) -> list[Datastream]:
     return datastreams
 
 
-@asset(partitions_def=station_partition, group_name="owdp")
+@asset(partitions_def=station_partition, group_name="wrd")
 def sta_station(
     station_metadata: StationData,
 ):
     return to_sensorthings_station(station_metadata)
 
 
-@asset(partitions_def=station_partition, group_name="owdp")
+@asset(partitions_def=station_partition, group_name="wrd")
 def sta_all_observations(
     station_metadata: StationData, sta_datastreams: list[Datastream], config: MockValues
 ):
@@ -253,7 +253,7 @@ def sta_all_observations(
     return observations
 
 
-@asset(partitions_def=station_partition, group_name="owdp")
+@asset(partitions_def=station_partition, group_name="wrd")
 def post_station(sta_station: dict):
     """Post a station to the Sensorthings API"""
     # get the station with the station number
@@ -281,7 +281,7 @@ def post_station(sta_station: dict):
     return
 
 
-@asset(partitions_def=station_partition, deps=[post_station], group_name="owdp")
+@asset(partitions_def=station_partition, deps=[post_station], group_name="wrd")
 def post_datastreams(sta_datastreams: list[Datastream]):
     """Post just the datastreams to the Sensorthings API"""
     # check if the datastreams exist
@@ -314,7 +314,7 @@ def post_datastreams(sta_datastreams: list[Datastream]):
             )
 
 
-@asset(partitions_def=station_partition, deps=[post_datastreams], group_name="owdp")
+@asset(partitions_def=station_partition, deps=[post_datastreams], group_name="wrd")
 def batch_post_observations(sta_all_observations: list[Observation]):
     """Post a group of observations for multiple datastreams to the Sensorthings API"""
     BatchHelper().send_observations(sta_all_observations)
@@ -353,10 +353,10 @@ def check_duplicate_observations():
     )
 
 
-odwr_job = define_asset_job(
-    "harvest_owdp",
-    description="harvest owdp data",
-    selection=AssetSelection.groups("owdp"),
+wrd_job = define_asset_job(
+    "harvest_wrd",
+    description="harvest wrd data",
+    selection=AssetSelection.groups("wrd"),
 )
 
 EVERY_4_HOURS = "0 */4 * * *"
@@ -364,12 +364,12 @@ EVERY_4_HOURS = "0 */4 * * *"
 
 @schedule(
     cron_schedule=EVERY_4_HOURS,
-    target=AssetSelection.groups("owdp"),
+    target=AssetSelection.groups("wrd"),
     default_status=DefaultScheduleStatus.STOPPED
     if RUNNING_AS_TEST_OR_DEV()
     else DefaultScheduleStatus.RUNNING,
 )
-def odwr_schedule():
+def wrd_schedule():
     for partition_key in station_partition.get_partition_keys():
         yield RunRequest(
             partition_key=partition_key,

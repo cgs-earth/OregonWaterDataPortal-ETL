@@ -9,7 +9,7 @@
 # =================================================================
 
 from userCode.awqms.types import StationData, GmlPoint
-from userCode.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import ONTOLOGY_MAPPING, Ontology
 from userCode.types import Datastream, Observation
 from userCode.util import from_oregon_datetime
 
@@ -99,12 +99,27 @@ def to_sensorthings_datastream(
     """Generate a sensorthings representation of a station's datastreams.
     Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
 
-    ontology_mapped_property = ONTOLOGY_MAPPING.get(property)
-    if not ontology_mapped_property:
-        raise RuntimeError(
+    try:
+        ontology_mapped_property = ONTOLOGY_MAPPING[property]
+    except KeyError:
+        # this represents that we forgot to map a property
+        # to a term in the ODM2 ontology
+        raise KeyError(
             f"Datastream '{property}' not found in the ontology: "
             "'{ONTOLOGY_MAPPING}'."
             "You need to map this term to a common vocabulary term to use it."
+        )
+    if not ontology_mapped_property:
+        # this represents the case in which we mapped the property
+        # but the property doesn't exist and thus is none in the ontology
+
+        # if the property is not a term in the ODM2 ontology, use the raw property
+        # directly as it defined in the upstream API
+        ontology_mapped_property = Ontology(
+            name=property,
+            description="Undefined",
+            definition="Undefined",
+            uri="Not defined in ODM2",
         )
 
     datastream: Datastream = Datastream(

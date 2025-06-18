@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import requests
+
 
 from userCode.groundwater.wells import (
     WellAttributes,
@@ -46,7 +48,10 @@ def test_fetch_timeseries_data():
     assert data
 
 
-def test_to_sta_observations():
+def test_fetch_associated_reports():
+    """
+    Make sure that the associated reports are included in the feature
+    """
     feat = WellFeature(
         attributes=WellAttributes(
             OBJECTID=0,
@@ -59,10 +64,40 @@ def test_to_sta_observations():
         ),
         geometry=WellGeometry(x=0, y=0),
     )
+    for url in [
+        feat._get_well_log_url(),
+        feat._get_well_report_pdf_url(),
+        feat._get_well_hydrograph_url(),
+    ]:
+        assert url
+        resp = requests.get(url)
+        assert resp.ok, resp.text
+
+
+def test_to_sta():
+    feat = WellFeature(
+        attributes=WellAttributes(
+            OBJECTID=0,
+            wl_id=0,
+            type_of_log="",
+            wl_county_code="MORR",
+            wl_nbr=635,
+            wl_version=0,
+            est_horizontal_error=0,
+        ),
+        geometry=WellGeometry(x=0, y=0),
+    )
+    asStaThing = feat.to_sta_thing()
+    assert asStaThing["properties"]["organization"] == "OWRD", (
+        "Groundwater wells should be labeled as OWRD"
+    )
+
     sta_obs = feat.to_sta_observations()
     assert sta_obs
     # make sure that the pydantic model adds all attributes
-    assert sta_obs[0].FeatureOfInterest["properties"]["organization"]
+    assert sta_obs[0].FeatureOfInterest["properties"]["organization"] != "OWRD", (
+        "The observations for each groundwater welll should not necessarily be OWRD but could be another organization"
+    )
 
 
 def test_get_geometry_file():

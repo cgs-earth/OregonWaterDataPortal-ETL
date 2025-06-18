@@ -15,6 +15,7 @@ from typing import TypedDict, Union
 
 from userCode.env import API_BACKEND_URL
 
+# the site data sheet in the xlsx
 SiteData = TypedDict(
     "SiteData",
     {
@@ -32,6 +33,7 @@ SiteData = TypedDict(
     },
 )
 
+# the metadata sheet in the xlsx
 Metadata = TypedDict(
     "Metadata",
     {
@@ -53,6 +55,7 @@ Metadata = TypedDict(
     },
 )
 
+# the timeseries data sheet in the xlsx
 Data = TypedDict(
     "Data",
     {
@@ -66,6 +69,7 @@ Data = TypedDict(
 )
 
 
+# a fully parsed xlsx file containing 3 sheets
 @dataclass
 class OregonXLSX:
     siteDataSheet: list[SiteData]  # data about the site/location/station
