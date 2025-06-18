@@ -2,7 +2,6 @@
 
 The integration for the Oregon water resources department crawls timeseries data on a schedule and sends it to the Sensorthings API. It uses the datetime data in the db to only fetch new data.
 
-
 ## Upstream Documentation
 
 Oregon uses an ESRI server and you can get all the metadata about each monitoring site by going to: https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query

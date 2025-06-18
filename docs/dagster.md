@@ -1,6 +1,6 @@
 # Dagster
 
-This project uses Dagster for crawling. 
+This project uses Dagster for crawling.
 
 - Crawl schedules can be managed from the `Automation` tab
 - Crawl jobs can be started and monitored from the `Jobs` tab

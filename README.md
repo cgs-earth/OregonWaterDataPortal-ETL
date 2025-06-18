@@ -18,13 +18,12 @@ make dev
 
 Services can be accessed at the following URLs:
 
-| Service | URL |
-| --- | --- |
-| Frontend | http://localhost:8999 |
-| Crawler UI | http://localhost:3000 |
-| API | http://localhost:8999/oapi |
-| Database | http://localhost:8999/FROST-Server/ |
-
+| Service    | URL                                 |
+| ---------- | ----------------------------------- |
+| Frontend   | http://localhost:8999               |
+| Crawler UI | http://localhost:3000               |
+| API        | http://localhost:8999/oapi          |
+| Database   | http://localhost:8999/FROST-Server/ |
 
 ### Production
 
@@ -44,8 +43,7 @@ make caddy
 ## Performance tips
 
 - Once you start the database and the frost server, you will likely want to add extra indices to optimize queries.
-    - Run `make addIndices` to add them
-
+  - Run `make addIndices` to add them
 
 ## Integrations
 

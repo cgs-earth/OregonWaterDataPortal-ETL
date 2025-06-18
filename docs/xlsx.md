@@ -1,6 +1,6 @@
 # Xlsx
 
-Xlsx data can be either crawled or manually added via the web interface. 
+Xlsx data can be either crawled or manually added via the web interface.
 
 ## Manual
 
