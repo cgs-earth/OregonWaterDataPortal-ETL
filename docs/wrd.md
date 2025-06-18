@@ -1,17 +1,7 @@
-# Oregon Water Data Portal
+# Oregon Water Resources Department
 
-The Oregon Water Data portal crawls or ingests data from multiple different Oregon sources and exposes them via a Sensorthings and OGC API Features endpoint.
+The integration for the Oregon water resources department crawls timeseries data on a schedule and sends it to the Sensorthings API. It uses the datetime data in the db to only fetch new data.
 
-## Deployment Documentation
-
-This program uses Dagster to crawl sites from Oregon. The UI for the crawler which displays its logs can be found at `crawler.owdp-pilot.internetofwater.app`
-
-- To start the process of crawling data, click on the "automation" tab and then enable the sensor. This is needed to start the crawler. It is disabled by default so it is not accidentally ran in CI/CD
-- To manually start a crawl click on the "jobs" tab and then click `harvest_owdp` and then `materialize`.
-  - This will crawl all the sites
-- To see logs for each individual station that is being ingested, click on
-  - `jobs` tab
-  - you can then inspect a specific asset to see its logs and whether or not it failed
 
 ## Upstream Documentation
 

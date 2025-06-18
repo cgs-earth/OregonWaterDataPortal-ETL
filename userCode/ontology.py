@@ -345,5 +345,7 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
 
     return equiv_dict
 
-
+print("ontology started")
 ONTOLOGY_MAPPING = construct_ontology_mapping()
+
+print("ontolog done")

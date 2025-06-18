@@ -2,25 +2,53 @@
 
 The Oregon Water Data portal crawls or ingests data from multiple different Oregon sources and exposes them via a Sensorthings and OGC API Features endpoint.
 
-# How to use
+## Usage
 
-1. Copy the `.env.example` file to `.env` and change the URL to your desired domain.
-2. Spin up the infrastructure with docker
+Copy the `.env.example` file to `.env` and change the URL to your desired domain.
+
+### Development
+
+1. Install [uv](https://github.com/astral-sh/uv)
+2. Enter the virtual environment
+3. Run the user code locally with the following command
 
 ```sh
-docker compose --env-file .env --profile production up
+make dev
 ```
 
-3. Once you start the database and the frost server, you will likely want to add extra indices to make it faster. To do this run the [init script](./docker/frost/wait-for-frost-and-init-db.sh)
+Services can be accessed at the following URLs:
 
-Access the frontend at `localhost:8999` and the API at `localhost:8999/oapi`, or edit `.env` and deploy at your own URL.
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:8999 |
+| Crawler UI | http://localhost:3000 |
+| API | http://localhost:8999/oapi |
+| Database | http://localhost:8999/FROST-Server/ |
 
-4. Start Caddy with `make caddy` if you want to get https in production.
 
-## Development
+### Production
 
-When developing you don't need production services so you can just run `docker compose up` (without `--profile production`) and then run dagster with `dagster dev`
+_Builds the images then run user code as a container_
 
-- You must use python 3.12 or below since 3.13 is not supported by Dagster currently
-- This project uses `uv` since it makes it easier to manage the python version
-- It is sometimes helpful to use `screen` to start a background shell, run `dagster dev` then detach the screen. You can then reattach to it at a later time with `screen -r` so it runs in the background but is still accessible via the cli.
+```
+make prodBuild
+make prodUp
+```
+
+_Start the reverse proxy, Caddy, which exposes the services and provisions the SSL certificate_
+
+```
+make caddy
+```
+
+## Performance tips
+
+- Once you start the database and the frost server, you will likely want to add extra indices to optimize queries.
+    - Run `make addIndices` to add them
+
+
+## Integrations
+
+Each integration that we are ingesting is defined as a separate folder in the [userCode](userCode/) folder.
+
+Documentation for all individual integrations can be found in the [docs](docs/) folder
