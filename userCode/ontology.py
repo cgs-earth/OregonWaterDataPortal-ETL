@@ -8,11 +8,12 @@
 #
 # =================================================================
 
+import json
 from typing import Optional, Sequence
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
-import requests
 
+from userCode.cache import ShelveCache
 from userCode.schema import ResourceURI
 from userCode.util import deterministic_hash
 
@@ -37,19 +38,18 @@ def get_ontology(uri: str) -> Ontology:
     """Parse an odm2 vocabulary into a pydantic model"""
     uriAsJson = f"{uri}?format=json"
     get_dagster_logger().info(f"Constructing ontology object from {uriAsJson}")
-    resp = requests.get(uriAsJson)
-    assert resp.ok, f"Failed to get {uriAsJson}: {resp.text}"
-    try:
-        json = resp.json()
-    except Exception:
-        # raise a more informative error if something is wrong in the json parse
-        # usually indicates a quirk of ODM2 itself
-        raise RuntimeError(f"Failed to get {uriAsJson}: {resp.text}")
+    cache = ShelveCache()
+    # always cache the ontology; we just need to get the data once
+    # and it shouldn't ever change since it is an ontology
+    resp, status = cache.get_or_fetch(uriAsJson, cache_result=True, force_fetch=False)
+
+    assert status == 200
+    asJson = json.loads(resp)
 
     return Ontology(
-        definition=json["definition"],
-        description=json["provenance"],
-        name=json["name"],
+        definition=asJson["definition"],
+        description=asJson["provenance"],
+        name=asJson["name"],
         uri=uri,
     )
 
@@ -345,7 +345,6 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
 
     return equiv_dict
 
-print("ontology started")
-ONTOLOGY_MAPPING = construct_ontology_mapping()
 
-print("ontolog done")
+ONTOLOGY_MAPPING = construct_ontology_mapping()
+print("Ontology mapping constructed")

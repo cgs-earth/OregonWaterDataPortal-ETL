@@ -26,15 +26,18 @@ wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
 # run all tests that test our ETL 
+.PHONY: test
 test:
 	pytest -vv -x -m "not upstream"
 
 # Run tests that are relevant to checking our understanding
 # of the upstream APIs, not the associated ETL
+.PHONY: testUpstream
 testUpstream:
 	pytest -vv -x -m "upstream"
 
 # install requirements needed to run dagster
+.PHONY: env
 env:
 # make sure you are in a new shell env after installing uv
 	uv python install 3.12
