@@ -8,9 +8,9 @@ storage:
     base_dir: .
 
 # Sets a maximum of 8 hours for every run in the deployment
-# We set a very long timeout here just to make sure it 
+# We set a very long timeout here just to make sure it
 # doesn't hang indefinitely on a bad http request / db conn
-# No job should take anywhere near this amount but it is set 
+# No job should take anywhere near this amount but it is set
 # to something very high for safety
 run_monitoring:
   enabled: true
