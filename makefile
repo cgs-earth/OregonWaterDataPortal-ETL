@@ -1,6 +1,9 @@
-###### Docker Compose Commands
+###### Docker Compose Wrapper Commands 
 ## We use these since there is a production profile and without specifying the profile
-## docker will not start those services. This can be a footgun
+## docker will not start those services. This can be easy to overlook
+
+dev:
+	docker compose up -d && dagster dev
 
 prodUp:
 	docker compose --profile production up -d
@@ -12,7 +15,6 @@ prodDown:
 	docker compose --profile production down
 
 ####### Helper Commands
-
 # start the reverse proxy which gives our server https and points to the proper domain
 caddy:
 	cp ./Caddyfile /etc/caddy/Caddyfile
@@ -23,27 +25,23 @@ caddy:
 wipedb:
 	docker volume rm oregonwaterdataportal-etl_postgis_volume
 
-# run tests on the dagster pipeline. NOTE: this will clear the db and start fresh
+# run all tests that test our ETL 
 .PHONY: test
 test:
 	pytest -vv -x -m "not upstream"
 
+# Run tests that are relevant to checking our understanding
+# of the upstream APIs, not the associated ETL
 .PHONY: testUpstream
 testUpstream:
 	pytest -vv -x -m "upstream"
 
-# install uv for python package management
-uv:
-# uv is a python version manager and venv manager that we use because of the fact that dagster is pinned to specific
-# python versions and is not trivial to manage. 
-	wget -qO- https://astral.sh/uv/install.sh | sh
-
 # install requirements needed to run dagster
-build:
+.PHONY: env
+env:
 # make sure you are in a new shell env after installing uv
 	uv python install 3.12
 	uv sync 
-	source .venv/bin/activate
 
 addIndices:
 	docker exec -i owdp-database psql -U sensorthings -d sensorthings < docker/frost/indices.sql

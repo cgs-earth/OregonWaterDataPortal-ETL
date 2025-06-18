@@ -10,7 +10,7 @@
 
 import click
 import debugpy
-from lib import parse_xlsx
+from userCode.xlsx.lib import parse_xlsx
 import os
 import pytest
 from pathlib import Path
