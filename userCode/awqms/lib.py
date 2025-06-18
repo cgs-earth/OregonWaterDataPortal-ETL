@@ -48,7 +48,7 @@ def get_datastream_unit(observed_prop: str, station_id: str) -> str:
         # we have to match on the text since sometimes awqms returns 200 for this and sometimes 404
         or "No records were found which match your search criteria"
         in response.decode("utf-8")
-    ):        
+    ):
         return "Unknown"
 
     assert status == 200, (
