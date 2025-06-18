@@ -13,12 +13,12 @@ import pytest
 import requests
 
 
-from userCode.odwr.lib import (
+from userCode.wrd.lib import (
     download_oregon_tsv,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
 )
-from userCode.odwr.types import START_OF_DATA
+from userCode.wrd.types import START_OF_DATA
 from userCode.util import (
     PACIFIC_TIME,
     assert_utc_date_in_range,
