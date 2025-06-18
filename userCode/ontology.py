@@ -346,3 +346,4 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
 
 
 ONTOLOGY_MAPPING = construct_ontology_mapping()
+print("Ontology mapping constructed")
