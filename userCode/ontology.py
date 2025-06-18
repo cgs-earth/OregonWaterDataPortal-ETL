@@ -9,7 +9,7 @@
 # =================================================================
 
 import json
-from typing import Optional, Sequence
+from typing import Final, Optional, Sequence
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
 
@@ -54,7 +54,7 @@ def get_ontology(uri: str) -> Ontology:
 
 
 # Define the association between user terms
-__ontology_definition: dict[Sequence, Optional[ResourceURI]] = {
+__ontology_definition: Final[dict[Sequence, Optional[ResourceURI]]] = {
     (
         "mean_daily_flow",
         "mean daily flow",
