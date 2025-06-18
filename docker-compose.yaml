@@ -81,27 +81,6 @@ services:
     # otherwise we want to use uv with hot reloading using dagster dev
     profiles: [production]
 
-  owdp-container-monitor:
-    build:
-      context: ./docker/container_monitor
-    container_name: owdp-container-monitor
-    env_file:
-      - .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      # test scopes for the token with https://api.slack.com/methods/chat.postMessage/test
-      - SLACK_BOT_TOKEN
-      # NOTE, no # needed here for the channel name
-      - SLACK_CHANNEL_NAME=cgs-iow-bots
-      - SLACK_BOT_NAME=Oregon Container Monitoring Bot
-      - SLACK_BOT_AVATAR=https://cida.usgs.gov/wsgi/ngwmn_ui/static/img/provider_logos/owrd_logo.50b3448a.png
-      - LOG_WATCH_CONTAINER_NAME=owdp-frost
-      - LOG_WATCH_COMMA_SEPARATED_PATTERNS=Slow Query
-    # Don't monitor containers in the dev env or CI/CD
-    profiles: [production]
-    restart: always
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
