@@ -61,3 +61,6 @@ clean:
 	rm -rf schedules/
 	rm -rf tmp*/
 	rm -rf history/
+
+validateConf:
+	docker exec owdp-pygeoapi sh -c "pygeoapi config validate -c /pygeoapi/local.config.yml"

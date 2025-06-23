@@ -16,8 +16,6 @@ server:
   map:
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     attribution: '<a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-  templates:
-    path: "/pygeoapi/pygeoapi/templates"
 logging:
   level: DEBUG
 metadata:
@@ -60,6 +58,8 @@ resources:
   things:
     type: "collection"
     title: "Things"
+    templates: 
+      path: /pygeoapi/pygeoapi/templates/jsonld/things
     description: "SensorThings API Things"
     keywords:
       - "thing"
