@@ -37,6 +37,8 @@ services:
       - API_BACKEND_URL=http://owdp-frost:8080/FROST-Server/v1.1
       - SCRIPT_NAME=/oapi
     restart: always
+    volumes:
+      - ./docker/pygeoapi/templates/jsonld/things/collections/items/item.jsonld:/pygeoapi/pygeoapi/templates/jsonld/things/collections/items/item.jsonld
 
   owdp-ui:
     image: internetofwater/hub2box-ui:owdp-limited

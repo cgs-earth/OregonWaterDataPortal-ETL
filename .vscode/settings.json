@@ -19,5 +19,9 @@
     // hide build artifacts / dependency installations
     "**/*.egg-info/": true,
     ".venv/": true
+  },
+  // pygeoapi requires templates to be labeled as jsonld
+  "files.associations": {
+    "*.jsonld": "jinja"
   }
 }

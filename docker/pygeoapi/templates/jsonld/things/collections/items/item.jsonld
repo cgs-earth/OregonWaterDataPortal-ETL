@@ -22,65 +22,66 @@
   "@type": [
     "hyf:HY_HydrometricFeature",
     "hyf:HY_HydroLocation"
-  ],
+  ]
   {%- if data['monitoringLocationType'] %}
-    "hyf:HydroLocationType": "{{ data['monitoringLocationType'] }}",
+    ,"hyf:HydroLocationType": "{{ data['monitoringLocationType'] }}"
   {% endif -%}
 
   {% set id = data['id'] | trim("'") %}
-  "identifier": {
+  {%- if data['organization'] -%}
+  ,"identifier": {
     "@type": "PropertyValue",
     "propertyID": "{{ data['organization'] }} Site identifier",
     "value": "{{ id }}"
-  },
+  }
+  {%- endif -%}
   {%- if data['name'] %}
-    "name": "{{ data['name'] }}",
+    , "name": "{{ data['name'] }}"
   {% endif -%}
 
   {%- if data['locations'] and data['locations'][0]['description'] %}
-    "description": "{{ data['locations'][0]['description'] }}",
+    ,"description": "{{ data['locations'][0]['description'] }}"
   {% endif -%}
   {%- if data['organization'] -%}
-  "provider": {
+  ,"provider": {
     "@type": "GovernmentOrganization",
     "name": "{{ data['organization'] }}"
-  },
+  }
   {% endif -%}
 
   {%- if data['schema:geo'] %}
-    "geo": {{ data['schema:geo'] | to_json }},
+    ,"geo": {{ data['schema:geo'] | to_json }}
   {% endif -%}
   {%- if data['gsp:hasGeometry'] %}
-    "gsp:hasGeometry": {
+    ,"gsp:hasGeometry": {
       "@type": "{{ data['gsp:hasGeometry']['@type'] }}", 
       "gsp:asWKT": {{ data['gsp:hasGeometry']['gsp:asWKT'] | to_json }},
       "gsp:crs": {
         "@id": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
       }
-    },
+    }
   {% endif -%}
 
   {%- if data["hu08"] or data["hu12"] -%}
-      "hyf:containingCatchment": [
+      ,"hyf:containingCatchment": [
       {%- if data["hu08"] -%}
           {
               "@id": "{{ data['hu08'] }}"
           }
           {%- if data["hu12"] -%}
-          ,
-          {% endif -%}
+      {% endif -%}
       {%- endif -%}
-  {%- if data["hu12"] -%}
+      {%- if data["hu12"] -%}
       {
-          "@id": "{{ data['hu12'] }}"
+          ,"@id": "{{ data['hu12'] }}"
       }
       {%- endif -%}
-      ],
+      ]
   {%- endif -%}
 
 
   {%- if data["county"] or data["state"] -%}
-  "gsp:sfWithin": [
+  ,"gsp:sfWithin": [
     {%- if data["county"] -%}
       { "@id": "{{ data['county'] }}" }
       {%- if data["state"] -%}, {%- endif -%}
@@ -88,65 +89,63 @@
     {%- if data["state"] -%}
       { "@id": "{{ data['state'] }}" }
     {%- endif -%}
-  ],
+  ]
   {% endif -%}
 
-  "subjectOf": [
+  {%- if data['Datastreams'] -%}
+  ,"subjectOf": [
     {%- for stream in data['Datastreams'] %}
         {
-          "@type": "Dataset",
-          "name": "{{ id }}",
+          "@type": "Dataset"
+          ,"name": "{{ id }}"
 
           {%- if stream['description'] %}
-          "description": "{{ stream["description"]}}",
+          ,"description": "{{ stream["description"]}}"
           {% endif -%}
 
-          "provider": {
+          ,"provider": {
               "url": "https://www.waterqualitydata.us",
               "@type": "GovernmentOrganization",
               "name": "{{ data['OrganizationFormalName'] }}"
-          },
+          }
           {%- if data['station_url'] %}
-          "url": "{{ data['station_url'] }}",
+          ,"url": "{{ data['station_url'] }}"
           {% endif -%}
 
-          "variableMeasured": { ,,,
-            "@type": "PropertyValue",
-            "name": "{{ stream['ObservedProperty']['name'] }}",
+          {%- if stream["ObservedProperty"] -%}
+          ,"variableMeasured": { 
+            "@type": "PropertyValue"
 
-            {%- if stream['unitOfMeasurement']['name'] %}
-            "description": "{{ stream['ObservedProperty']['name'] }} in {{ stream['unitOfMeasurement']['name'] }}",
+            {%- if stream['ObservedProperty']['name'] %}
+            ,"name": "{{ stream['ObservedProperty']['name'] }}"
             {% endif -%}
 
-            "propertyID": "{{ stream['ObservedProperty']['definition'].split('/')[-1] }}",
-            "url": "{{ stream['ObservedProperty']['definition'] }}",
-
-            {%- if stream['unitOfMeasurement']['name'] %}
-            "unitText": "{{ stream['unitOfMeasurement']['name'] }}",
+            {%- if stream['unitOfMeasurement']['name'] and stream['ObservedProperty']['name'] %}
+            ,"description": "{{ stream['ObservedProperty']['name'] }} in {{ stream['unitOfMeasurement']['name'] }}"
             {% endif -%}
 
-            "measurementTechnique": "observation",
-            "measurementMethod": {
+            ,"propertyID": "{{ stream['ObservedProperty']['definition'].split('/')[-1] }}"
+            ,"url": "{{ stream['ObservedProperty']['definition'] }}"
+
+            {%- if stream['unitOfMeasurement']['name'] %}
+            ,"unitText": "{{ stream['unitOfMeasurement']['name'] }}"
+            {% endif -%}
+
+            ,"measurementTechnique": "observation"
+            ,"measurementMethod": {
               "name": "{{ stream['ObservedProperty']['name'] }} Measurements",
               "publisher": "{{ data['OrganizationFormalName'] }}"
             }
           },
           {%- if stream['phenomenonTime']  %}
-          "temporalCoverage": "{{ stream['phenomenonTime'] }}",
+          "temporalCoverage": "{{ stream['phenomenonTime'] }}"
           {% endif -%}
-          "distribution": [
-            {
-              "@type": "DataDownload",
-              "name": "Water Quality Portal",
-              "contentUrl": "https://www.waterqualitydata.us/data/Result/search?siteid={{ id }}&CharacteristicName={{ stream['ObservedProperty']['name'] }}&mimeType=csv",
-              "encodingFormat": [
-                "text/comma-separated-values"
-              ],
-              "dc:conformsTo": "https://www.waterqualitydata.us/webservices_documentation/"
-            }
-          ]
+          {%- endif -%}
+
         }
       {%- if not loop.last %},{% endif -%}
+
       {% endfor -%}
     ]
+    {%- endif -%}
 }
