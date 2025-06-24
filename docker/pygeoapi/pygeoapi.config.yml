@@ -81,7 +81,8 @@ resources:
         entity: Things
         id_field: "@iot.id"
         title_field: "name"
-        intralink: true
+        expand: Locations,Datastreams/ObservedProperty
+        intralink: false
     links:
       - type: "text/html"
         rel: "canonical"
@@ -115,7 +116,7 @@ resources:
         entity: Datastreams
         id_field: "@iot.id"
         title_field: "name"
-        intralink: true
+        intralink: false
         expand: Thing/Locations,Observations($select=@iot.id;$orderby=phenomenonTime desc;$top=1),Observations/FeatureOfInterest($select=feature),Sensor,ObservedProperty
     links:
       - type: "text/html"

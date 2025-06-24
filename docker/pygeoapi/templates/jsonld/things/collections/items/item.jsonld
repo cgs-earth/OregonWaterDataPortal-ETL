@@ -68,8 +68,6 @@
           {
               "@id": "{{ data['hu08'] }}"
           }
-          {%- if data["hu12"] -%}
-      {% endif -%}
       {%- endif -%}
       {%- if data["hu12"] -%}
       {
@@ -102,12 +100,13 @@
           {%- if stream['description'] %}
           ,"description": "{{ stream["description"]}}"
           {% endif -%}
-
+          
+          {%- if data["organization"] -%}
           ,"provider": {
-              "url": "https://www.waterqualitydata.us",
               "@type": "GovernmentOrganization",
-              "name": "{{ data['OrganizationFormalName'] }}"
+              "name": "{{ data['organization'] }}"
           }
+          {% endif -%}
           {%- if data['station_url'] %}
           ,"url": "{{ data['station_url'] }}"
           {% endif -%}
@@ -134,17 +133,15 @@
             ,"measurementTechnique": "observation"
             ,"measurementMethod": {
               "name": "{{ stream['ObservedProperty']['name'] }} Measurements",
-              "publisher": "{{ data['OrganizationFormalName'] }}"
+              "publisher": "{{ data['organization'] }}"
             }
-          },
+          }
           {%- if stream['phenomenonTime']  %}
-          "temporalCoverage": "{{ stream['phenomenonTime'] }}"
+          ,"temporalCoverage": "{{ stream['phenomenonTime'] }}"
           {% endif -%}
           {%- endif -%}
-
         }
       {%- if not loop.last %},{% endif -%}
-
       {% endfor -%}
     ]
     {%- endif -%}
