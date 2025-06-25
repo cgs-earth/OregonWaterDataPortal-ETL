@@ -1,6 +1,8 @@
 from userCode.cache import RedisCache
+import pytest
 
 
+@pytest.mark.redis
 def test_cache():
     cache = RedisCache()
 

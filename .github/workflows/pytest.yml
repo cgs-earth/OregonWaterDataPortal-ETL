@@ -70,7 +70,7 @@ jobs:
       - name: Run tests
         run: |
           cp .env.example .env
-          uv run pytest -x -m "not upstream"
+          uv run pytest -x -m "not upstream and not redis"
 
       - name: Stop Docker Compose services
         if: always()
