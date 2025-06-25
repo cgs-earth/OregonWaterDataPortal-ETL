@@ -108,7 +108,7 @@ def to_sensorthings_datastream(
         raise KeyError(
             f"Datastream '{property}' not found in the ontology: "
             "You need to map this term to a common vocabulary term to use it."
-            f"Got error {e}"
+            f"Full ontology {ONTOLOGY_MAPPING}"
         )
     if not ontology_mapped_property:
         # this represents the case in which we mapped the property
