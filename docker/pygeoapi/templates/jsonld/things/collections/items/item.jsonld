@@ -1,0 +1,148 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/", 
+    "xsd": "https://www.w3.org/TR/xmlschema-2/#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "dc": "http://purl.org/dc/terms/",
+    "dcat": "https://www.w3.org/ns/dcat#",
+    "freq": "http://purl.org/cld/freq/",
+    "qudt": "http://qudt.org/schema/qudt/",
+    "qudt-units": "http://qudt.org/vocab/unit/",
+    "qudt-quantkinds": "http://qudt.org/vocab/quantitykind/",
+    "gsp": "http://www.opengis.net/ont/geosparql#",
+    "locType": "http://vocabulary.odm2.org/sitetype",
+    "odm2var":"http://vocabulary.odm2.org/variablename/",
+    "odm2varType": "http://vocabulary.odm2.org/variabletype/",
+    "hyf": "https://www.opengis.net/def/schema/hy_features/hyf/",
+    "skos": "https://www.opengis.net/def/schema/hy_features/hyf/HY_HydroLocationType",
+    "ssn": "http://www.w3.org/ns/ssn/",
+    "ssn-system": "http://www.w3.org/ns/ssn/systems/"
+  },
+  "@id": "{{ data['@id'] }}",
+  "@type": [
+    "hyf:HY_HydrometricFeature",
+    "hyf:HY_HydroLocation"
+  ]
+  {%- if data['monitoringLocationType'] %}
+    ,"hyf:HydroLocationType": "{{ data['monitoringLocationType'] }}"
+  {% endif -%}
+
+  {% set id = data['id'] | trim("'") %}
+  {%- if data['organization'] -%}
+  ,"identifier": {
+    "@type": "PropertyValue",
+    "propertyID": "{{ data['organization'] }} Site identifier",
+    "value": "{{ id }}"
+  }
+  {%- endif -%}
+  {%- if data['name'] %}
+    , "name": "{{ data['name'] }}"
+  {% endif -%}
+
+  {%- if data['locations'] and data['locations'][0]['description'] %}
+    ,"description": "{{ data['locations'][0]['description'] }}"
+  {% endif -%}
+  {%- if data['organization'] -%}
+  ,"provider": {
+    "@type": "GovernmentOrganization",
+    "name": "{{ data['organization'] }}"
+  }
+  {% endif -%}
+
+  {%- if data['schema:geo'] %}
+    ,"geo": {{ data['schema:geo'] | to_json }}
+  {% endif -%}
+  {%- if data['gsp:hasGeometry'] %}
+    ,"gsp:hasGeometry": {
+      "@type": "{{ data['gsp:hasGeometry']['@type'] }}", 
+      "gsp:asWKT": {{ data['gsp:hasGeometry']['gsp:asWKT'] | to_json }},
+      "gsp:crs": {
+        "@id": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+      }
+    }
+  {% endif -%}
+
+  {%- if data["hu08"] or data["hu12"] -%}
+      ,"hyf:containingCatchment": [
+      {%- if data["hu08"] -%}
+          {
+              "@id": "{{ data['hu08'] }}"
+          }
+      {%- endif -%}
+      {%- if data["hu12"] -%}
+      {
+          ,"@id": "{{ data['hu12'] }}"
+      }
+      {%- endif -%}
+      ]
+  {%- endif -%}
+
+
+  {%- if data["county"] or data["state"] -%}
+  ,"gsp:sfWithin": [
+    {%- if data["county"] -%}
+      { "@id": "{{ data['county'] }}" }
+      {%- if data["state"] -%}, {%- endif -%}
+    {%- endif -%}
+    {%- if data["state"] -%}
+      { "@id": "{{ data['state'] }}" }
+    {%- endif -%}
+  ]
+  {% endif -%}
+
+  {%- if data['Datastreams'] -%}
+  ,"subjectOf": [
+    {%- for stream in data['Datastreams'] %}
+        {
+          "@type": "Dataset"
+          ,"name": "{{ id }}"
+
+          {%- if stream['description'] %}
+          ,"description": "{{ stream["description"]}}"
+          {% endif -%}
+          
+          {%- if data["organization"] -%}
+          ,"provider": {
+              "@type": "GovernmentOrganization",
+              "name": "{{ data['organization'] }}"
+          }
+          {% endif -%}
+          {%- if data['station_url'] %}
+          ,"url": "{{ data['station_url'] }}"
+          {% endif -%}
+
+          {%- if stream["ObservedProperty"] -%}
+          ,"variableMeasured": { 
+            "@type": "PropertyValue"
+
+            {%- if stream['ObservedProperty']['name'] %}
+            ,"name": "{{ stream['ObservedProperty']['name'] }}"
+            {% endif -%}
+
+            {%- if stream['unitOfMeasurement']['name'] and stream['ObservedProperty']['name'] %}
+            ,"description": "{{ stream['ObservedProperty']['name'] }} in {{ stream['unitOfMeasurement']['name'] }}"
+            {% endif -%}
+
+            ,"propertyID": "{{ stream['ObservedProperty']['definition'].split('/')[-1] }}"
+            ,"url": "{{ stream['ObservedProperty']['definition'] }}"
+
+            {%- if stream['unitOfMeasurement']['name'] %}
+            ,"unitText": "{{ stream['unitOfMeasurement']['name'] }}"
+            {% endif -%}
+
+            ,"measurementTechnique": "observation"
+            ,"measurementMethod": {
+              "name": "{{ stream['ObservedProperty']['name'] }} Measurements",
+              "publisher": "{{ data['organization'] }}"
+            }
+          }
+          {%- if stream['phenomenonTime']  %}
+          ,"temporalCoverage": "{{ stream['phenomenonTime'] }}"
+          {% endif -%}
+          {%- endif -%}
+        }
+      {%- if not loop.last %},{% endif -%}
+      {% endfor -%}
+    ]
+    {%- endif -%}
+}

@@ -101,13 +101,13 @@ def to_sensorthings_datastream(
 
     try:
         ontology_mapped_property = ONTOLOGY_MAPPING[property]
-    except KeyError:
+    except KeyError as e:
         # this represents that we forgot to map a property
         # to a term in the ODM2 ontology
         raise KeyError(
             f"Datastream '{property}' not found in the ontology: "
-            "'{ONTOLOGY_MAPPING}'."
             "You need to map this term to a common vocabulary term to use it."
+            f"Got error {e}"
         )
     if not ontology_mapped_property:
         # this represents the case in which we mapped the property
