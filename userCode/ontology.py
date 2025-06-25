@@ -101,7 +101,6 @@ __ontology_definition: Final[dict[Sequence[str], ResourceURI]] = {
     ("Nitrate + Nitrite"): "nitrogenNitrite_NO2_Nitrate_NO3",
     ("Organic carbon"): "carbonOrganicExtractable",
     ("Orthophosphate"): "phosphorusOrthophosphate",
-    ("Pheophytin a"): "pheophytin",
     ("Potassium"): "potassium",
     ("Selenium"): "seleniumTotal",
     ("Silver"): "silver",
@@ -184,10 +183,14 @@ __ontology_definition: Final[dict[Sequence[str], ResourceURI]] = {
 # all terms in this ontology definition are not in ODM2
 # and are defined here for our own use
 __ontology_definition_with_custom_vocab: Final[dict[Sequence[str], str]] = {
+    # This is a special case; it is in the ontology but it is non unique for some reason inside of ODM2
+    # so thus it is considered custom for our purposes; i.e. we won't fetch it upstream since there is not a unique ODM2 mapping for it
+    ("Pheophytin a"): "pheophytin",
     ("Trichloronate"): "trichloronate",
     ("Chemical oxygen demand"): "Chemical_oxygen_demand",
     (
-        "Carbonaceous biochemical oxygen demand, non-standard conditions"
+        "Carbonaceous biochemical oxygen demand, non-standard conditions",
+        "Biochemical oxygen demand, non-standard conditions",
     ): "BOD_nonstandard",
     ("Chlorthal-dimethyl"): "Chlorthal_dimethyl",
     ("Dacthal Acid Metabolites"): "Dacthal_Acid_Metabolites",
@@ -337,14 +340,6 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
             keys = (keys,)
 
         assert value
-
-        # special case that has to be skipped
-        # since there is no standard uri
-        # by skipping this it doesn't mean it won't show
-        # up at all, rather it means we use the direct name and
-        # not the mapped vocabulary term since to do would be ambiguous
-        if value and "pheophytin" in value:
-            continue
 
         for key in keys:
             assert isinstance(key, str)
