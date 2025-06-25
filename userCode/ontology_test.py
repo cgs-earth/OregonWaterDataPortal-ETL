@@ -30,3 +30,5 @@ def test_construct_ontology_mapping():
     assert equiv_dict["mean_daily_flow"].id == id, (
         f"The deterministic hash that generates the id should always generate {id}. A different name was likely used to generate the id"
     )
+
+    assert "Carboxin" in ONTOLOGY_MAPPING and "Carbaryl" in ONTOLOGY_MAPPING

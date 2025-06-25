@@ -93,8 +93,11 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
             associatedThingId="TEST123",
         )
 
+
+def test_property_not_in_odm2_but_defined_by_us(sample_station_data):
+    # make sure a property not in ODM2
+    # but defined by us still works
     assert "MCPA" in ONTOLOGY_MAPPING
-    assert not ONTOLOGY_MAPPING["MCPA"]
 
     assert to_sensorthings_datastream(
         attr=sample_station_data,
