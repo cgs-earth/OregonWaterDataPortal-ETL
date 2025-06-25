@@ -14,7 +14,6 @@ import pytest
 import requests
 
 from userCode import definitions
-from userCode.ontology import ONTOLOGY_MAPPING
 from userCode.env import API_BACKEND_URL
 from userCode.wrd.dag import all_metadata, post_station, sta_station
 from userCode.helper_classes import get_datastream_time_range, MockValues
@@ -23,6 +22,7 @@ from userCode.wrd.lib import (
     generate_oregon_tsv_url,
     parse_oregon_tsv,
 )
+from userCode.ontology import get_or_generate_ontology
 from userCode.wrd.types import StationData
 from userCode.util import PACIFIC_TIME, from_oregon_datetime, to_oregon_datetime
 
@@ -163,6 +163,8 @@ def test_full_pipeline(metadata: list[StationData]):
     assert observedPropertyResp.ok, observedPropertyResp.text
 
     observedPropertyName = observedPropertyResp.json()["name"]
+
+    ONTOLOGY_MAPPING = get_or_generate_ontology()
 
     for ontology in ONTOLOGY_MAPPING:
         if observedPropertyName in ONTOLOGY_MAPPING[ontology].name:

@@ -17,7 +17,7 @@ from userCode.awqms.sta_generation import (
     to_sensorthings_datastream,
 )
 from userCode.awqms.types import GmlPoint
-from userCode.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import get_or_generate_ontology
 
 
 def test_to_sensorthings_station(sample_station_data):
@@ -70,6 +70,7 @@ def test_to_sensorthings_observation_none_datapoint(sample_datastream):
 
 
 def test_to_sensorthings_datastream(sample_station_data):
+    ONTOLOGY_MAPPING = get_or_generate_ontology()
     property_name = list(ONTOLOGY_MAPPING.keys())[0]
 
     result = to_sensorthings_datastream(
@@ -95,6 +96,7 @@ def test_to_sensorthings_datastream_unknown_property(sample_station_data):
 
 
 def test_property_not_in_odm2_but_defined_by_us(sample_station_data):
+    ONTOLOGY_MAPPING = get_or_generate_ontology()
     # make sure a property not in ODM2
     # but defined by us still works
     assert "MCPA" in ONTOLOGY_MAPPING

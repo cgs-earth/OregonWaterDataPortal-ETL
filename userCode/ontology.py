@@ -9,11 +9,14 @@
 # =================================================================
 
 import json
+import os
+from pathlib import Path
+import pickle
 from typing import Final, Sequence
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
 
-from userCode.cache import ShelveCache
+from userCode.cache import RedisCache
 from userCode.awqms._generated.schema import ResourceURI
 from userCode.util import deterministic_hash
 
@@ -38,7 +41,7 @@ def get_ontology(uri: str) -> Ontology:
     """Parse an odm2 vocabulary into a pydantic model"""
     uriAsJson = f"{uri}?format=json"
     get_dagster_logger().info(f"Constructing ontology object from {uriAsJson}")
-    cache = ShelveCache()
+    cache = RedisCache()
     # always cache the ontology
     resp, status = cache.get_or_fetch(uriAsJson, force_fetch=False, cache_result=True)
     assert status == 200, (
@@ -322,13 +325,18 @@ __ontology_definition_with_custom_vocab: Final[dict[Sequence[str], str]] = {
 }
 
 
+ONTOLOGY_CACHE_PATH = Path(os.path.dirname(__file__), "ontology_cache.json")
+
+
 def construct_ontology_mapping() -> dict[str, Ontology]:
     """Construct a dictionary from the association list in which we defined in the ontology mapping"""
-    equiv_dict = dict()
+    equiv_dict: dict[str, Ontology] = dict()
 
     for keys, value in __ontology_definition.items():
         if type(keys) is not tuple:
             keys = (keys,)
+
+        assert value
 
         # special case that has to be skipped
         # since there is no standard uri
@@ -339,9 +347,7 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
             continue
 
         for key in keys:
-            if not value:
-                equiv_dict[key] = None
-                continue
+            assert isinstance(key, str)
 
             assert key not in equiv_dict, (
                 f"Tried to add duplicate key {key} when it already exists in {equiv_dict[key]}"
@@ -367,8 +373,15 @@ def construct_ontology_mapping() -> dict[str, Ontology]:
             )
             equiv_dict[key] = ontology
 
+    with open(ONTOLOGY_CACHE_PATH, "wb") as f:
+        pickle.dump(equiv_dict, f)
+
     return equiv_dict
 
 
-ONTOLOGY_MAPPING = construct_ontology_mapping()
-print("Ontology mapping constructed")
+def get_or_generate_ontology() -> dict[str, Ontology]:
+    if os.path.exists(ONTOLOGY_CACHE_PATH):
+        with open(ONTOLOGY_CACHE_PATH, "rb") as f:
+            return pickle.load(f)
+    else:
+        return construct_ontology_mapping()

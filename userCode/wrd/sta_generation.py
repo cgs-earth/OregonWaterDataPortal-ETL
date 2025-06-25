@@ -10,7 +10,7 @@
 
 from typing import Optional
 
-from userCode.ontology import ONTOLOGY_MAPPING
+from userCode.ontology import get_or_generate_ontology
 from userCode.wrd.types import Attributes, StationData
 from userCode.types import Datastream, Observation
 
@@ -102,6 +102,8 @@ def to_sensorthings_datastream(
 ) -> Datastream:
     """Generate a sensorthings representation of a station's datastreams. Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
     property = stream_name.removesuffix("_available").removesuffix("_avail")
+
+    ONTOLOGY_MAPPING = get_or_generate_ontology()
 
     ontology_mapped_property = ONTOLOGY_MAPPING.get(property)
     if not ontology_mapped_property:

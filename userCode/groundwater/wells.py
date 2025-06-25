@@ -8,7 +8,7 @@ from dagster import get_dagster_logger
 from pydantic import BaseModel, ConfigDict
 
 from userCode import ontology
-from userCode.cache import ShelveCache
+from userCode.cache import RedisCache
 from userCode.groundwater.lib import generate_circle_polygon
 from userCode.types import Datastream, Observation
 from userCode.util import PACIFIC_TIME, deterministic_hash
@@ -105,7 +105,7 @@ class WellFeature(BaseModel):
         url = f"https://apps.wrd.state.or.us/apps/gw/gw_data_rws/api/{timeseries_id}/gw_measured_water_level/?start_date=1/1/1905&end_date=12/30/2050&public_viewable="
 
         # Don't cache in prod since it would bloat the cache, and don't cache in prod either
-        cache = ShelveCache()
+        cache = RedisCache()
         resp, status = cache.get_or_fetch(url, force_fetch=False)
         assert status == 200
         data = json.loads(resp)
@@ -223,7 +223,8 @@ class WellFeature(BaseModel):
         }
 
     def to_sta_datastream(self):
-        ontology_mapped_property = ontology.ONTOLOGY_MAPPING["groundwater_level"]
+        ONTOLOGY_MAPPING = ontology.get_or_generate_ontology()
+        ontology_mapped_property = ONTOLOGY_MAPPING["groundwater_level"]
         assert ontology_mapped_property, "groundwater_level not found in the ontology"
 
         return Datastream(
@@ -312,7 +313,7 @@ def fetch_wells():
         getNewResultsOnceAWeek = datetime.datetime.now().weekday() == 6
         # skip caching and fetch directly once a week, otherwise cache it so it doesn't take forever
         # this is different behavior from other cache calls in the codebase
-        cache = ShelveCache()
+        cache = RedisCache()
         response, status = cache.get_or_fetch(
             f"{base_url}&{encoded_params}",
             cache_result=True,

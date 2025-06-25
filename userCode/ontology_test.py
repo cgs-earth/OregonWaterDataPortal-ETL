@@ -9,8 +9,8 @@
 # =================================================================
 
 from userCode.ontology import (
-    ONTOLOGY_MAPPING,
     construct_ontology_mapping,
+    get_or_generate_ontology,
     get_ontology,
 )
 
@@ -22,7 +22,7 @@ def test_construct_ontology_mapping():
         "http://vocabulary.odm2.org/api/v1/variablename/streamflow/"
     )
 
-    assert ONTOLOGY_MAPPING["mean_daily_flow_available"] == get_ontology(
+    assert get_or_generate_ontology()["mean_daily_flow_available"] == get_ontology(
         "http://vocabulary.odm2.org/api/v1/variablename/streamflow/"
     )
     assert equiv_dict["mean_daily_flow"].id != equiv_dict["water temperature"].id
@@ -31,4 +31,7 @@ def test_construct_ontology_mapping():
         f"The deterministic hash that generates the id should always generate {id}. A different name was likely used to generate the id"
     )
 
-    assert "Carboxin" in ONTOLOGY_MAPPING and "Carbaryl" in ONTOLOGY_MAPPING
+    assert (
+        "Carboxin" in get_or_generate_ontology()
+        and "Carbaryl" in get_or_generate_ontology()
+    )
