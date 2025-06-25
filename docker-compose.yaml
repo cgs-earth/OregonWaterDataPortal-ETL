@@ -112,4 +112,3 @@ volumes:
   postgis_volume:
   pgadmin_data:
   redis_data:
-
