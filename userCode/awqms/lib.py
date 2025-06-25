@@ -13,7 +13,7 @@ import logging
 import requests
 from urllib.parse import urlencode
 
-from userCode.cache import ShelveCache
+from userCode.cache import RedisCache
 from userCode.env import API_BACKEND_URL, AWQMS_URL
 from userCode.util import url_join
 
@@ -35,7 +35,7 @@ def get_datastream_unit(observed_prop: str, station_id: str) -> str:
     encoded_params = urlencode(params)
     results_url = url_join(AWQMS_URL, f"ContinuousResultsVer1?{encoded_params}")
 
-    cache = ShelveCache()
+    cache = RedisCache()
 
     response, status = cache.get_or_fetch(
         results_url, force_fetch=False, cache_result=True
@@ -72,7 +72,7 @@ def fetch_station(station_id: str) -> bytes:
     encoded_params = urlencode(params)
     xml_url = url_join(AWQMS_URL, f"MonitoringLocationsVer1?{encoded_params}")
 
-    cache = ShelveCache()
+    cache = RedisCache()
     response, status_code = cache.get_or_fetch(
         xml_url, force_fetch=False, cache_result=True
     )

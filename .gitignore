@@ -176,3 +176,5 @@ cython_debug/
 #.idea/
 
 node_modules/
+
+ontology_cache.json

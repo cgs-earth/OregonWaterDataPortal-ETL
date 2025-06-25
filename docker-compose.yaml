@@ -101,6 +101,15 @@ services:
     profiles:
       - debug
 
+  redis:
+    image: redislabs/redismod
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgis_volume:
   pgadmin_data:
+  redis_data:
+

@@ -18,7 +18,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 
-from userCode.cache import ShelveCache
+from userCode.cache import RedisCache
 from userCode.env import API_BACKEND_URL
 from userCode.wrd.types import (
     BASE_OREGON_URL,
@@ -178,7 +178,7 @@ def download_oregon_tsv(
 
     # we don't want to cache all tsv responses if we are in prod
     # otherwise we will have a huge cache duplicating all the data
-    cache = ShelveCache()
+    cache = RedisCache()
     response, status_code = cache.get_or_fetch(tsv_url, force_fetch=False)
 
     if status_code != 200 or "An Error Has Occured" in response.decode("utf-8"):

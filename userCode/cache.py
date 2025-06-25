@@ -10,11 +10,12 @@
 # =================================================================
 
 from datetime import timedelta
+import json
+import os
 from dagster import get_dagster_logger
-from pickle import UnpicklingError
+import redis
 import requests
-import shelve
-from typing import ClassVar, Optional, Tuple
+from typing import Optional, Tuple
 
 from userCode.env import RUNNING_AS_TEST_OR_DEV
 from userCode.util import deterministic_hash
@@ -22,29 +23,32 @@ from userCode.util import deterministic_hash
 
 HEADERS = {"accept": "application/vnd.api+json"}
 
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
-class ShelveCache:
+
+class RedisCache:
     """
-    Helper cache for storing and fetching data from the oregon API.
-    Not used in production, moreso to make testing less intensive on upstream
+    Helper cache for storing and fetching data from the Oregon API.
     """
 
-    db: ClassVar[str] = "oregondb"
+    def __init__(self):
+        self.db = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
 
     def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
         try:
-            with shelve.open(ShelveCache.db, "w") as db:
-                db[self.hash_url(url)] = content
+            key = self.hash_url(url)
+            if _ttl:
+                self.db.setex(key, int(_ttl.total_seconds()), content)
+            else:
+                self.db.set(key, content)
         except Exception:
             get_dagster_logger().warning(f"Unable to cache: {url}")
 
     def get_or_fetch(
         self,
         url: str,
-        # force fetch and skip sourcing items from the cache
         force_fetch: bool,
-        # cache results in test/dev mode for faster testing, otherwise default
-        #  to skipping caching in prod so we don't fill up a huge db
         cache_result: bool = RUNNING_AS_TEST_OR_DEV(),
     ) -> Tuple[bytes, int]:
         if not cache_result:
@@ -54,35 +58,28 @@ class ShelveCache:
         if self.contains(url) and not force_fetch:
             try:
                 return self.get(url), 200
-            except (KeyError, UnpicklingError):
-                # Force fetch
-                return self.get_or_fetch(url, True)
-        else:
-            res = requests.get(url, headers=HEADERS, timeout=300)
-            self.set(url, res.content)
-            return res.content, res.status_code
+            except (KeyError, json.JSONDecodeError):
+                return self.get_or_fetch(url, True, cache_result)
+
+        response = requests.get(url, headers=HEADERS, timeout=300)
+        self.set(url, response.content)
+        return response.content, response.status_code
 
     def reset(self):
-        with shelve.open(ShelveCache.db, "w") as db:
-            for key in db.keys():
-                del db[key]
+        self.db.flushdb()
 
     def clear(self, url: str):
-        url_hash = self.hash_url(url)
-        with shelve.open(ShelveCache.db, "w") as db:
-            if self.hash_url(url) not in db:
-                return
-
-            del db[url_hash]
+        self.db.delete(self.hash_url(url))
 
     def contains(self, url: str) -> bool:
-        with shelve.open(ShelveCache.db) as db:
-            return self.hash_url(url) in db
+        return self.db.exists(self.hash_url(url)) == 1
 
-    def get(self, url: str):
-        with shelve.open(ShelveCache.db) as db:
-            return db[self.hash_url(url)]
+    def get(self, url: str) -> bytes:
+        data = self.db.get(self.hash_url(url))
+        if data is None:
+            raise KeyError(f"{url} not found in cache")
+        return data  # type: ignore not clear why this is needed; redis returns bytes
 
     @staticmethod
-    def hash_url(url: str):
+    def hash_url(url: str) -> str:
         return str(deterministic_hash(url, 16))

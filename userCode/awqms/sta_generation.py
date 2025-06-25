@@ -9,7 +9,7 @@
 # =================================================================
 
 from userCode.awqms.types import StationData, GmlPoint
-from userCode.ontology import ONTOLOGY_MAPPING, Ontology
+from userCode.ontology import Ontology, get_or_generate_ontology
 from userCode.types import Datastream, Observation
 from userCode.util import from_oregon_datetime
 
@@ -99,6 +99,7 @@ def to_sensorthings_datastream(
     """Generate a sensorthings representation of a station's datastreams.
     Conforms to https://developers.sensorup.com/docs/#datastreams_post"""
 
+    ONTOLOGY_MAPPING = get_or_generate_ontology()
     try:
         ontology_mapped_property = ONTOLOGY_MAPPING[property]
     except KeyError as e:

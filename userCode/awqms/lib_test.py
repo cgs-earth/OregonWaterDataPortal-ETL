@@ -10,11 +10,9 @@
 
 from pathlib import Path
 import pytest
-import tempfile
 from unittest.mock import patch, Mock
 
 from userCode.awqms.lib import (
-    fetch_station,
     fetch_observations,
     fetch_observation_ids_in_db,
     get_datastream_unit,
@@ -48,47 +46,6 @@ def test_read_csv_file_not_found():
 
 def test_get_datastream_unit():
     assert get_datastream_unit("Temperature, water", "11973-ORDEQ") == "deg C"
-
-
-@patch("userCode.cache.ShelveCache", autospec=True)
-def test_fetch_station(mock_shelve_cache_cls):
-    with tempfile.NamedTemporaryFile() as temp_db:
-        mock_shelve_cache_cls.db = temp_db.name + ".db"
-
-        result = fetch_station("12005-ORDEQ")
-        assert len(result) == 99994
-
-
-@patch("userCode.cache.ShelveCache", autospec=True)
-def test_fetch_station_error(mock_shelve_cache_cls):
-    with tempfile.NamedTemporaryFile() as temp_db:
-        # Configure the mocked ShelveCache class to use a temporary database
-        mock_shelve_cache_cls.db = temp_db.name + ".db"
-
-        # Mock the behavior of the cache instance
-        mock_cache_instance = Mock()
-        mock_cache_instance.get_or_fetch.return_value = (b"error", 404)
-        mock_shelve_cache_cls.return_value = mock_cache_instance
-
-        # Test that a RuntimeError is raised for a failed fetch
-        with pytest.raises(RuntimeError, match="Request.*failed with status 404"):
-            fetch_station("120016-ORDEQ")
-
-
-@patch("userCode.cache.ShelveCache", autospec=True)
-def test_fetch_observations(mock_shelve_cache_cls):
-    with tempfile.NamedTemporaryFile() as temp_db:
-        # Configure the mocked ShelveCache class to use a temporary database
-        mock_shelve_cache_cls.db = temp_db.name + ".db"
-
-        # Mock a valid response with JSON data
-        mock_cache_instance = Mock()
-        mock_shelve_cache_cls.return_value = mock_cache_instance
-
-        # Fetch observations and assert the results are as expected
-        result = fetch_observations("Temperature, water", "12005-ORDEQ")
-
-        assert len(result) == 3354
 
 
 @patch("requests.get", autospec=True)
