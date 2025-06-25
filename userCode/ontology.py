@@ -186,13 +186,11 @@ __ontology_definition_with_custom_vocab: Final[dict[Sequence[str], str]] = {
     # This is a special case; it is in the ontology but it is non unique for some reason inside of ODM2
     # so thus it is considered custom for our purposes; i.e. we won't fetch it upstream since there is not a unique ODM2 mapping for it
     ("Pheophytin a"): "pheophytin",
-
-
     ("Trichloronate"): "trichloronate",
     ("Chemical oxygen demand"): "Chemical_oxygen_demand",
     (
         "Carbonaceous biochemical oxygen demand, non-standard conditions",
-        "Biochemical oxygen demand, non-standard conditions"
+        "Biochemical oxygen demand, non-standard conditions",
     ): "BOD_nonstandard",
     ("Chlorthal-dimethyl"): "Chlorthal_dimethyl",
     ("Dacthal Acid Metabolites"): "Dacthal_Acid_Metabolites",
