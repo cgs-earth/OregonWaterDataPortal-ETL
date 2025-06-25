@@ -85,10 +85,23 @@ def test_to_sensorthings_datastream(sample_station_data):
 
 
 def test_to_sensorthings_datastream_unknown_property(sample_station_data):
-    with pytest.raises(RuntimeError, match="not found in the ontology"):
+    with pytest.raises(KeyError, match="not found in the ontology"):
         to_sensorthings_datastream(
             attr=sample_station_data,
             units="celsius",
             property="unknown_property",
             associatedThingId="TEST123",
         )
+
+
+def test_property_not_in_odm2_but_defined_by_us(sample_station_data):
+    # make sure a property not in ODM2
+    # but defined by us still works
+    assert "MCPA" in ONTOLOGY_MAPPING
+
+    assert to_sensorthings_datastream(
+        attr=sample_station_data,
+        units="N/A",
+        property="MCPA",
+        associatedThingId="TEST123",
+    )

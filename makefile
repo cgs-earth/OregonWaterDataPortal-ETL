@@ -28,7 +28,7 @@ wipedb:
 # run all tests that test our ETL 
 .PHONY: test
 test:
-	pytest -vv -x -m "not upstream"
+	pyright && pytest -vv -x -m "not upstream"
 
 # Run tests that are relevant to checking our understanding
 # of the upstream APIs, not the associated ETL
@@ -61,3 +61,6 @@ clean:
 	rm -rf schedules/
 	rm -rf tmp*/
 	rm -rf history/
+
+validateConf:
+	docker exec owdp-pygeoapi sh -c "pygeoapi config validate -c /pygeoapi/local.config.yml"

@@ -13,29 +13,6 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 
-POTENTIAL_DATASTREAMS: dict[str, str] = {
-    "Temperature, water": "°C",
-    # "Conductivity": "uS/cm",
-    # "Alkalinity": "mg/L",
-    # "Dissolved oxygen (DO)": "mg/L",
-    # "Nitrate + Nitrite": "mg/L",
-    # "Dissolved oxygen saturation": "%",
-    # "Escherichia coli": "CFU/100 mL",
-    # "Alkalinity, total": "mg/L",
-    # "Depth, bottom": "m",
-    # "pH": "None",
-    # "1,1,1,2-Tetrachloroethane": "mg/L",
-    # "Turbidity Field": "NTU",
-    # "Pressure": "mmHg",
-    # "Sulfate": "mg/L",
-    # "Field Msr/Obs": "None",
-    # "Turbidity": "NTU",
-    # "(-)-cis-Permethrin": "mg/L",
-    # "1,1,1-Trichloroethane": "mg/L",
-    # "Ammonia": "mg/L",
-}
-
-
 class GmlPoint(BaseModel):
     latitude: float
     longitude: float
@@ -76,10 +53,7 @@ def parse_monitoring_locations(features: bytes) -> StationData:
             continue
 
         observed_property = ds["CharacteristicName"]
-        if (
-            observed_property in foundProperties
-            or observed_property not in POTENTIAL_DATASTREAMS
-        ):
+        if observed_property in foundProperties:
             continue
 
         foundProperties.add(observed_property)
