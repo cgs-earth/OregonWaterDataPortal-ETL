@@ -58,8 +58,6 @@ resources:
   things:
     type: "collection"
     title: "Things"
-    templates:
-      path: /pygeoapi/pygeoapi/templates/jsonld/things
     description: "SensorThings API Things"
     keywords:
       - "thing"
