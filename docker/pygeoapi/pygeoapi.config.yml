@@ -58,8 +58,6 @@ resources:
   things:
     type: "collection"
     title: "Things"
-    templates:
-      path: /pygeoapi/pygeoapi/templates/jsonld/things
     description: "SensorThings API Things"
     keywords:
       - "thing"
@@ -81,8 +79,7 @@ resources:
         entity: Things
         id_field: "@iot.id"
         title_field: "name"
-        expand: Locations,Datastreams/ObservedProperty
-        intralink: false
+        intralink: true
     links:
       - type: "text/html"
         rel: "canonical"
@@ -116,7 +113,7 @@ resources:
         entity: Datastreams
         id_field: "@iot.id"
         title_field: "name"
-        intralink: false
+        intralink: true
         expand: Thing/Locations,Observations($select=@iot.id;$orderby=phenomenonTime desc;$top=1),Observations/FeatureOfInterest($select=feature),Sensor,ObservedProperty
     links:
       - type: "text/html"
