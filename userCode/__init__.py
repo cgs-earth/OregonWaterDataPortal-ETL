@@ -16,6 +16,7 @@ from dagster import (
 )
 import dagster_slack
 
+from userCode.env_test import slack_message_test
 import userCode.xlsx.dag as xlsx
 from userCode.util import get_env, slack_error_fn
 import userCode.awqms.dag as awqms
@@ -26,7 +27,7 @@ assets = load_assets_from_modules([awqms, wrd, groundwater, xlsx])
 asset_checks = load_asset_checks_from_modules([awqms, wrd, groundwater, xlsx])
 
 definitions = Definitions(
-    assets=assets,
+    assets=[*assets, slack_message_test],
     asset_checks=asset_checks,
     jobs=[awqms.awqms_job, wrd.wrd_job, groundwater.groundwater_job, xlsx.xlsx_job],
     schedules=[
@@ -44,4 +45,5 @@ definitions = Definitions(
             monitor_all_code_locations=True,
         )
     ],
+    resources={"slack": dagster_slack.SlackResource(token=get_env("SLACK_BOT_TOKEN"))},
 )
