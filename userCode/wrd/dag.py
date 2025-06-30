@@ -327,7 +327,7 @@ def check_duplicate_properties():
 
     # if we are running in dev, run this to check and make sure
     # that wrd is working right and that nothing is duplicated;
-    # but if we are running in production we want to skip this check. 
+    # but if we are running in production we want to skip this check.
     # That is since some sources in integrations outside of wrd
     # may have the same names in a way that is out of our control;
     # for instance, xlsx data may include similar property names but not be mapped;
@@ -335,8 +335,8 @@ def check_duplicate_properties():
     # all properties before they are inserted
     if not RUNNING_AS_TEST_OR_DEV():
         return AssetCheckResult(
-        passed=True,
-    )
+            passed=True,
+        )
 
     observedProperties = requests.get(f"{API_BACKEND_URL}/ObservedProperties")
     assert observedProperties.ok, observedProperties.text
