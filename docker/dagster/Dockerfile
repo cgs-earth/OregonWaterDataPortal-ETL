@@ -12,6 +12,7 @@ ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 COPY ../dagster.yaml /opt/dagster/dagster_home/
 COPY ../pyproject.toml /opt/dagster/app/pyproject.toml
 COPY userCode /opt/dagster/app/userCode
+COPY .env /opt/dagster/app/.env
 
 WORKDIR /opt/dagster/app
 
