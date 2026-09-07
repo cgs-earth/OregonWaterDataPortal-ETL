@@ -9,16 +9,16 @@
 # =================================================================
 
 from pathlib import Path
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import patch, Mock
 
 from userCode.awqms.lib import (
-    fetch_observations,
     fetch_observation_ids_in_db,
+    fetch_observations,
     get_datastream_unit,
 )
 from userCode.awqms.stations import read_csv
-
 
 # def test_fish_and_wildlife():
 #     id = "21449829"

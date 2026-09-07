@@ -9,7 +9,9 @@
 # =================================================================
 
 import concurrent.futures
-from typing import Set
+
+import httpx
+import requests
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -19,8 +21,6 @@ from dagster import (
     get_dagster_logger,
     schedule,
 )
-import httpx
-import requests
 
 from userCode.env import (
     API_BACKEND_URL,
@@ -47,7 +47,7 @@ def get_wells() -> list[WellFeature]:
 
 def get_existing_datastream_ids() -> set[str]:
     url = f"{API_BACKEND_URL}/Datastreams?$select=@iot.id"
-    existing_ids: Set[str] = set()
+    existing_ids: set[str] = set()
     with httpx.Client(timeout=10.0) as client:
         while url:
             response = client.get(url)

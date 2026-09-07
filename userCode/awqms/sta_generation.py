@@ -8,7 +8,7 @@
 #
 # =================================================================
 
-from userCode.awqms.types import StationData, GmlPoint
+from userCode.awqms.types import GmlPoint, StationData
 from userCode.ontology import Ontology, get_or_generate_ontology
 from userCode.types import Datastream, Observation
 from userCode.util import from_oregon_datetime
@@ -128,7 +128,7 @@ def to_sensorthings_datastream(
             "@iot.id": f"{associatedThingId}-{ontology_mapped_property.id}",
             "name": f"{attr.MonitoringLocationName} {property}",
             "description": property,
-            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",  # noqa
+            "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
             "unitOfMeasurement": {
                 "name": units,
                 "symbol": units,

@@ -9,9 +9,10 @@
 # =================================================================
 
 from pathlib import Path
+
 import pandas as pd
 
-from userCode.xlsx.helpers import OregonXLSX, Metadata, SiteData, Data
+from userCode.xlsx.helpers import Data, Metadata, OregonXLSX, SiteData
 
 
 # Reads a workbook sheet and returns a list of dictionaries

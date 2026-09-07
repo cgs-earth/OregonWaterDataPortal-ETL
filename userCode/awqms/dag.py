@@ -9,7 +9,10 @@
 # =================================================================
 
 import asyncio
+
+import requests
 from dagster import (
+    AssetExecutionContext,
     AssetSelection,
     DefaultScheduleStatus,
     RunRequest,
@@ -17,15 +20,13 @@ from dagster import (
     asset,
     define_asset_job,
     get_dagster_logger,
-    AssetExecutionContext,
     schedule,
 )
-import requests
 
 from userCode.awqms.lib import (
-    fetch_station,
-    fetch_observations,
     fetch_observation_ids_in_db,
+    fetch_observations,
+    fetch_station,
     get_datastream_unit,
 )
 from userCode.awqms.sta_generation import (
@@ -40,8 +41,8 @@ from userCode.awqms.types import (
 )
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import BatchHelper
-from userCode.util import deterministic_hash, url_join
 from userCode.types import Datastream, Observation
+from userCode.util import deterministic_hash, url_join
 
 LOGGER = get_dagster_logger()
 

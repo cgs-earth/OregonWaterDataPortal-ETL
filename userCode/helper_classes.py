@@ -8,17 +8,18 @@
 #
 # =================================================================
 
-from dagster import Config, get_dagster_logger
-from dataclasses import dataclass
 import datetime
+from dataclasses import dataclass
 from itertools import batched
+from typing import Literal, NamedTuple
+
 import requests
-from typing import Literal, NamedTuple, Optional
+from dagster import Config, get_dagster_logger
 
 from userCode.env import API_BACKEND_URL
+from userCode.types import Datastream, Observation
 from userCode.util import from_oregon_datetime, url_join
 from userCode.wrd.types import START_OF_DATA, FrostBatchRequest
-from userCode.types import Datastream, Observation
 
 
 @dataclass
@@ -125,7 +126,7 @@ class MockValues(Config):
 
     # needs to be a string because the dagster config system does not support datetime
     # doesn't need to exist since mocking is optional and only used for testing
-    mocked_date_to_update_until: Optional[str]
+    mocked_date_to_update_until: str | None
 
 
 def get_datastream_time_range(iotid: str | int) -> UTCTimeRange:

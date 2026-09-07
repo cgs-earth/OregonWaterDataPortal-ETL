@@ -8,18 +8,29 @@
 #
 # =================================================================
 
-from dagster import DagsterInstance
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from unittest.mock import MagicMock, patch
+
 import pytest
 import requests
-from unittest.mock import patch, MagicMock
+from dagster import DagsterInstance
 
+from test.lib import (
+    assert_no_duplicate_at_given_time,
+    assert_observations_and_datastreams_empty,
+    wipe_datastreams,
+    wipe_locations,
+    wipe_observed_properties,
+    wipe_things,
+)
 from userCode import definitions
 from userCode.awqms.dag import (
-    awqms_preflight_checks,
-    post_awqms_station,
-    post_awqms_datastreams,
     awqms_datastreams,
+    awqms_preflight_checks,
     awqms_schedule,
+    post_awqms_datastreams,
+    post_awqms_station,
 )
 from userCode.awqms.lib import fetch_station
 from userCode.awqms.stations import _STATIONS_IN_INITIAL_REQUEST, ALL_RELEVANT_STATIONS
@@ -27,19 +38,6 @@ from userCode.awqms.types import parse_monitoring_locations
 from userCode.env import API_BACKEND_URL
 from userCode.helper_classes import get_datastream_time_range
 from userCode.util import url_join
-from concurrent.futures import ThreadPoolExecutor
-
-from test.lib import (
-    wipe_datastreams,
-    wipe_locations,
-    wipe_observed_properties,
-    wipe_things,
-    assert_observations_and_datastreams_empty,
-    assert_no_duplicate_at_given_time,
-)
-
-
-import threading
 
 
 @pytest.mark.upstream

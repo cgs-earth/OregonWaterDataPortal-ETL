@@ -1,12 +1,13 @@
 from dagster import DagsterInstance
+
 from test.lib import (
     wipe_datastreams,
     wipe_locations,
     wipe_observed_properties,
     wipe_things,
 )
-from userCode.xlsx.dag import xlsx_files_raw
 from userCode import definitions
+from userCode.xlsx.dag import xlsx_files_raw
 
 
 def test_remote_xlsx_files():
