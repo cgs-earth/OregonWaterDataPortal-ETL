@@ -8,13 +8,14 @@
 #
 # =================================================================
 
-import pytest
 from typing import cast
 
+import pytest
+
 from userCode.awqms.sta_generation import (
-    to_sensorthings_station,
-    to_sensorthings_observation,
     to_sensorthings_datastream,
+    to_sensorthings_observation,
+    to_sensorthings_station,
 )
 from userCode.awqms.types import GmlPoint
 from userCode.ontology import get_or_generate_ontology

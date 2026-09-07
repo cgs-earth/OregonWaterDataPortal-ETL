@@ -1,17 +1,16 @@
 from pathlib import Path
 
+import pytest
 import requests
-
 
 from userCode.groundwater.wells import (
     WellAttributes,
     WellFeature,
     WellGeometry,
     fetch_wells,
-    merge_paginated_well_response,
     get_geometry_file,
+    merge_paginated_well_response,
 )
-import pytest
 
 
 @pytest.mark.upstream

@@ -9,8 +9,8 @@
 #
 # =================================================================
 
+
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class UnitOfMeasurement(BaseModel):
@@ -51,5 +51,5 @@ class Observation(BaseModel):
     resultTime: str
     phenomenonTime: str
     Datastream: dict
-    result: Optional[float]
+    result: float | None
     FeatureOfInterest: dict

@@ -8,12 +8,14 @@
 #
 # =================================================================
 
+import os
+from pathlib import Path
+
 import click
 import debugpy
-from userCode.xlsx.lib import parse_xlsx_from_path
-import os
 import pytest
-from pathlib import Path
+
+from userCode.xlsx.lib import parse_xlsx_from_path
 
 
 @click.command(context_settings=dict(ignore_unknown_options=True))
@@ -56,7 +58,6 @@ def test_debug(ctx, pytest_args):
 @click.group()
 def xlsx():
     """Station metadata management via xlsx files which represent a STA data model."""
-    pass
 
 
 xlsx.add_command(test)

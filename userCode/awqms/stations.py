@@ -1,9 +1,8 @@
 import csv
 from pathlib import Path
-from typing import List
 
 
-def read_csv(filepath: Path) -> List[str]:
+def read_csv(filepath: Path) -> list[str]:
     result_list = []
 
     with open(filepath, "r", newline="", encoding="utf-8") as csvfile:

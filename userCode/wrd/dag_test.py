@@ -8,24 +8,11 @@
 #
 # =================================================================
 
-from dagster import DagsterInstance, RunConfig
 import datetime
+
 import pytest
 import requests
-
-from userCode import definitions
-from userCode.env import API_BACKEND_URL
-from userCode.wrd.dag import all_metadata, post_station, sta_station
-from userCode.helper_classes import get_datastream_time_range, MockValues
-from userCode.wrd.lib import (
-    assert_no_observations_with_same_iotid_in_first_page,
-    generate_oregon_tsv_url,
-    parse_oregon_tsv,
-)
-from userCode.ontology import get_or_generate_ontology
-from userCode.wrd.types import StationData
-from userCode.util import PACIFIC_TIME, from_oregon_datetime, to_oregon_datetime
-
+from dagster import DagsterInstance, RunConfig
 
 from test.lib import (
     assert_no_duplicate_at_given_time,
@@ -37,6 +24,19 @@ from test.lib import (
     wipe_observed_properties,
     wipe_things,
 )
+from userCode import definitions
+from userCode.env import API_BACKEND_URL
+from userCode.helper_classes import MockValues, get_datastream_time_range
+from userCode.ontology import get_or_generate_ontology
+from userCode.util import PACIFIC_TIME, from_oregon_datetime, to_oregon_datetime
+from userCode.wrd.dag import all_metadata, post_station, sta_station
+from userCode.wrd.lib import (
+    assert_no_observations_with_same_iotid_in_first_page,
+    generate_oregon_tsv_url,
+    parse_oregon_tsv,
+)
+from userCode.wrd.types import StationData
+
 from .lib_test import test_iow_hash_is_deterministic
 
 

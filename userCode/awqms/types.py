@@ -9,8 +9,8 @@
 # =================================================================
 
 import json
+
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class GmlPoint(BaseModel):
@@ -24,16 +24,16 @@ class ResultSummary(BaseModel):
 
 
 class StationData(BaseModel):
-    CountyName: Optional[str] = None
-    Huc8: Optional[str] = None
-    Huc12: Optional[str] = None
+    CountyName: str | None = None
+    Huc8: str | None = None
+    Huc12: str | None = None
     MonitoringLocationId: str
     MonitoringLocationName: str
     organization: str = Field(alias="OrganizationIdentifier")
-    StateCode: Optional[str] = None
+    StateCode: str | None = None
     MonitoringLocationType: str
-    WaterbodyName: Optional[str] = None
-    WatershedManagementUnit: Optional[str] = None
+    WaterbodyName: str | None = None
+    WatershedManagementUnit: str | None = None
     Geometry: GmlPoint
     Datastreams: list[ResultSummary] = []
 
