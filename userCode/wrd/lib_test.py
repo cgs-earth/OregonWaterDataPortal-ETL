@@ -9,16 +9,18 @@
 # =================================================================
 
 import datetime
-from hypothesis import given, strategies as st
+
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from test.lib import wipe_datastreams, wipe_locations, wipe_things
+from userCode.util import PACIFIC_TIME, deterministic_hash, from_oregon_datetime
 from userCode.wrd.lib import (
     assert_valid_oregon_date,
     download_oregon_tsv,
     parse_oregon_tsv,
 )
-from userCode.util import PACIFIC_TIME, from_oregon_datetime, deterministic_hash
 
 
 def test_download():
@@ -48,12 +50,10 @@ def test_parse_tsv():
     start_dt_utc = (
         from_oregon_datetime(start)
         .replace(tzinfo=PACIFIC_TIME)
-        .astimezone(datetime.timezone.utc)
+        .astimezone(datetime.UTC)
     )
     end_dt_utc = (
-        from_oregon_datetime(end)
-        .replace(tzinfo=PACIFIC_TIME)
-        .astimezone(datetime.timezone.utc)
+        from_oregon_datetime(end).replace(tzinfo=PACIFIC_TIME).astimezone(datetime.UTC)
     )
     first_date = datetime.datetime.fromisoformat(dates[0].replace("Z", "+00:00"))
     last_date = datetime.datetime.fromisoformat(dates[-1].replace("Z", "+00:00"))

@@ -8,8 +8,9 @@
 #
 # =================================================================
 
-import frost_sta_client as fsc
 from pathlib import Path
+
+import frost_sta_client as fsc
 import pytest
 
 from userCode.env import API_BACKEND_URL

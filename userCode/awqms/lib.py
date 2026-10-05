@@ -10,8 +10,9 @@
 
 import json
 import logging
-import requests
 from urllib.parse import urlencode
+
+import requests
 
 from userCode.cache import RedisCache
 from userCode.env import API_BACKEND_URL, AWQMS_URL

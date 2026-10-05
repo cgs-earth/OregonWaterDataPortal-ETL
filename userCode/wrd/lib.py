@@ -9,24 +9,23 @@
 # =================================================================
 
 import csv
-from dagster import get_dagster_logger
 import datetime
 import io
 import logging
-import requests
-from typing import Optional
 from urllib.parse import urlencode
 
+import requests
+from dagster import get_dagster_logger
 
 from userCode.cache import RedisCache
 from userCode.env import API_BACKEND_URL
+from userCode.util import PACIFIC_TIME
 from userCode.wrd.types import (
     BASE_OREGON_URL,
     POTENTIAL_DATASTREAMS,
     OregonHttpResponse,
     ParsedTSVData,
 )
-from userCode.util import PACIFIC_TIME
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +59,7 @@ def parse_oregon_tsv(
     # we just use the third column since the name of the dataset in the
     # url does not match the name in the result column. However,
     # it consistently is returned in the third column
-    data: list[Optional[float]] = []
+    data: list[float | None] = []
 
     # in python set is not ordered but a dict is
     # so we can essentially use it as a set and ignore the values
@@ -80,9 +79,7 @@ def parse_oregon_tsv(
         for row in reader:
             if len(row) < 3:
                 continue
-            _STATION_NUMBER_COLUMN = row[
-                0
-            ]  # here just for documentation purposes  # noqa: F841
+            _STATION_NUMBER_COLUMN = row[0]  # here just for documentation purposes
             DATE_COLUMN = row[1]
             RESULT_COLUMN = row[2]
             if not RESULT_COLUMN:
@@ -117,7 +114,7 @@ def tsv_date_response_to_datetime(date_str: str) -> datetime.datetime:
     return datetime.datetime.fromisoformat(date_str).replace(tzinfo=PACIFIC_TIME)
 
 
-def generate_phenomenon_time(dates: list[str]) -> Optional[str]:
+def generate_phenomenon_time(dates: list[str]) -> str | None:
     if len(dates) == 0:
         return None
     # generate the phenomenon time from the dates
@@ -138,7 +135,7 @@ def parse_pacific_time_date_and_return_utc(date_str: str) -> str:
                 # replace asserts that the time we are getting is in pacific time
                 .replace(tzinfo=PACIFIC_TIME)
                 # we then convert it to UTC
-                .astimezone(datetime.timezone.utc)
+                .astimezone(datetime.UTC)
                 .isoformat()
                 # and finally convert it to the standard utc iso format
                 # for some reason python doesnt do this automatically

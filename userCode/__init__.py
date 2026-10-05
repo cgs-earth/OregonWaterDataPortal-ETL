@@ -8,20 +8,20 @@
 #
 # =================================================================
 
+import dagster_slack
 from dagster import (
     DefaultSensorStatus,
     Definitions,
-    load_assets_from_modules,
     load_asset_checks_from_modules,
+    load_assets_from_modules,
 )
-import dagster_slack
 
-from userCode.env_test import slack_message_test
-import userCode.xlsx.dag as xlsx
-from userCode.util import get_env, slack_error_fn
 import userCode.awqms.dag as awqms
-import userCode.wrd.dag as wrd
 import userCode.groundwater.dag as groundwater
+import userCode.wrd.dag as wrd
+import userCode.xlsx.dag as xlsx
+from userCode.env_test import slack_message_test
+from userCode.util import get_env, slack_error_fn
 
 assets = load_assets_from_modules([awqms, wrd, groundwater, xlsx])
 asset_checks = load_asset_checks_from_modules([awqms, wrd, groundwater, xlsx])

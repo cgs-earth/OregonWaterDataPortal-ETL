@@ -9,9 +9,10 @@
 # =================================================================
 
 from dataclasses import dataclass
+from typing import TypedDict
+
 import frost_sta_client as fsc
 import geojson
-from typing import TypedDict, Union
 
 from userCode.env import API_BACKEND_URL
 
@@ -62,7 +63,7 @@ Data = TypedDict(
         "Associated Metadata Identifier": str,
         "Sample Timestamp": str,
         "Result Timestamp": str,
-        "Data Value": Union[float, int, str],
+        "Data Value": float | int | str,
         "Comments": str,
         "Data Quality": str,
     },

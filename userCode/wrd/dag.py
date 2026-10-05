@@ -10,8 +10,12 @@
 
 import asyncio
 import datetime
+
+import httpx
+import requests
 from dagster import (
     AssetCheckResult,
+    AssetExecutionContext,
     AssetSelection,
     DefaultScheduleStatus,
     RunRequest,
@@ -20,12 +24,8 @@ from dagster import (
     asset_check,
     define_asset_job,
     get_dagster_logger,
-    AssetExecutionContext,
     schedule,
 )
-import httpx
-import requests
-from typing import List, Optional, Tuple
 
 from userCode.env import (
     API_BACKEND_URL,
@@ -33,15 +33,22 @@ from userCode.env import (
 )
 from userCode.helper_classes import (
     BatchHelper,
+    MockValues,
     UTCTimeRange,
     get_datastream_time_range,
-    MockValues,
+)
+from userCode.types import Datastream, Observation
+from userCode.util import (
+    PACIFIC_TIME,
+    assert_utc_date_in_range,
+    now_as_oregon_datetime,
+    to_oregon_datetime,
 )
 from userCode.wrd.lib import (
+    assert_no_observations_with_same_iotid_in_first_page,
     fetch_station_metadata,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
-    assert_no_observations_with_same_iotid_in_first_page,
 )
 from userCode.wrd.sta_generation import (
     to_sensorthings_datastream,
@@ -56,17 +63,9 @@ from userCode.wrd.types import (
     ParsedTSVData,
     StationData,
 )
-from userCode.types import Datastream, Observation
-from userCode.util import (
-    PACIFIC_TIME,
-    assert_utc_date_in_range,
-    now_as_oregon_datetime,
-    to_oregon_datetime,
-)
-
 
 station_partition = StaticPartitionsDefinition([str(i) for i in ALL_RELEVANT_STATIONS])
-seen_obs: set[Tuple[str, str]] = set()
+seen_obs: set[tuple[str, str]] = set()
 
 
 @asset(group_name="wrd")
@@ -109,7 +108,7 @@ def station_metadata(
 ) -> StationData:
     """Get the timeseries data of datastreams in the API"""
     station_partition = context.partition_key
-    relevant_metadata: Optional[StationData] = None
+    relevant_metadata: StationData | None = None
     for station in all_metadata:
         if station.attributes.station_nbr == station_partition:
             relevant_metadata = station
@@ -165,7 +164,7 @@ def sta_all_observations(
     associatedGeometry = station_metadata.geometry
     attr: Attributes = station_metadata.attributes
 
-    async def fetch_obs(datastream: Datastream) -> List[Observation]:
+    async def fetch_obs(datastream: Datastream) -> list[Observation]:
         """Fetch observations for a single datastream and return them."""
         local_observations = []  # the observations array local to this function.
         range: UTCTimeRange = get_datastream_time_range(datastream.iotid)

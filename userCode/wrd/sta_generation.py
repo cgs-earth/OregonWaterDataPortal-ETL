@@ -8,16 +8,15 @@
 #
 # =================================================================
 
-from typing import Optional
 
 from userCode.ontology import get_or_generate_ontology
-from userCode.wrd.types import Attributes, StationData
 from userCode.types import Datastream, Observation
+from userCode.wrd.types import Attributes, StationData
 
 
 def to_sensorthings_observation(
     associatedDatastream: Datastream,
-    datapoint: Optional[float],
+    datapoint: float | None,
     resultTime: str,
     phenom_time: str,
     associatedGeometry: dict,

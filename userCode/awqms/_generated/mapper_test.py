@@ -1,14 +1,15 @@
-from typing import Tuple
 import json
 import os
+
+import pytest
+
 from userCode.awqms.lib import (
     fetch_station,
     get_datastream_unit,
 )
 from userCode.awqms.stations import ALL_RELEVANT_STATIONS
-from userCode.awqms.types import parse_monitoring_locations, StationData
+from userCode.awqms.types import StationData, parse_monitoring_locations
 from userCode.ontology import construct_ontology_mapping
-import pytest
 
 """
 All code in this file is for generating a static json file
@@ -56,7 +57,7 @@ def test_generate_mappings():
     assert len(station_responses) == len(ALL_RELEVANT_STATIONS)
 
     # map upstream name to mapped name and unit
-    datastream_mapper: dict[str, Tuple[str | None, str]] = {}
+    datastream_mapper: dict[str, tuple[str | None, str]] = {}
 
     for station in station_responses:
         thingid = station.MonitoringLocationId

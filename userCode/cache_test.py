@@ -1,5 +1,6 @@
-from userCode.cache import RedisCache
 import pytest
+
+from userCode.cache import RedisCache
 
 
 @pytest.mark.redis

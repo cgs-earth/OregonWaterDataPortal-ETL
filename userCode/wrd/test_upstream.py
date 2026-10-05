@@ -8,24 +8,24 @@
 #
 # =================================================================
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 import pytest
 import requests
 
-
+from userCode.util import (
+    PACIFIC_TIME,
+    assert_utc_date_in_range,
+    from_oregon_datetime,
+    now_as_oregon_datetime,
+    to_oregon_datetime,
+)
 from userCode.wrd.lib import (
     download_oregon_tsv,
     generate_oregon_tsv_url,
     parse_oregon_tsv,
 )
 from userCode.wrd.types import START_OF_DATA
-from userCode.util import (
-    PACIFIC_TIME,
-    assert_utc_date_in_range,
-    now_as_oregon_datetime,
-    from_oregon_datetime,
-    to_oregon_datetime,
-)
 
 
 @pytest.mark.upstream
@@ -192,12 +192,8 @@ def test_timezone_behavior():
     for date in result.dates:
         assert_utc_date_in_range(
             date,
-            from_oregon_datetime(begin)
-            .replace(tzinfo=PACIFIC_TIME)
-            .astimezone(timezone.utc),
-            from_oregon_datetime(end)
-            .replace(tzinfo=PACIFIC_TIME)
-            .astimezone(timezone.utc),
+            from_oregon_datetime(begin).replace(tzinfo=PACIFIC_TIME).astimezone(UTC),
+            from_oregon_datetime(end).replace(tzinfo=PACIFIC_TIME).astimezone(UTC),
         )
 
 

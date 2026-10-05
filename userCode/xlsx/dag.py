@@ -1,3 +1,7 @@
+from typing import Final
+
+import frost_sta_client as fsc
+import requests
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -7,14 +11,11 @@ from dagster import (
     get_dagster_logger,
     schedule,
 )
-from typing import Final
-
 from pydantic import BaseModel
-import requests
+
 from userCode.env import API_BACKEND_URL, RUNNING_AS_TEST_OR_DEV
 from userCode.util import now_as_oregon_datetime
 from userCode.xlsx.lib import parse_xlsx_from_bytes
-import frost_sta_client as fsc
 
 # xlsx files are uploaded here: https://www.oregonwaterdata.org/pages/uploaddata
 ESRI_FS_XLSX_ENDPOINT: Final = "https://services.arcgis.com/uUvqNMGPm7axC2dD/ArcGIS/rest/services/survey123_753e0778292145b2bd2d63ac2f57226d_results/FeatureServer/1/queryAttachments?objectIds=1&globalIds=&definitionExpression=&attachmentsDefinitionExpression=&attachmentTypes=&size=&keywords=&resultOffset=&resultRecordCount=&orderByFields=&returnUrl=false&returnCountOnly=false&returnDistinctKeywords=false&cacheHint=false&f=pjson&token="

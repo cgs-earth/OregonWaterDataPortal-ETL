@@ -8,9 +8,10 @@
 #
 # =================================================================
 
-from typing import Literal, Optional, TypedDict
-from pydantic import BaseModel, Field
 from dataclasses import dataclass
+from typing import Literal, TypedDict
+
+from pydantic import BaseModel, Field
 
 BASE_OREGON_URL: str = "https://gis.wrd.state.or.us/server/rest/services/dynamic/Gaging_Stations_WGS84/FeatureServer/2/query?"
 
@@ -178,52 +179,52 @@ class Attributes(BaseModel):
     station_nbr: str
     station_name: str
     station_status: str
-    streamflow_type: Optional[str]
+    streamflow_type: str | None
     source_type: str
-    streamcode: Optional[str]
+    streamcode: str | None
     longitude_dec: float
     latitude_dec: float
     county_name: str
     state_name: str
     owrd_region: str
     wm_district: int
-    hydrologic_unit_code: Optional[int]
-    meridian: Optional[str]
-    township: Optional[int]
-    township_char: Optional[str]
-    range: Optional[float]
-    range_char: Optional[str]
-    sctn: Optional[int]
-    qtr160: Optional[str]
-    qtr40: Optional[str]
-    elevation: Optional[int]
-    elevation_datum: Optional[float]
-    current_operation_mode: Optional[str]
+    hydrologic_unit_code: int | None
+    meridian: str | None
+    township: int | None
+    township_char: str | None
+    range: float | None
+    range_char: str | None
+    sctn: int | None
+    qtr160: str | None
+    qtr40: str | None
+    elevation: int | None
+    elevation_datum: float | None
+    current_operation_mode: str | None
 
     # owdr outputs most_recent_operator
     # however, we want to have a string for organization for the UI
     # so we use an alias to map most_recent_operator to organization.
     # When we dump the Attributes class, it will use the 'organization' alias
     organization: str = Field(alias="most_recent_operator")
-    cooperators: Optional[str]
-    published_area: Optional[float]
-    owrd_area: Optional[float]
+    cooperators: str | None
+    published_area: float | None
+    owrd_area: float | None
     ws_characteristic: int
-    flood_region: Optional[int]
+    flood_region: int | None
     basin_name: str
-    streamflow_type_name: Optional[str]
+    streamflow_type_name: str | None
     source_type_name: str
     station_status_name: str
-    current_operation_mode_name: Optional[str]
+    current_operation_mode_name: str | None
 
     # period of record is as a unix time delta and thus is a int
-    period_of_record_start_date: Optional[int]
-    period_of_record_end_date: Optional[int]
+    period_of_record_start_date: int | None
+    period_of_record_end_date: int | None
 
     nbr_of_complete_water_years: int
     nbr_of_peak_flow_values: int
-    peak_flow_record_start_wy: Optional[int]
-    peak_flow_record_end_wy: Optional[int]
+    peak_flow_record_start_wy: int | None
+    peak_flow_record_end_wy: int | None
     near_real_time_web_link: str
     near_real_time_processing: int
     daily_processing: int
@@ -264,7 +265,7 @@ class Period(BaseModel, extra="forbid"):
     StartTime: str
     SuppressData: bool
     ReferenceValue: float
-    ReferenceValueToTriggerDisplay: Optional[float]
+    ReferenceValueToTriggerDisplay: float | None
 
 
 class Threshold(BaseModel):
@@ -282,7 +283,7 @@ class OregonHttpResponse(BaseModel):
 
 @dataclass
 class ParsedTSVData:
-    data: list[Optional[float]]
+    data: list[float | None]
     units: str
     dates: list[str]
 
