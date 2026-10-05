@@ -10,14 +10,16 @@
 
 import json
 import os
-from pathlib import Path
 import pickle
-from typing import Final, Sequence
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Final
+
 from dagster import get_dagster_logger
 from pydantic import BaseModel, Field
 
-from userCode.cache import RedisCache
 from userCode.awqms._generated.schema import ResourceURI
+from userCode.cache import RedisCache
 from userCode.util import deterministic_hash
 
 

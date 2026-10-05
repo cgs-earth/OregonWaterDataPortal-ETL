@@ -9,17 +9,16 @@
 #
 # =================================================================
 
-from datetime import timedelta
 import json
 import os
-from dagster import get_dagster_logger
+from datetime import timedelta
+
 import redis
 import requests
-from typing import Optional, Tuple
+from dagster import get_dagster_logger
 
 from userCode.env import RUNNING_AS_TEST_OR_DEV
 from userCode.util import deterministic_hash
-
 
 HEADERS = {"accept": "application/vnd.api+json"}
 
@@ -35,7 +34,7 @@ class RedisCache:
     def __init__(self):
         self.db = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=False)
 
-    def set(self, url: str, content: bytes, _ttl: Optional[timedelta] = None):
+    def set(self, url: str, content: bytes, _ttl: timedelta | None = None):
         try:
             key = self.hash_url(url)
             if _ttl:
@@ -50,7 +49,7 @@ class RedisCache:
         url: str,
         force_fetch: bool,
         cache_result: bool = RUNNING_AS_TEST_OR_DEV(),
-    ) -> Tuple[bytes, int]:
+    ) -> tuple[bytes, int]:
         if not cache_result:
             response = requests.get(url, headers=HEADERS, timeout=300)
             return response.content, response.status_code

@@ -1,7 +1,8 @@
+import datetime
 import json
 import logging
 import os
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 from dagster import get_dagster_logger
@@ -12,7 +13,6 @@ from userCode.cache import RedisCache
 from userCode.groundwater.lib import generate_circle_polygon
 from userCode.types import Datastream, Observation
 from userCode.util import PACIFIC_TIME, deterministic_hash
-import datetime
 
 
 class WellField(BaseModel):
@@ -39,16 +39,16 @@ class WellAttributes(BaseModel):
     # this value is in feet; if a value from the Oregon
     # water system is not specific, it is likely to be
     # feet, not meters according to email correspondence
-    est_horizontal_error: Optional[float] = None
+    est_horizontal_error: float | None = None
 
 
 # All the properties contained on the API response which returns
 # the relevant measurement data for a well
 class TimeseriesProperties(BaseModel):
     gw_logid: str
-    land_surface_elevation: Optional[float] = None
-    waterlevel_ft_above_mean_sea_level: Optional[float] = None
-    waterlevel_ft_below_land_surface: Optional[float] = None
+    land_surface_elevation: float | None = None
+    waterlevel_ft_above_mean_sea_level: float | None = None
+    waterlevel_ft_below_land_surface: float | None = None
     method_of_water_level_measurement: str
     reviewed_status_desc: str
     measured_date: str
@@ -56,17 +56,17 @@ class TimeseriesProperties(BaseModel):
     measured_datetime: str
     measurement_source_organization: str
     measurement_source_owrd: str
-    measurement_source_owrd_region: Optional[str] = None
+    measurement_source_owrd_region: str | None = None
     measurement_method: str
     measurement_status_desc: str
-    airline_length: Optional[float] = None
-    gage_pressure: Optional[float] = None
-    tape_hold: Optional[float] = None
-    tape_missing: Optional[float] = None
-    tape_cut: Optional[float] = None
-    tape_stretch_correction: Optional[float] = None
-    measuring_point_height: Optional[float] = None
-    waterlevel_accuracy: Optional[float] = None
+    airline_length: float | None = None
+    gage_pressure: float | None = None
+    tape_hold: float | None = None
+    tape_missing: float | None = None
+    tape_cut: float | None = None
+    tape_stretch_correction: float | None = None
+    measuring_point_height: float | None = None
+    waterlevel_accuracy: float | None = None
 
 
 class WellFeature(BaseModel):
@@ -131,7 +131,7 @@ class WellFeature(BaseModel):
             asPacific = (
                 datetime.datetime.fromisoformat(item.measured_datetime)
                 .replace(tzinfo=PACIFIC_TIME)
-                .astimezone(datetime.timezone.utc)
+                .astimezone(datetime.UTC)
             )
 
             if not self.attributes.est_horizontal_error:
@@ -328,7 +328,7 @@ def fetch_wells():
 
         required_request_total = count // MAX_RECORDS_PER_REQUEST + 1
 
-        for i in range(0, required_request_total):
+        for i in range(required_request_total):
             params["resultOffset"] = i * MAX_RECORDS_PER_REQUEST
             params["returnCountOnly"] = False
             encoded_params = urlencode(params)

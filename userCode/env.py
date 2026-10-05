@@ -9,9 +9,11 @@
 #
 # =================================================================
 
-from dagster import get_dagster_logger
-from userCode.util import get_env
 import os
+
+from dagster import get_dagster_logger
+
+from userCode.util import get_env
 
 API_BACKEND_URL = get_env("API_BACKEND_URL")
 AWQMS_URL = "https://ordeq.gselements.com/api"

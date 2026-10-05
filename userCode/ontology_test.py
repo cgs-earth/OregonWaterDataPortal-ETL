@@ -10,8 +10,8 @@
 
 from userCode.ontology import (
     construct_ontology_mapping,
-    get_or_generate_ontology,
     get_ontology,
+    get_or_generate_ontology,
 )
 
 

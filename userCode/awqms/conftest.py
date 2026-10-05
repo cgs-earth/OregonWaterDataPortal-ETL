@@ -9,9 +9,10 @@
 # =================================================================
 
 from datetime import datetime
+
 import pytest
 
-from userCode.awqms.types import StationData, GmlPoint, ResultSummary
+from userCode.awqms.types import GmlPoint, ResultSummary, StationData
 from userCode.types import Datastream, Observation
 
 

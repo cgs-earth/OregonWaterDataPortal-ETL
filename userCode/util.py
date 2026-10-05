@@ -10,10 +10,11 @@
 # =================================================================
 
 import datetime
-from dagster import RunFailureSensorContext, get_dagster_logger
 import hashlib
 import os
 from zoneinfo import ZoneInfo
+
+from dagster import RunFailureSensorContext, get_dagster_logger
 
 PACIFIC_TIME = ZoneInfo("America/Los_Angeles")
 
@@ -54,9 +55,9 @@ def assert_utc_date_in_range(
 ):
     isoDate = datetime.datetime.fromisoformat(date)
     assert (
-        isoDate.tzinfo == datetime.timezone.utc
-        and start.tzinfo == datetime.timezone.utc
-        and end.tzinfo == datetime.timezone.utc
+        isoDate.tzinfo == datetime.UTC
+        and start.tzinfo == datetime.UTC
+        and end.tzinfo == datetime.UTC
     ), "Dates should be in UTC"
     assert isoDate >= start and isoDate <= end, (
         f"{isoDate} is not in range {start} - {end}"
